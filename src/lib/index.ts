@@ -1,0 +1,1 @@
+export { generateShortId } from './shortid'

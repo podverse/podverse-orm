@@ -1,0 +1,8 @@
+{
+  "ignore": ["node_modules/*"],
+  "watch": ["src/"],
+  "ext": "ts",
+  "env": {
+    "NODE_ENV": "development"
+  }
+}
