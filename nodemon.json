@@ -1,6 +1,9 @@
 {
-  "ignore": ["node_modules/*"],
-  "watch": ["src/"],
+  "watch": [
+    "src",
+    "node_modules/podverse-parser",
+    "node_modules/podverse-shared"
+  ],
   "ext": "ts",
   "env": {
     "NODE_ENV": "development"

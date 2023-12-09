@@ -1,25 +1,23 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { IsUrl } from 'class-validator'
-import { Podcast } from './entities'
 import {
   BeforeInsert,
+  BeforeUpdate,
   Column,
   CreateDateColumn,
   Entity,
   Generated,
   Index,
-  ManyToOne,
+  ManyToMany,
   PrimaryColumn,
-  Unique,
   UpdateDateColumn
 } from 'typeorm'
+import { Podcast } from './entities'
+import { convertToSlug } from './lib/utility'
 import { generateShortId } from './lib/utility'
 
-@Entity('feedUrls')
-@Unique('index_feedUrlId_isAuthority', ['id', 'isAuthority'])
-@Unique('feedUrl_index_podcastId_isAuthority', ['podcast', 'isAuthority'])
-export class FeedUrl {
+@Entity('authors')
+export class Author {
   @PrimaryColumn('varchar', {
     default: generateShortId(),
     length: 14
@@ -31,24 +29,29 @@ export class FeedUrl {
   @Generated('increment')
   int_id: number
 
-  @Column({ default: null, nullable: true })
-  isAuthority: boolean
+  @Index()
+  @Column()
+  name: string
 
   @Index()
-  @IsUrl()
   @Column({ unique: true })
-  url: string
+  slug: string
 
-  @ManyToOne((type) => Podcast, (podcast) => podcast.feedUrls, {
-    onDelete: 'CASCADE'
-  })
-  podcast: Podcast
+  @ManyToMany((type) => Podcast, (podcast) => podcast.authors)
+  podcasts: Podcast[]
 
   @CreateDateColumn()
   createdAt: Date
 
   @UpdateDateColumn()
   updatedAt: Date
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  beforeAll() {
+    this.name = this.name.trim()
+    this.slug = convertToSlug(this.name)
+  }
 
   @BeforeInsert()
   beforeInsert() {
