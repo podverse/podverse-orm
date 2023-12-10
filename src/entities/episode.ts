@@ -10,16 +10,6 @@ import {
   ValueTagOriginal
 } from 'podverse-shared'
 import {
-  Author,
-  Category,
-  LiveItem,
-  MediaRef,
-  Podcast,
-  UserHistoryItem,
-  UserNowPlayingItem,
-  UserQueueItem
-} from './entities'
-import {
   BeforeInsert,
   BeforeUpdate,
   Column,
@@ -34,7 +24,17 @@ import {
   PrimaryColumn,
   UpdateDateColumn
 } from 'typeorm'
-import { generateShortId } from './lib/utility'
+import {
+  Author,
+  Category,
+  LiveItem,
+  MediaRef,
+  Podcast,
+  UserHistoryItem,
+  UserNowPlayingItem,
+  UserQueueItem
+} from './'
+import { generateShortId } from '../lib/shortid'
 
 @Entity('episodes')
 @Index(['isPublic', 'pubDate'])

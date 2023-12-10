@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import {
   BeforeInsert,
   BeforeUpdate,
@@ -12,9 +10,9 @@ import {
   PrimaryColumn,
   UpdateDateColumn
 } from 'typeorm'
-import { Podcast } from './entities'
-import { convertToSlug } from './lib/utility'
-import { generateShortId } from './lib/utility'
+import { Podcast } from './'
+import { convertToSlug } from '../lib/misc'
+import { generateShortId } from '../lib/shortid'
 
 @Entity('authors')
 export class Author {
@@ -37,7 +35,7 @@ export class Author {
   @Column({ unique: true })
   slug: string
 
-  @ManyToMany((type) => Podcast, (podcast) => podcast.authors)
+  @ManyToMany(() => Podcast, (podcast) => podcast.authors)
   podcasts: Podcast[]
 
   @CreateDateColumn()

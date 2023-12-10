@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { IsEmail, IsUUID, Validate, ValidateIf } from 'class-validator'
 import { NowPlayingItem } from 'podverse-shared'
 import {
@@ -17,21 +15,21 @@ import {
   UpdateDateColumn
 } from 'typeorm'
 import {
+  AppStorePurchase,
   BitPayInvoice,
   FCMDevice,
+  GooglePlayPurchase,
   MediaRef,
   Notification,
   PayPalOrder,
   Playlist,
   UPDevice,
   UserHistoryItem,
+  UserNowPlayingItem,
   UserQueueItem
-} from './entities'
-import { ValidatePassword } from './entities/validation/password'
-import { AppStorePurchase } from './appStorePurchase'
-import { GooglePlayPurchase } from './googlePlayPurchase'
-import { UserNowPlayingItem } from './userNowPlayingItem'
-import { generateShortId } from './lib/utility'
+} from './'
+import { generateShortId } from '../lib/shortid'
+import { ValidatePassword } from './validation/password'
 
 @Entity('users')
 export class User {
@@ -161,41 +159,41 @@ export class User {
   @Column('simple-json', { select: false })
   queueItems: NowPlayingItem[]
 
-  @OneToMany((type) => AppStorePurchase, (appStorePurchase) => appStorePurchase.owner)
+  @OneToMany(() => AppStorePurchase, (appStorePurchase) => appStorePurchase.owner)
   appStorePurchases: AppStorePurchase[]
 
-  @OneToMany((type) => BitPayInvoice, (bitpayInvoice) => bitpayInvoice.owner)
+  @OneToMany(() => BitPayInvoice, (bitpayInvoice) => bitpayInvoice.owner)
   bitpayInvoices: BitPayInvoice[]
 
-  @OneToMany((type) => FCMDevice, (fcmDevice) => fcmDevice.user)
+  @OneToMany(() => FCMDevice, (fcmDevice) => fcmDevice.user)
   fcmDevices: FCMDevice[]
 
-  @OneToMany((type) => GooglePlayPurchase, (googlePlayPurchase) => googlePlayPurchase.owner)
+  @OneToMany(() => GooglePlayPurchase, (googlePlayPurchase) => googlePlayPurchase.owner)
   googlePlayPurchases: GooglePlayPurchase[]
 
-  @OneToMany((type) => MediaRef, (mediaRefs) => mediaRefs.owner)
+  @OneToMany(() => MediaRef, (mediaRefs) => mediaRefs.owner)
   mediaRefs: MediaRef[]
 
-  @OneToMany((type) => Notification, (notification) => notification.user)
+  @OneToMany(() => Notification, (notification) => notification.user)
   notifications: Notification[]
 
-  @OneToMany((type) => PayPalOrder, (paypalOrder) => paypalOrder.owner)
+  @OneToMany(() => PayPalOrder, (paypalOrder) => paypalOrder.owner)
   paypalOrders: PayPalOrder[]
 
-  @OneToMany((type) => Playlist, (playlist) => playlist.owner)
+  @OneToMany(() => Playlist, (playlist) => playlist.owner)
   playlists: Playlist[]
 
-  @OneToMany((type) => UPDevice, (upDevice) => upDevice.user)
+  @OneToMany(() => UPDevice, (upDevice) => upDevice.user)
   upDevices: UPDevice[]
 
-  @OneToMany((type) => UserHistoryItem, (userHistoryItem) => userHistoryItem.owner)
+  @OneToMany(() => UserHistoryItem, (userHistoryItem) => userHistoryItem.owner)
   userHistoryItems: UserHistoryItem[]
 
-  @OneToOne((type) => UserNowPlayingItem, (userNowPlayingItem) => userNowPlayingItem.owner)
+  @OneToOne(() => UserNowPlayingItem, (userNowPlayingItem) => userNowPlayingItem.owner)
   @JoinColumn()
   userNowPlayingItem: UserNowPlayingItem
 
-  @OneToMany((type) => UserQueueItem, (userQueueItem) => userQueueItem.owner)
+  @OneToMany(() => UserQueueItem, (userQueueItem) => userQueueItem.owner)
   userQueueItems: UserQueueItem[]
 
   @CreateDateColumn({ select: false })

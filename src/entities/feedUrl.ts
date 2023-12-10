@@ -1,7 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { IsUrl } from 'class-validator'
-import { Podcast } from './entities'
 import {
   BeforeInsert,
   Column,
@@ -14,7 +11,8 @@ import {
   Unique,
   UpdateDateColumn
 } from 'typeorm'
-import { generateShortId } from './lib/utility'
+import { Podcast } from './'
+import { generateShortId } from '../lib/shortid'
 
 @Entity('feedUrls')
 @Unique('index_feedUrlId_isAuthority', ['id', 'isAuthority'])
@@ -39,7 +37,7 @@ export class FeedUrl {
   @Column({ unique: true })
   url: string
 
-  @ManyToOne((type) => Podcast, (podcast) => podcast.feedUrls, {
+  @ManyToOne(() => Podcast, (podcast) => podcast.feedUrls, {
     onDelete: 'CASCADE'
   })
   podcast: Podcast

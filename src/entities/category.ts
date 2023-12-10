@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import {
   BeforeInsert,
   BeforeUpdate,
@@ -14,8 +12,8 @@ import {
   PrimaryColumn,
   UpdateDateColumn
 } from 'typeorm'
-import { Podcast } from './entities'
-import { generateShortId } from './lib/utility'
+import { Podcast } from './'
+import { generateShortId } from '../lib/shortid'
 
 @Entity('categories')
 export class Category {
@@ -42,13 +40,13 @@ export class Category {
   @Column({ unique: true })
   title: string
 
-  @ManyToOne((type) => Category, (category) => category.categories, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Category, (category) => category.categories, { onDelete: 'CASCADE' })
   category: Category
 
-  @OneToMany((type) => Category, (category) => category.category)
+  @OneToMany(() => Category, (category) => category.category)
   categories: Category[]
 
-  @ManyToMany((type) => Podcast, (podcast) => podcast.categories)
+  @ManyToMany(() => Podcast, (podcast) => podcast.categories)
   podcasts: Podcast[]
 
   @CreateDateColumn()

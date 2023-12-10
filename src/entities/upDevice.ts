@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryColumn, UpdateDateColumn } from 'typeorm'
-import { User } from './entities'
+import { User } from './'
 
 export interface UPEndpointData {
   upEndpoint: string
@@ -22,7 +20,7 @@ export class UPDevice {
   @Column()
   upAuthKey: string
 
-  @ManyToOne((type) => User, (user) => user.upDevices, {
+  @ManyToOne(() => User, (user) => user.upDevices, {
     nullable: false,
     onDelete: 'CASCADE'
   })

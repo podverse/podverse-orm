@@ -1,8 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { IsInt, Min } from 'class-validator'
 import { Column, CreateDateColumn, Entity, Index, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
-import { Episode, MediaRef, User } from './entities'
+import { Episode, MediaRef, User } from './'
 
 @Entity('userQueueItems')
 export class UserQueueItem {
@@ -14,20 +12,20 @@ export class UserQueueItem {
   @Column({ default: 0 })
   queuePosition: number
 
-  @ManyToOne((type) => Episode, (episode) => episode.userQueueItems, {
+  @ManyToOne(() => Episode, (episode) => episode.userQueueItems, {
     nullable: true,
     onDelete: 'CASCADE'
   })
   episode: Episode
 
-  @ManyToOne((type) => MediaRef, (mediaRef) => mediaRef.userQueueItems, {
+  @ManyToOne(() => MediaRef, (mediaRef) => mediaRef.userQueueItems, {
     nullable: true,
     onDelete: 'CASCADE'
   })
   mediaRef: MediaRef
 
   @Index()
-  @ManyToOne((type) => User, (user) => user.userQueueItems, {
+  @ManyToOne(() => User, (user) => user.userQueueItems, {
     nullable: false,
     onDelete: 'CASCADE'
   })

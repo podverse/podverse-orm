@@ -1,12 +1,13 @@
+import createError from 'http-errors'
+import SqlString from 'sqlstring'
 import { getConnection, getRepository } from 'typeorm'
 import { config } from '../config'
 import { MediaRef, MediaRefVideos } from '../entities'
-import { validateClassOrThrow } from './lib/errors'
-import { addOrderByToQuery, getManticoreOrderByColumnName, removeAllSpaces } from '../lib/utility'
-import { validateSearchQueryString } from './lib/utility/validation'
-import { manticoreWildcardSpecialCharacters, searchApi } from './services/manticore'
-const createError = require('http-errors')
-const SqlString = require('sqlstring')
+import { validateClassOrThrow } from '../lib/errors'
+import { getManticoreOrderByColumnName, manticoreWildcardSpecialCharacters, searchApi } from '../lib/manticore'
+import { addOrderByToQuery, removeAllSpaces } from '../lib/misc'
+import { validateSearchQueryString } from '../lib/validation'
+
 const { superUserId } = config
 
 const relations = [

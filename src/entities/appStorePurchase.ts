@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryColumn, UpdateDateColumn } from 'typeorm'
-import { User } from './entities'
+import { User } from './'
 
 // https://developer.apple.com/library/archive/releasenotes/General/ValidateAppStoreReceipt/Chapters/ValidateRemotely.html
 
@@ -77,7 +75,7 @@ export class AppStorePurchase {
 
   // END: Apple Developer responseBody.Receipt.In_app based fields
 
-  @ManyToOne((type) => User, (user) => user.appStorePurchases, {
+  @ManyToOne(() => User, (user) => user.appStorePurchases, {
     nullable: false,
     onDelete: 'CASCADE'
   })

@@ -1,17 +1,17 @@
+import createError from 'http-errors'
+import SqlString from 'sqlstring'
 import { getConnection, getRepository } from 'typeorm'
+import { v5 as uuidv5, NIL as uuidNIL } from 'uuid'
 import { config } from '../config'
 import { Episode, EpisodeMostRecent, MediaRef, Podcast } from '../entities'
-import { request } from './lib/request'
-import { addOrderByToQuery, getManticoreOrderByColumnName, removeAllSpaces } from '../lib/utility'
-import { validateSearchQueryString } from './lib/utility/validation'
-import { manticoreWildcardSpecialCharacters, searchApi } from './services/manticore'
+import { getManticoreOrderByColumnName, manticoreWildcardSpecialCharacters, searchApi } from '../lib/manticore'
+import { addOrderByToQuery, removeAllSpaces } from '../lib/misc'
+import { request } from '../lib/request'
+import { validateSearchQueryString } from '../lib/validation'
 import { liveItemStatuses } from './liveItem'
 import { createMediaRef, updateMediaRef } from './mediaRef'
 import { getPodcast, getPodcastByPodcastGuid } from './podcast'
 import { getLightningKeysendValueItem } from 'podverse-shared'
-const createError = require('http-errors')
-const SqlString = require('sqlstring')
-import { v5 as uuidv5, NIL as uuidNIL } from 'uuid'
 
 const { superUserId } = config
 

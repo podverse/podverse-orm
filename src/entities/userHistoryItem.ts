@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { IsInt, Min } from 'class-validator'
 import {
   Column,
@@ -11,7 +9,7 @@ import {
   Unique,
   UpdateDateColumn
 } from 'typeorm'
-import { Episode, MediaRef, User } from './entities'
+import { Episode, MediaRef, User } from './'
 
 @Entity('userHistoryItems')
 @Unique('index_episode_owner', ['episode', 'owner'])
@@ -36,20 +34,20 @@ export class UserHistoryItem {
   @Column({ default: 0 })
   userPlaybackPosition: number
 
-  @ManyToOne((type) => Episode, (episode) => episode.userHistoryItems, {
+  @ManyToOne(() => Episode, (episode) => episode.userHistoryItems, {
     nullable: true,
     onDelete: 'CASCADE'
   })
   episode: Episode
 
-  @ManyToOne((type) => MediaRef, (mediaRef) => mediaRef.userHistoryItems, {
+  @ManyToOne(() => MediaRef, (mediaRef) => mediaRef.userHistoryItems, {
     nullable: true,
     onDelete: 'CASCADE'
   })
   mediaRef: MediaRef
 
   @Index()
-  @ManyToOne((type) => User, (user) => user.userHistoryItems, {
+  @ManyToOne(() => User, (user) => user.userHistoryItems, {
     nullable: false,
     onDelete: 'CASCADE'
   })

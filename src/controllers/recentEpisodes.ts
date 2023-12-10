@@ -72,7 +72,7 @@ const updateRecentEpisodesTables = async () => {
 }
 
 const generateByCategoryQueryPromise = (em, i) => {
-  return new Promise(async (resolve) => {
+  return new Promise<void>(async (resolve) => {
     await em.query(`
       CREATE TABLE "recentEpisodesByCategoryTemp${i}" (
         LIKE "recentEpisodesByCategory" EXCLUDING ALL
@@ -96,7 +96,7 @@ const generateByCategoryQueryPromise = (em, i) => {
 }
 
 const generateByPodcastQueryPromise = (em, i) => {
-  return new Promise(async (resolve) => {
+  return new Promise<void>(async (resolve) => {
     await em.query(`
       CREATE TABLE "recentEpisodesByPodcastTemp${i}" (
         LIKE "recentEpisodesByPodcast" EXCLUDING ALL

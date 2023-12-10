@@ -1,7 +1,7 @@
+import createError from 'http-errors'
 import { getRepository } from 'typeorm'
-import { cleanUserItemResult, cleanUserItemResults, generateGetUserItemsQuery } from './controllers/userHistoryItem'
+import { cleanUserItemResult, cleanUserItemResults, generateGetUserItemsQuery } from './userHistoryItem'
 import { UserQueueItem } from '../entities'
-const createError = require('http-errors')
 
 export const getUserQueueItems = async (loggedInUserId, useGetMany) => {
   const limit = 500

@@ -1,14 +1,14 @@
+import createError from 'http-errors'
+import { parseFeedUrlsByPodcastIds } from 'podverse-parser'
+import SqlString from 'sqlstring'
 import { getRepository, In } from 'typeorm'
-import { config } from '../config'
-import { getUserSubscribedPodcastIds } from './user'
-import { FeedUrl, Podcast, User } from '../entities'
-import { addOrderByToQuery, getManticoreOrderByColumnName, removeAllSpaces } from '../lib/misc'
-import { validateSearchQueryString } from '../lib/validation'
-import { manticoreWildcardSpecialCharacters, searchApi } from '../lib/manticore'
 import { deleteNotification } from './notification'
-import { parseFeedUrlsByPodcastIds } from './services/parser'
-const createError = require('http-errors')
-const SqlString = require('sqlstring')
+import { getUserSubscribedPodcastIds } from './user'
+import { config } from '../config'
+import { FeedUrl, Podcast, User } from '../entities'
+import { getManticoreOrderByColumnName, manticoreWildcardSpecialCharacters, searchApi } from '../lib/manticore'
+import { addOrderByToQuery, removeAllSpaces } from '../lib/misc'
+import { validateSearchQueryString } from '../lib/validation'
 
 const getPodcast = async (id, includeRelations = true, allowNonPublic?: boolean) => {
   const repository = getRepository(Podcast)

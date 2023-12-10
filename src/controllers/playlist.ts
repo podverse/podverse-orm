@@ -1,11 +1,11 @@
-import { getRepository } from 'typeorm'
-import { Playlist, User } from '../entities'
-import { validateClassOrThrow } from './lib/errors'
-import { getUserSubscribedPlaylistIds } from './user'
-import { getMediaRef } from './mediaRef'
-import { getEpisode } from './episode'
+import createError from 'http-errors'
 import { combineAndSortPlaylistItems } from 'podverse-shared'
-const createError = require('http-errors')
+import { getRepository } from 'typeorm'
+import { getEpisode } from './episode'
+import { getMediaRef } from './mediaRef'
+import { getUserSubscribedPlaylistIds } from './user'
+import { Playlist, User } from '../entities'
+import { validateClassOrThrow } from '../lib/errors'
 
 // medium = podcast are always be put in the general "mixed" category for playlists
 const getPlaylistMedium = (medium) => {

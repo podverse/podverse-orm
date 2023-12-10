@@ -1,8 +1,8 @@
+import createError from 'http-errors'
 import { getRepository, In } from 'typeorm'
 import { FeedUrl } from '../entities'
-import { validateClassOrThrow } from './lib/errors'
-import { removeProtocol } from '../lib/utility'
-const createError = require('http-errors')
+import { validateClassOrThrow } from '../lib/errors'
+import { removeProtocol } from '../lib/misc'
 
 const relations = ['podcast']
 

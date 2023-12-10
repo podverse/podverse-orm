@@ -1,15 +1,13 @@
 import { hash } from 'bcryptjs'
+import createError from 'http-errors'
 import { getRepository } from 'typeorm'
-import { getFeedUrlByUrlIgnoreProtocolForPublicPodcast } from './controllers/feedUrl'
-import { getPlaylists } from './controllers/playlist'
-import { subscribeToPodcast } from './controllers/podcast'
+import { getFeedUrlByUrlIgnoreProtocolForPublicPodcast } from './feedUrl'
+import { getPlaylists } from './playlist'
+import { subscribeToPodcast } from './podcast'
 import { MediaRef, Playlist, User, UserHistoryItem, UserNowPlayingItem, UserQueueItem } from '../entities'
-import { saltRounds } from './lib/constants'
-import { validateClassOrThrow } from './lib/errors'
-import { addOrderByToQuery, validatePassword } from '../lib/utility'
-import { validateEmail } from './lib/utility/validation'
-
-const createError = require('http-errors')
+import { validateClassOrThrow } from '../lib/errors'
+import { addOrderByToQuery, saltRounds } from '../lib/misc'
+import { validateEmail, validatePassword } from '../lib/validation'
 
 const addYearsToUserMembershipExpiration = async (id: string, years: number) => {
   const user = await getUser(id)

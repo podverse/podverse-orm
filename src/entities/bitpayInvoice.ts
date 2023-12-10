@@ -1,8 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { IsUrl, IsUUID } from 'class-validator'
 import { Column, CreateDateColumn, Entity, Index, ManyToOne, PrimaryColumn, UpdateDateColumn } from 'typeorm'
-import { User } from './entities'
+import { User } from './'
 
 @Entity('bitpayInvoices')
 export class BitPayInvoice {
@@ -46,7 +44,7 @@ export class BitPayInvoice {
   @Column()
   url: string
 
-  @ManyToOne((type) => User, (user) => user.bitpayInvoices, {
+  @ManyToOne(() => User, (user) => user.bitpayInvoices, {
     nullable: false,
     onDelete: 'CASCADE'
   })

@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { IsInt, IsUrl, Min, ValidateIf } from 'class-validator'
 import {
   BeforeInsert,
@@ -17,8 +15,8 @@ import {
   Unique,
   UpdateDateColumn
 } from 'typeorm'
-import { Author, Category, Episode, User, UserHistoryItem, UserNowPlayingItem, UserQueueItem } from './entities'
-import { generateShortId } from './lib/utility'
+import { Author, Category, Episode, User, UserHistoryItem, UserNowPlayingItem, UserQueueItem } from './'
+import { generateShortId } from '../lib/shortid'
 
 @Entity('mediaRefs')
 // Deprecated: we no longer ensure uniqueness with startTime as it was too buggy
@@ -132,33 +130,33 @@ export class MediaRef {
   @Column({ nullable: true })
   title?: string
 
-  @ManyToMany((type) => Author)
+  @ManyToMany(() => Author)
   @JoinTable()
   authors: Author[]
 
-  @ManyToMany((type) => Category)
+  @ManyToMany(() => Category)
   @JoinTable()
   categories: Category[]
 
   @Index()
-  @ManyToOne((type) => Episode, (episode) => episode.mediaRefs, {
+  @ManyToOne(() => Episode, (episode) => episode.mediaRefs, {
     onDelete: 'CASCADE'
   })
   episode: Episode
 
-  @ManyToOne((type) => User, (user) => user.mediaRefs, {
+  @ManyToOne(() => User, (user) => user.mediaRefs, {
     nullable: false,
     onDelete: 'CASCADE'
   })
   owner: User
 
-  @OneToMany((type) => UserHistoryItem, (userHistoryItem) => userHistoryItem.mediaRef)
+  @OneToMany(() => UserHistoryItem, (userHistoryItem) => userHistoryItem.mediaRef)
   userHistoryItems: UserHistoryItem[]
 
-  @OneToMany((type) => UserNowPlayingItem, (userNowPlayingItem) => userNowPlayingItem.mediaRef)
+  @OneToMany(() => UserNowPlayingItem, (userNowPlayingItem) => userNowPlayingItem.mediaRef)
   userNowPlayingItems: UserNowPlayingItem[]
 
-  @OneToMany((type) => UserQueueItem, (userQueueItem) => userQueueItem.mediaRef)
+  @OneToMany(() => UserQueueItem, (userQueueItem) => userQueueItem.mediaRef)
   userQueueItems: UserQueueItem[]
 
   @CreateDateColumn()

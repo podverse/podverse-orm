@@ -1,7 +1,7 @@
+import createError from 'http-errors'
 import { getRepository } from 'typeorm'
 import { FCMDevice, Notification } from '../entities'
 import { getLoggedInUser } from './user'
-const createError = require('http-errors')
 
 export const createFCMDevice = async (fcmToken: string, loggedInUserId: string) => {
   if (!fcmToken) {

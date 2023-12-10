@@ -1,8 +1,8 @@
-import { LessThan, MoreThan, getRepository } from 'typeorm'
-import { Episode, Podcast } from '../entities'
-import { getPlaylist } from './playlist'
+import createError from 'http-errors'
 import { combineAndSortPlaylistItems } from 'podverse-shared'
-const createError = require('http-errors')
+import { LessThan, MoreThan, getRepository } from 'typeorm'
+import { getPlaylist } from './playlist'
+import { Episode, Podcast } from '../entities'
 
 const relations = ['liveItem', 'podcast']
 

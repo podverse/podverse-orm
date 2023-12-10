@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "dev": "nodemon --watch ./src -x \"npm run build\"",
+    "dev:watch": "nodemon --watch 'src/**/*' --watch $(realpath node_modules/podverse-parser) --watch $(realpath node_modules/podverse-shared) -x \"npm run build\"",
     "build": "esbuild src/index.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outfile=dist/index.js",
     "lint": "eslint ./src --ext .ts",
     "lint-fix": "eslint --fix",
@@ -24,22 +24,26 @@
   },
   "homepage": "https://github.com/podverse/podverse-orm#readme",
   "devDependencies": {
+    "@types/node": "^20.10.4",
     "@typescript-eslint/eslint-plugin": "^6.13.0",
     "@typescript-eslint/parser": "^6.13.0",
     "esbuild": "^0.19.8",
     "eslint": "^8.54.0",
-    "http-errors": "^1.7.3",
     "nodemon": "^3.0.2",
     "tsx": "^4.6.0",
-    "typeorm": "0.2.45",
     "typescript": "^5.3.2"
   },
   "dependencies": {
+    "axios": "1.6.0",
+    "bcryptjs": "^2.4.3",
     "class-validator": "0.14.0",
+    "http-errors": "^1.7.3",
     "manticoresearch": "^2.0.3",
     "password-validator": "5.0.3",
     "podverse-parser": "^1.0.0",
     "podverse-shared": "^4.15.2",
-    "shortid": "2.2.15"
+    "shortid": "2.2.15",
+    "sqlstring": "2.3.3",
+    "typeorm": "0.2.45"
   }
 }

@@ -1,8 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { IsUrl, IsInt, Min, ValidateIf } from 'class-validator'
 import { podcastItunesTypeDefaultValue, LiveItemStatus, PodcastMedium, ValueTagOriginal } from 'podverse-shared'
-import { Author, Category, Episode, FeedUrl, Notification } from './entities'
 import {
   BeforeInsert,
   BeforeUpdate,
@@ -17,7 +14,8 @@ import {
   PrimaryColumn,
   UpdateDateColumn
 } from 'typeorm'
-import { generateShortId } from './lib/utility'
+import { Author, Category, Episode, FeedUrl, Notification } from './'
+import { generateShortId } from '../lib/shortid'
 
 type Funding = {
   url: string
@@ -229,21 +227,21 @@ export class Podcast {
   @Column('simple-json', { nullable: true })
   value: ValueTagOriginal[]
 
-  @ManyToMany((type) => Author, (author) => author.podcasts)
+  @ManyToMany(() => Author, (author) => author.podcasts)
   @JoinTable()
   authors: Author[]
 
-  @ManyToMany((type) => Category, (category) => category.podcasts)
+  @ManyToMany(() => Category, (category) => category.podcasts)
   @JoinTable()
   categories: Category[]
 
-  @OneToMany((type) => Episode, (episode) => episode.podcast)
+  @OneToMany(() => Episode, (episode) => episode.podcast)
   episodes: Episode[]
 
-  @OneToMany((type) => FeedUrl, (feedUrl) => feedUrl.podcast)
+  @OneToMany(() => FeedUrl, (feedUrl) => feedUrl.podcast)
   feedUrls: FeedUrl[]
 
-  @OneToMany((type) => Notification, (notification) => notification.podcast)
+  @OneToMany(() => Notification, (notification) => notification.podcast)
   notifications: Notification[]
 
   @CreateDateColumn()

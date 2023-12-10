@@ -1,7 +1,7 @@
+import createError from 'http-errors'
 import { getRepository } from 'typeorm'
 import { Episode, UserHistoryItem } from '../entities'
-import { parseProp } from '../lib/utility'
-const createError = require('http-errors')
+import { parseProp } from '../lib/misc'
 
 export const cleanUserItemResult = (result) => {
   // NOTE: These first 2 if conditions are deprecated as of 4.15.8 API, and the 4.15.0 Mobile app.

@@ -1,8 +1,8 @@
+import createError from 'http-errors'
 import { getRepository } from 'typeorm'
 import { AccountClaimToken } from '../entities'
-import { errorMessages, validateClassOrThrow } from './lib/errors'
+import { errorMessages, validateClassOrThrow } from '../lib/errors'
 import { addYearsToUserMembershipExpiration, getUserByEmail } from './user'
-const createError = require('http-errors')
 
 const getAccountClaimToken = async (id: string) => {
   const repository = getRepository(AccountClaimToken)

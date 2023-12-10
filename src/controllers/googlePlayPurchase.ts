@@ -1,7 +1,7 @@
+import createError from 'http-errors'
 import { getRepository } from 'typeorm'
 import { GooglePlayPurchase } from '../entities'
-import { validateClassOrThrow } from './lib/errors'
-const createError = require('http-errors')
+import { validateClassOrThrow } from '../lib/errors'
 
 const createGooglePlayPurchase = async (obj) => {
   const repository = getRepository(GooglePlayPurchase)

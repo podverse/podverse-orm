@@ -1,7 +1,7 @@
+import createError from 'http-errors'
 import { getRepository } from 'typeorm'
 import { Category } from '../entities'
-import { validateSearchQueryString } from './lib/utility/validation'
-const createError = require('http-errors')
+import { validateSearchQueryString } from '../lib/validation'
 
 const deleteCategoryByTitle = async (title) => {
   const repository = getRepository(Category)

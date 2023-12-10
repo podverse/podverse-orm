@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
-import { Episode, MediaRef, User } from './entities'
+import { PodcastMedium, podcastMediumAllowedValues } from 'podverse-shared'
 import {
   BeforeInsert,
   BeforeUpdate,
@@ -15,9 +13,8 @@ import {
   PrimaryColumn,
   UpdateDateColumn
 } from 'typeorm'
-import { generateShortId } from './lib/utility'
-import { PodcastMedium } from 'podverse-shared'
-import { podcastMediumAllowedValues } from './lib/constants'
+import { Episode, MediaRef, User } from './'
+import { generateShortId } from '../lib/shortid'
 
 @Entity('playlists')
 export class Playlist {
@@ -59,15 +56,15 @@ export class Playlist {
   @Column({ nullable: true })
   title?: string
 
-  @ManyToMany((type) => Episode)
+  @ManyToMany(() => Episode)
   @JoinTable()
   episodes: Episode[]
 
-  @ManyToMany((type) => MediaRef)
+  @ManyToMany(() => MediaRef)
   @JoinTable()
   mediaRefs: MediaRef[]
 
-  @ManyToOne((type) => User, (user) => user.playlists, {
+  @ManyToOne(() => User, (user) => user.playlists, {
     nullable: false,
     onDelete: 'CASCADE'
   })

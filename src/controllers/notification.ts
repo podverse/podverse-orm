@@ -2,7 +2,7 @@ import { getRepository } from 'typeorm'
 import { Notification } from '../entities'
 import { getPodcast } from './podcast'
 import { getLoggedInUser } from './user'
-const createError = require('http-errors')
+import createError from 'http-errors'
 
 export const createNotification = async (podcastId: string, loggedInUserId: string) => {
   if (!podcastId) {

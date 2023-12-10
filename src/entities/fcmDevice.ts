@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { CreateDateColumn, Entity, ManyToOne, PrimaryColumn, UpdateDateColumn } from 'typeorm'
-import { User } from './entities'
+import { User } from './'
 
 @Entity('fcmDevices')
 export class FCMDevice {

@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryColumn, UpdateDateColumn } from 'typeorm'
-import { User } from './entities'
+import { User } from './'
 
 @Entity('paypalOrders')
 export class PayPalOrder {
@@ -11,7 +9,7 @@ export class PayPalOrder {
   @Column({ nullable: true })
   state: string
 
-  @ManyToOne((type) => User, (user) => user.paypalOrders, {
+  @ManyToOne(() => User, (user) => user.paypalOrders, {
     nullable: false,
     onDelete: 'CASCADE'
   })

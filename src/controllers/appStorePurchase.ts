@@ -1,8 +1,8 @@
+import createError from 'http-errors'
 import { getRepository } from 'typeorm'
-import { addYearsToUserMembershipExpiration } from './controllers/user'
+import { addYearsToUserMembershipExpiration } from './user'
 import { AppStorePurchase } from '../entities'
-import { validateClassOrThrow } from './lib/errors'
-const createError = require('http-errors')
+import { validateClassOrThrow } from '../lib/errors'
 
 const getAppStorePurchase = async (transactionId, loggedInUserId) => {
   const repository = getRepository(AppStorePurchase)

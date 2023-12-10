@@ -1,8 +1,7 @@
+import createError from 'http-errors'
 import { getRepository } from 'typeorm'
-import { UPDevice, Notification } from '../entities'
 import { getLoggedInUser } from './user'
-import { UPEndpointData } from './entities/upDevice'
-const createError = require('http-errors')
+import { Notification, UPDevice, UPEndpointData } from '../entities'
 
 export const createUPDevice = async ({
   upEndpoint,

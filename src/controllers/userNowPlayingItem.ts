@@ -1,7 +1,7 @@
+import createError from 'http-errors'
 import { getRepository } from 'typeorm'
 import { User, UserNowPlayingItem } from '../entities'
-import { validateClassOrThrow } from './lib/errors'
-const createError = require('http-errors')
+import { validateClassOrThrow } from '../lib/errors'
 
 export const deleteUserNowPlayingItem = async (loggedInUserId) => {
   const repository = getRepository(UserNowPlayingItem)

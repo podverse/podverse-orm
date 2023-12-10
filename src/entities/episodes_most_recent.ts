@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   EpisodeAlternateEnclosure,
   EpisodeContentLinks,
@@ -8,7 +7,7 @@ import {
   ValueTagOriginal
 } from 'podverse-shared'
 import { Column, JoinTable, ManyToMany, ManyToOne, ViewColumn, ViewEntity } from 'typeorm'
-import { Author, Category, Podcast } from './entities'
+import { Author, Category, Podcast } from './'
 
 @ViewEntity('episodes_most_recent')
 export class EpisodeMostRecent {
@@ -117,15 +116,15 @@ export class EpisodeMostRecent {
   @Column('simple-json', { nullable: true })
   value: ValueTagOriginal[]
 
-  @ManyToMany((type) => Author)
+  @ManyToMany(() => Author)
   @JoinTable()
   authors: Author[]
 
-  @ManyToMany((type) => Category)
+  @ManyToMany(() => Category)
   @JoinTable()
   categories: Category[]
 
-  @ManyToOne((type) => Podcast, (podcast) => podcast.episodes)
+  @ManyToOne(() => Podcast, (podcast) => podcast.episodes)
   podcast: Podcast
 
   @ViewColumn()

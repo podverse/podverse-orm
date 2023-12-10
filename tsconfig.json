@@ -2,6 +2,10 @@
   "compilerOptions": {
     "module": "commonjs",
     "target": "es2015",
+    "lib": [
+      "es2016",
+      "DOM"
+  ],
     "declaration": true,
     "outDir": "./dist",
     "experimentalDecorators": true,

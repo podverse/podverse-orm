@@ -1,4 +1,3 @@
-export { validatePassword } from '~/lib/utility/validation'
 import { performance } from 'perf_hooks'
 
 export const delimitQueryValues = (ctx, keys) => {
@@ -94,39 +93,6 @@ export const generateQueryParams = (query: any) => {
       return `${key}=${query[key]}`
     })
     .join('&')
-}
-
-export const getManticoreOrderByColumnName = (sort) => {
-  let orderByColumnName = ''
-  let orderByDirection = 'desc'
-
-  if (sort === 'top-past-hour') {
-    orderByColumnName = 'pasthourtotaluniquepageviews'
-  } else if (sort === 'top-past-week') {
-    orderByColumnName = 'pastweektotaluniquepageviews'
-  } else if (sort === 'top-past-month') {
-    orderByColumnName = 'pastmonthtotaluniquepageviews'
-  } else if (sort === 'top-past-year') {
-    orderByColumnName = 'pastyeartotaluniquepageviews'
-  } else if (sort === 'top-all-time') {
-    orderByColumnName = 'pastalltimetotaluniquepageviews'
-  } else if (sort === 'oldest') {
-    orderByColumnName = 'created_date'
-    orderByDirection = 'asc'
-  } else if (sort === 'most-recent') {
-    orderByColumnName = 'created_date'
-  } else if (sort === 'alphabetical') {
-    orderByColumnName = 'sortabletitle'
-    orderByDirection = 'asc'
-  } else {
-    /*
-      Default to pastmonthtotaluniquepageviews for all other searches
-      so there is at least some popularity ranking in the match score.
-    */
-    orderByColumnName = 'pastmonthtotaluniquepageviews'
-  }
-
-  return { orderByColumnName, orderByDirection }
 }
 
 export const addOrderByToQuery = (qb, type, sort, sortDateKey, allowRandom, isFromManticoreSearch?) => {
@@ -261,3 +227,5 @@ export const removeAllSpaces = (str: string) => {
 export const checkIfVideoMediaType = (str: string) => {
   return str && (str.toLowerCase().indexOf('video') >= 0 || str.toLowerCase().indexOf('application/x-mpegurl')) >= 0
 }
+
+export const saltRounds = 10

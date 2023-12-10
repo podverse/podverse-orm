@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryColumn, UpdateDateColumn } from 'typeorm'
-import { User } from './entities'
+import { User } from './'
 
 // https://developers.google.com/android-publisher/api-ref/purchases/products#resource
 
@@ -34,7 +32,7 @@ export class GooglePlayPurchase {
   @Column({ unique: true })
   purchaseToken: string
 
-  @ManyToOne((type) => User, (user) => user.googlePlayPurchases, {
+  @ManyToOne(() => User, (user) => user.googlePlayPurchases, {
     nullable: false,
     onDelete: 'CASCADE'
   })
