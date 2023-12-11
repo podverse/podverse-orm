@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "dev:watch": "nodemon --watch 'src' --watch $(realpath node_modules/podverse-parser) --watch $(realpath node_modules/podverse-shared) -x \"npm run build\"",
+    "dev:watch": "nodemon --watch 'src' --watch $(realpath node_modules/podverse-external-services) --watch $(realpath node_modules/podverse-parser) --watch $(realpath node_modules/podverse-shared) -x \"npm run build\"",
     "build": "tsc",
     "lint": "eslint ./src --ext .ts",
     "lint-fix": "eslint --fix",
