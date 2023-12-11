@@ -197,15 +197,6 @@ export const removeProtocol = (str: string) => {
   return str ? str.replace(/^https?\:\/\//i, '') : ''
 }
 
-export const logPerformance = (subject: string, stage: string, notes = '') => {
-  console.log(
-    subject + ',' + stage + ',' + Math.ceil(performance.now()).toString() + 'ms' + ',' + notes + ',' + new Date()
-  )
-}
-
-export const _logStart = 'start'
-export const _logEnd = 'end'
-
 export const parseProp = (item: any, key: string, defaultValue: any) => {
   let val = defaultValue
   if (typeof item === 'object' && item[key]) {
@@ -216,16 +207,6 @@ export const parseProp = (item: any, key: string, defaultValue: any) => {
     }
   }
   return val
-}
-
-export const removeAllSpaces = (str: string) => {
-  str = str.replace(/%20/g, ' ')
-  str = str.replace(/\s/g, '')
-  return str
-}
-
-export const checkIfVideoMediaType = (str: string) => {
-  return str && (str.toLowerCase().indexOf('video') >= 0 || str.toLowerCase().indexOf('application/x-mpegurl')) >= 0
 }
 
 export const saltRounds = 10

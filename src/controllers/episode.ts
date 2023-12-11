@@ -1,17 +1,16 @@
 import createError from 'http-errors'
+import { getLightningKeysendValueItem, liveItemStatuses, removeAllSpaces } from 'podverse-shared'
 import SqlString from 'sqlstring'
 import { getConnection, getRepository } from 'typeorm'
 import { v5 as uuidv5, NIL as uuidNIL } from 'uuid'
 import { config } from '../config'
 import { Episode, EpisodeMostRecent, MediaRef, Podcast } from '../entities'
 import { getManticoreOrderByColumnName, manticoreWildcardSpecialCharacters, searchApi } from '../lib/manticore'
-import { addOrderByToQuery, removeAllSpaces } from '../lib/misc'
+import { addOrderByToQuery } from '../lib/misc'
 import { request } from '../lib/request'
 import { validateSearchQueryString } from '../lib/validation'
-import { liveItemStatuses } from './liveItem'
 import { createMediaRef, updateMediaRef } from './mediaRef'
 import { getPodcast, getPodcastByPodcastGuid } from './podcast'
-import { getLightningKeysendValueItem } from 'podverse-shared'
 
 const { superUserId } = config
 
@@ -729,8 +728,8 @@ const retrieveLatestChapters = async (id, includeNonToc = true) => {
     if (chaptersUrl && (!chaptersUrlLastParsed || oneHour > chaptersUrlLastParsedDate)) {
       try {
         await episodeRepository.update(episode.id, { chaptersUrlLastParsed: new Date() })
-        const response = await request(chaptersUrl)
-        const trimmedResponse = (response && response.trim()) || {}
+        const response = await request({ url: chaptersUrl })
+        const trimmedResponse = response?.data.trim() || {}
         const parsedResponse = JSON.parse(trimmedResponse)
         const { chapters: newChapters } = parsedResponse
 

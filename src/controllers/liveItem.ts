@@ -1,8 +1,6 @@
 import { getRepository } from 'typeorm'
 import { LiveItem } from '../entities'
 
-export const liveItemStatuses = ['live', 'pending', 'ended']
-
 const getLiveItems = async (podcastId: string) => {
   const repository = getRepository(LiveItem)
 

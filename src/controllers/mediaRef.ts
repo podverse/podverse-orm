@@ -1,11 +1,12 @@
 import createError from 'http-errors'
+import { removeAllSpaces } from 'podverse-shared'
 import SqlString from 'sqlstring'
 import { getConnection, getRepository } from 'typeorm'
 import { config } from '../config'
 import { MediaRef, MediaRefVideos } from '../entities'
 import { validateClassOrThrow } from '../lib/errors'
 import { getManticoreOrderByColumnName, manticoreWildcardSpecialCharacters, searchApi } from '../lib/manticore'
-import { addOrderByToQuery, removeAllSpaces } from '../lib/misc'
+import { addOrderByToQuery } from '../lib/misc'
 import { validateSearchQueryString } from '../lib/validation'
 
 const { superUserId } = config

@@ -1,5 +1,6 @@
 import createError from 'http-errors'
 import { parseFeedUrlsByPodcastIds } from 'podverse-parser'
+import { removeAllSpaces } from 'podverse-shared'
 import SqlString from 'sqlstring'
 import { getRepository, In } from 'typeorm'
 import { deleteNotification } from './notification'
@@ -7,7 +8,7 @@ import { getUserSubscribedPodcastIds } from './user'
 import { config } from '../config'
 import { FeedUrl, Podcast, User } from '../entities'
 import { getManticoreOrderByColumnName, manticoreWildcardSpecialCharacters, searchApi } from '../lib/manticore'
-import { addOrderByToQuery, removeAllSpaces } from '../lib/misc'
+import { addOrderByToQuery } from '../lib/misc'
 import { validateSearchQueryString } from '../lib/validation'
 
 const getPodcast = async (id, includeRelations = true, allowNonPublic?: boolean) => {

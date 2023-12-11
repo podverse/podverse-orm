@@ -1,7 +1,6 @@
 export * from './accountClaimToken'
 export * from './appStorePurchase'
 export * from './author'
-export * from './bitpayInvoice'
 export * from './category'
 export * from './episode'
 export * from './fcmDevice'

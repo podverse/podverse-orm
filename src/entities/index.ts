@@ -1,7 +1,6 @@
 export { AccountClaimToken } from './accountClaimToken'
 export { AppStorePurchase } from './appStorePurchase'
 export { Author } from './author'
-export { BitPayInvoice } from './bitpayInvoice'
 export { Category } from './category'
 export { Episode } from './episode'
 export { EpisodeMostRecent } from './episodes_most_recent'

@@ -5,8 +5,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "dev:watch": "nodemon --watch 'src/**/*' --watch $(realpath node_modules/podverse-parser) --watch $(realpath node_modules/podverse-shared) -x \"npm run build\"",
-    "build": "esbuild src/index.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outfile=dist/index.js",
+    "dev:watch": "nodemon --watch 'src' --watch $(realpath node_modules/podverse-parser) --watch $(realpath node_modules/podverse-shared) -x \"npm run build\"",
+    "build": "tsc",
     "lint": "eslint ./src --ext .ts",
     "lint-fix": "eslint --fix",
     "prepare": "npm run build"
@@ -27,7 +27,6 @@
     "@types/node": "^20.10.4",
     "@typescript-eslint/eslint-plugin": "^6.13.0",
     "@typescript-eslint/parser": "^6.13.0",
-    "esbuild": "^0.19.8",
     "eslint": "^8.54.0",
     "nodemon": "^3.0.2",
     "tsx": "^4.6.0",
@@ -42,6 +41,7 @@
     "password-validator": "5.0.3",
     "podverse-parser": "^1.0.0",
     "podverse-shared": "^4.15.2",
+    "reflect-metadata": "0.1.13",
     "shortid": "2.2.15",
     "sqlstring": "2.3.3",
     "typeorm": "0.2.45"

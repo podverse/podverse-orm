@@ -16,7 +16,6 @@ import {
 } from 'typeorm'
 import {
   AppStorePurchase,
-  BitPayInvoice,
   FCMDevice,
   GooglePlayPurchase,
   MediaRef,
@@ -161,9 +160,6 @@ export class User {
 
   @OneToMany(() => AppStorePurchase, (appStorePurchase) => appStorePurchase.owner)
   appStorePurchases: AppStorePurchase[]
-
-  @OneToMany(() => BitPayInvoice, (bitpayInvoice) => bitpayInvoice.owner)
-  bitpayInvoices: BitPayInvoice[]
 
   @OneToMany(() => FCMDevice, (fcmDevice) => fcmDevice.user)
   fcmDevices: FCMDevice[]
