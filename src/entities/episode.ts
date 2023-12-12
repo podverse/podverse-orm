@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { IsUrl, IsInt, Min, ValidateIf } from 'class-validator'
 import {
   EpisodeAlternateEnclosure,
@@ -74,7 +72,7 @@ export class Episode {
   contentLinks: EpisodeContentLinks[]
 
   @Column({ default: false })
-  credentialsRequired?: boolean
+  credentialsRequired: boolean
 
   @Column({ nullable: true })
   description?: string
@@ -200,25 +198,25 @@ export class Episode {
   @Column('simple-json', { nullable: true })
   value: ValueTagOriginal[]
 
-  @ManyToMany((type) => Author)
+  @ManyToMany(() => Author)
   @JoinTable()
   authors: Author[]
 
-  @ManyToMany((type) => Category)
+  @ManyToMany(() => Category)
   @JoinTable()
   categories: Category[]
 
-  @OneToOne((type) => LiveItem, (liveItem) => liveItem.episode, {
+  @OneToOne(() => LiveItem, (liveItem) => liveItem.episode, {
     cascade: true,
     nullable: true
   })
   liveItem: LiveItem | null
 
-  @OneToMany((type) => MediaRef, (mediaRef) => mediaRef.episode)
+  @OneToMany(() => MediaRef, (mediaRef) => mediaRef.episode)
   mediaRefs: MediaRef[]
 
   @Index()
-  @ManyToOne((type) => Podcast, (podcast) => podcast.episodes, {
+  @ManyToOne(() => Podcast, (podcast) => podcast.episodes, {
     onDelete: 'CASCADE'
   })
   podcast: Podcast
@@ -228,13 +226,13 @@ export class Episode {
   @Column()
   podcastId: string
 
-  @OneToMany((type) => UserHistoryItem, (userHistoryItem) => userHistoryItem.episode)
+  @OneToMany(() => UserHistoryItem, (userHistoryItem) => userHistoryItem.episode)
   userHistoryItems: UserHistoryItem[]
 
-  @OneToMany((type) => UserNowPlayingItem, (userNowPlayingItem) => userNowPlayingItem.episode, { nullable: true })
+  @OneToMany(() => UserNowPlayingItem, (userNowPlayingItem) => userNowPlayingItem.episode, { nullable: true })
   userNowPlayingItems: UserNowPlayingItem[]
 
-  @OneToMany((type) => UserQueueItem, (userQueueItem) => userQueueItem.episode)
+  @OneToMany(() => UserQueueItem, (userQueueItem) => userQueueItem.episode)
   userQueueItems: UserQueueItem[]
 
   @CreateDateColumn()
