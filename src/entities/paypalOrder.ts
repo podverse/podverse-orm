@@ -7,7 +7,7 @@ export class PayPalOrder {
   paymentID: string
 
   @Column({ nullable: true })
-  state: string
+  state: string | null
 
   @ManyToOne(() => User, (user) => user.paypalOrders, {
     nullable: false,

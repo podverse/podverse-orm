@@ -30,7 +30,7 @@ export class FeedUrl {
   int_id: number
 
   @Column({ default: null, nullable: true })
-  isAuthority: boolean
+  isAuthority: boolean | null
 
   @Index()
   @IsUrl()

@@ -18,7 +18,7 @@ export class EpisodeMostRecent {
   int_id: number
 
   @Column('simple-json', { nullable: true })
-  alternateEnclosures: EpisodeAlternateEnclosure[]
+  alternateEnclosures: EpisodeAlternateEnclosure[] | null
 
   @ViewColumn()
   chaptersType?: string
@@ -30,7 +30,7 @@ export class EpisodeMostRecent {
   chaptersUrlLastParsed: Date
 
   @Column('simple-json', { nullable: true })
-  contentLinks: EpisodeContentLinks[]
+  contentLinks: EpisodeContentLinks[] | null
 
   @ViewColumn()
   credentialsRequired?: boolean
@@ -45,7 +45,7 @@ export class EpisodeMostRecent {
   episodeType?: string
 
   @Column('simple-json', { nullable: true })
-  funding: Funding[]
+  funding: Funding[] | null
 
   @ViewColumn()
   guid?: string
@@ -102,7 +102,7 @@ export class EpisodeMostRecent {
   pubDate?: Date
 
   @Column('simple-json', { nullable: true })
-  socialInteraction: SocialInteraction[]
+  socialInteraction: SocialInteraction[] | null
 
   @ViewColumn()
   subtitle?: string
@@ -111,10 +111,10 @@ export class EpisodeMostRecent {
   title?: string
 
   @Column('simple-json', { nullable: true })
-  transcript: Transcript[]
+  transcript: Transcript[] | null
 
   @Column('simple-json', { nullable: true })
-  value: ValueTagOriginal[]
+  value: ValueTagOriginal[] | null
 
   @ManyToMany(() => Author)
   @JoinTable()

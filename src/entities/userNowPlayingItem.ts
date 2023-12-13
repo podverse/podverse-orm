@@ -31,7 +31,7 @@ export class UserNowPlayingItem {
     nullable: true,
     onDelete: 'CASCADE'
   })
-  mediaRef: MediaRef
+  mediaRef: MediaRef | null
 
   @OneToOne(() => User, (user) => user.userNowPlayingItem, {
     nullable: false,

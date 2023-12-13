@@ -30,7 +30,7 @@ export class Playlist {
   int_id: number
 
   @Column({ nullable: true })
-  description?: string
+  description?: string | null
 
   @Column({ default: false })
   isDefault: boolean
@@ -54,7 +54,7 @@ export class Playlist {
 
   @Index()
   @Column({ nullable: true })
-  title?: string
+  title?: string | null
 
   @ManyToMany(() => Episode)
   @JoinTable()

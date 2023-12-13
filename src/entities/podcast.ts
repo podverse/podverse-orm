@@ -1,5 +1,5 @@
 import { IsUrl, IsInt, Min, ValidateIf } from 'class-validator'
-import { podcastItunesTypeDefaultValue, LiveItemStatus, PodcastMedium, ValueTagOriginal } from 'podverse-shared'
+import { Funding, podcastItunesTypeDefaultValue, LiveItemStatus, PodcastMedium, ValueTagOriginal } from 'podverse-shared'
 import {
   BeforeInsert,
   BeforeUpdate,
@@ -16,11 +16,6 @@ import {
 } from 'typeorm'
 import { Author, Category, Episode, FeedUrl, Notification } from './'
 import { generateShortId } from '../lib/shortid'
-
-type Funding = {
-  url: string
-  value?: string
-}
 
 @Index(['hasVideo', 'pastAllTimeTotalUniquePageviews'])
 @Index(['hasVideo', 'pastHourTotalUniquePageviews'])
@@ -49,32 +44,32 @@ export class Podcast {
 
   @Index()
   @Column({ nullable: true, unique: true })
-  podcastIndexId?: string
+  podcastIndexId?: string | null
 
   // This replaces the podcast.guid column
   @Index()
   @Column({ type: 'uuid', nullable: true })
-  podcastGuid?: string
+  podcastGuid?: string | null
 
   // deprecated: use podcastGuid instead
   @Column({ nullable: true })
-  guid?: string
+  guid?: string | null
 
   @Index()
   @Column({ nullable: true, unique: true })
-  authorityId?: string
+  authorityId?: string | null
 
   @Column({ default: false })
   alwaysFullyParse?: boolean
 
   @Column({ default: false })
-  credentialsRequired?: boolean
+  credentialsRequired: boolean
 
   @Column({ nullable: true })
-  description?: string
+  description?: string | null
 
   @Column({ nullable: true })
-  embedApprovedMediaUrlPaths?: string
+  embedApprovedMediaUrlPaths?: string | null
 
   @Column({ default: false })
   excludeCacheBust?: boolean
@@ -84,10 +79,10 @@ export class Podcast {
 
   @Index()
   @Column({ nullable: true })
-  feedLastUpdated?: Date
+  feedLastUpdated?: Date | null
 
   @Column('simple-json', { nullable: true })
-  funding: Funding[]
+  funding: Funding[] | null
 
   @Column({ default: false })
   hasLiveItem: boolean
@@ -107,7 +102,7 @@ export class Podcast {
   @ValidateIf((a) => a.imageUrl != null)
   @IsUrl()
   @Column({ nullable: true })
-  imageUrl?: string
+  imageUrl?: string | null
 
   @Column({ default: false })
   isExplicit: boolean
@@ -120,17 +115,17 @@ export class Podcast {
   itunesFeedType: string
 
   @Column({ nullable: true })
-  language?: string
+  language?: string | null
 
   @Index()
   @Column({ nullable: true })
-  lastEpisodePubDate?: Date
+  lastEpisodePubDate?: Date | null
 
   @Column({ nullable: true })
-  lastEpisodeTitle?: string
+  lastEpisodeTitle?: string | null
 
   @Column({ nullable: true })
-  lastFoundInPodcastIndex?: Date
+  lastFoundInPodcastIndex?: Date | null
 
   @Index()
   @Column({
@@ -143,7 +138,7 @@ export class Podcast {
   @ValidateIf((a) => a.linkUrl != null)
   @IsUrl()
   @Column({ nullable: true })
-  linkUrl?: string
+  linkUrl?: string | null
 
   // TODO: the Podcast.medium enum is currently missing the "mixed" value.
   // It is also missing Medium Lists values (podcastL, musicL, etc.),
@@ -157,7 +152,7 @@ export class Podcast {
   medium: PodcastMedium
 
   @Column({ default: false })
-  parsingPriority?: boolean
+  parsingPriority: boolean
 
   @Index()
   @ValidateIf((a) => a.pastAllTimeTotalUniquePageviews != null)
@@ -204,28 +199,28 @@ export class Podcast {
   @ValidateIf((a) => a.shrunkImageUrl != null)
   @IsUrl()
   @Column({ nullable: true })
-  shrunkImageUrl?: string
+  shrunkImageUrl?: string | null
 
   @Index()
   @Column({ nullable: true })
-  shrunkImageLastUpdated?: Date
+  shrunkImageLastUpdated?: Date | null
 
   @Index()
   @Column({ nullable: true })
-  sortableTitle?: string
+  sortableTitle?: string | null
 
   @Column({ nullable: true })
-  subtitle?: string
+  subtitle?: string | null
 
   @Index()
   @Column({ nullable: true })
-  title?: string
+  title?: string | null
 
   @Column({ nullable: true })
-  type?: string
+  type?: string | null
 
   @Column('simple-json', { nullable: true })
-  value: ValueTagOriginal[]
+  value: ValueTagOriginal[] | null
 
   @ManyToMany(() => Author, (author) => author.podcasts)
   @JoinTable()
@@ -236,13 +231,13 @@ export class Podcast {
   categories: Category[]
 
   @OneToMany(() => Episode, (episode) => episode.podcast)
-  episodes: Episode[]
+  episodes?: Episode[]
 
   @OneToMany(() => FeedUrl, (feedUrl) => feedUrl.podcast)
-  feedUrls: FeedUrl[]
+  feedUrls?: FeedUrl[]
 
   @OneToMany(() => Notification, (notification) => notification.podcast)
-  notifications: Notification[]
+  notifications?: Notification[]
 
   @CreateDateColumn()
   createdAt: Date

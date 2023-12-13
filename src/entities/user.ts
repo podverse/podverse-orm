@@ -65,13 +65,13 @@ export class User {
     select: false,
     unique: true
   })
-  emailVerificationToken: string
+  emailVerificationToken: string | null
 
   @Column({
     nullable: true,
     select: false
   })
-  emailVerificationTokenExpiration: Date
+  emailVerificationTokenExpiration: Date | null
 
   @Column({
     default: false,
@@ -83,7 +83,7 @@ export class User {
     nullable: true,
     select: false
   })
-  freeTrialExpiration: Date
+  freeTrialExpiration: Date | null
 
   @Column({ default: false })
   isDevAdmin: boolean
@@ -99,11 +99,11 @@ export class User {
     nullable: true,
     select: false
   })
-  membershipExpiration: Date
+  membershipExpiration: Date | null
 
   @Index()
   @Column({ nullable: true })
-  name: string
+  name: string | null
 
   @Validate(ValidatePassword)
   @Column({ select: false })
@@ -116,13 +116,13 @@ export class User {
     select: false,
     unique: true
   })
-  resetPasswordToken: string
+  resetPasswordToken: string | null
 
   @Column({
     nullable: true,
     select: false
   })
-  resetPasswordTokenExpiration: Date
+  resetPasswordTokenExpiration: Date | null
 
   @Column('varchar', {
     array: true,

@@ -38,13 +38,13 @@ export class UserHistoryItem {
     nullable: true,
     onDelete: 'CASCADE'
   })
-  episode: Episode
+  episode: Episode | null
 
   @ManyToOne(() => MediaRef, (mediaRef) => mediaRef.userHistoryItems, {
     nullable: true,
     onDelete: 'CASCADE'
   })
-  mediaRef: MediaRef
+  mediaRef: MediaRef | null
 
   @Index()
   @ManyToOne(() => User, (user) => user.userHistoryItems, {

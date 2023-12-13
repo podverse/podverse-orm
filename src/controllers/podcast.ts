@@ -1,5 +1,5 @@
 import createError from 'http-errors'
-import { parseFeedUrlsByPodcastIds } from 'podverse-parser'
+// import { parseFeedUrlsByPodcastIds } from 'podverse-parser'
 import { removeAllSpaces } from 'podverse-shared'
 import SqlString from 'sqlstring'
 import { getRepository, In } from 'typeorm'
@@ -110,17 +110,38 @@ const findPodcastsByFeedUrls = async (urls: string[]) => {
 }
 
 const getPodcastIdByFeedUrl = async (url: string) => {
+  const url1 = url
+  const url2 = url.indexOf('https:') === 0
+    ? url.replace('https:', 'http:')
+    : url.replace('http:', 'https:')
+
   const repository = getRepository(FeedUrl)
-  const feedUrl = await repository
+
+  const getFeed = (url: string) => {
+    return repository
     .createQueryBuilder('feedUrl')
     .select('feedUrl.url')
     .innerJoinAndSelect('feedUrl.podcast', 'podcast')
     .where('feedUrl.url = :url', { url })
     .getOne()
+  }
 
-  if (!feedUrl || !feedUrl.podcast) return
-
-  return feedUrl.podcast.id
+  const feedUrl1 = await getFeed(url1)
+  
+  if (feedUrl1) {
+    if (!feedUrl1?.podcast?.id) {
+      throw new createError.NotFound('FeedUrl1 Podcast not found')
+    } else {
+      return feedUrl1.podcast.id
+    }
+  } else {
+    const feedUrl2 = await getFeed(url2)
+    if (!feedUrl2?.podcast?.id) {
+      throw new createError.NotFound('FeedUrl1 Podcast not found')
+    } else {
+      return feedUrl2.podcast.id
+    }
+  }
 }
 
 const getSubscribedPodcasts = async (query, loggedInUserId) => {
@@ -481,7 +502,8 @@ const updateHasPodcastIndexValueTags = async (podcastIndexIds: number[]) => {
 
   const podcastsToReparseIds = podcastsToReparse.map((podcast) => podcast.id)
   console.log('parseFeedUrlsByPodcastIds', podcastsToReparseIds)
-  await parseFeedUrlsByPodcastIds(podcastsToReparseIds)
+  // TODO: fix!
+  // await parseFeedUrlsByPodcastIds(podcastsToReparseIds)
 
   console.log('updateHasPodcastIndexValueTags finished')
 }

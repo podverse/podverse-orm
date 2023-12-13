@@ -9,25 +9,25 @@ export class GooglePlayPurchase {
   transactionId: string
 
   @Column({ nullable: true })
-  acknowledgementState: number
+  acknowledgementState: number | null
 
   @Column({ nullable: true })
-  consumptionState: number
+  consumptionState: number | null
 
   @Column({ nullable: true })
-  developerPayload: string
+  developerPayload: string | null
 
   @Column({ nullable: true })
-  kind: string
+  kind: string | null
 
   @Column()
   productId: string
 
   @Column({ nullable: true })
-  purchaseTimeMillis: string
+  purchaseTimeMillis: string | null
 
   @Column({ nullable: true })
-  purchaseState: number
+  purchaseState: number | null
 
   @Column({ unique: true })
   purchaseToken: string

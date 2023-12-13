@@ -41,29 +41,29 @@ export class MediaRef {
   // reparse a chapters file.
   @Index()
   @Column({ type: 'uuid', nullable: true })
-  chapterHash: string
+  chapterHash: string | null
 
   @ValidateIf((a) => a.endTime != null)
   @IsInt()
   @Min(1)
   @Column({ nullable: true })
-  endTime: number
+  endTime: number | null
 
   @ValidateIf((a) => a.imageUrl != null)
   @IsUrl()
   @Column({ nullable: true })
-  imageUrl?: string
+  imageUrl?: string | null
 
   // If a chapter has true or null set for toc, then it should be handled as part of
   // the "table of contents" in the app UX. If it is set to false, then it should not.
   // podcasting 2.0 spec: https://github.com/Podcastindex-org/podcast-namespace/blob/main/chapters/jsonChapters.md#optional-attributes-1
   @Index()
   @Column({ default: null, nullable: true })
-  isChapterToc: boolean
+  isChapterToc: boolean | null
 
   @Index()
   @Column({ default: null, nullable: true })
-  isOfficialChapter: boolean
+  isOfficialChapter: boolean | null
 
   @Index()
   @Column({ default: false })
@@ -76,7 +76,7 @@ export class MediaRef {
   @ValidateIf((a) => a.linkUrl != null)
   @IsUrl()
   @Column({ nullable: true })
-  linkUrl?: string
+  linkUrl?: string | null
 
   @Index()
   @ValidateIf((a) => a.pastHourTotalUniquePageviews != null)
@@ -128,7 +128,7 @@ export class MediaRef {
 
   @Index()
   @Column({ nullable: true })
-  title?: string
+  title?: string | null
 
   @ManyToMany(() => Author)
   @JoinTable()

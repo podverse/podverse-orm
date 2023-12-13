@@ -10,5 +10,5 @@ export class RecentEpisodeByCategory {
   categoryId: string
 
   @Column({ nullable: true })
-  pubDate?: Date
+  pubDate?: Date | null
 }

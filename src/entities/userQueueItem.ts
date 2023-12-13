@@ -16,13 +16,13 @@ export class UserQueueItem {
     nullable: true,
     onDelete: 'CASCADE'
   })
-  episode: Episode
+  episode: Episode | null
 
   @ManyToOne(() => MediaRef, (mediaRef) => mediaRef.userQueueItems, {
     nullable: true,
     onDelete: 'CASCADE'
   })
-  mediaRef: MediaRef
+  mediaRef: MediaRef | null
 
   @Index()
   @ManyToOne(() => User, (user) => user.userQueueItems, {

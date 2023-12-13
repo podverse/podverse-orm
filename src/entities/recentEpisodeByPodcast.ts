@@ -10,5 +10,5 @@ export class RecentEpisodeByPodcast {
   podcastId: string
 
   @Column({ nullable: true })
-  pubDate?: Date
+  pubDate?: Date | null
 }

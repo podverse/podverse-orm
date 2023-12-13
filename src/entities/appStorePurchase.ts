@@ -11,67 +11,67 @@ export class AppStorePurchase {
   // START: Apple Developer responseBody.Receipt.In_app based fields
   // https://developer.apple.com/documentation/appstorereceipts/responsebody/receipt/in_app
   @Column({ nullable: true })
-  cancellation_date: string
+  cancellation_date: string | null
 
   @Column({ nullable: true })
-  cancellation_date_ms: string
+  cancellation_date_ms: string | null
 
   @Column({ nullable: true })
-  cancellation_date_pst: string
+  cancellation_date_pst: string | null
 
   @Column({ nullable: true })
-  cancellation_reason: string
+  cancellation_reason: string | null
 
   @Column({ nullable: true })
-  expires_date: string
+  expires_date: string | null
 
   @Column({ nullable: true })
-  expires_date_ms: string
+  expires_date_ms: string | null
 
   @Column({ nullable: true })
-  expires_date_pst: string
+  expires_date_pst: string | null
 
   @Column({ nullable: true })
-  is_in_intro_offer_period: boolean
+  is_in_intro_offer_period: boolean | null
 
   @Column({ nullable: true })
-  is_trial_period: boolean
+  is_trial_period: boolean | null
 
   @Column({ nullable: true })
-  original_purchase_date: string
+  original_purchase_date: string | null
 
   @Column({ nullable: true })
-  original_purchase_date_ms: string
+  original_purchase_date_ms: string | null
 
   @Column({ nullable: true })
-  original_purchase_date_pst: string
+  original_purchase_date_pst: string | null
 
   @Column({ nullable: true })
-  original_transaction_id: string
+  original_transaction_id: string | null
 
   @Column({ nullable: true })
-  product_id: string
+  product_id: string | null
 
   @Column({ nullable: true })
-  promotional_offer_id: string
+  promotional_offer_id: string | null
 
   @Column({ nullable: true })
-  purchase_date: string
+  purchase_date: string | null
 
   @Column({ nullable: true })
-  purchase_date_ms: string
+  purchase_date_ms: string | null
 
   @Column({ nullable: true })
-  purchase_date_pst: string
+  purchase_date_pst: string | null
 
   @Column({ nullable: true })
-  quantity: number
+  quantity: number | null
 
   @Column({ nullable: true })
-  transaction_id: string
+  transaction_id: string | null
 
   @Column({ nullable: true })
-  web_order_line_item_id: string
+  web_order_line_item_id: string | null
 
   // END: Apple Developer responseBody.Receipt.In_app based fields
 

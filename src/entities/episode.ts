@@ -55,27 +55,27 @@ export class Episode {
   // int_id: number
 
   @Column('simple-json', { nullable: true })
-  alternateEnclosures: EpisodeAlternateEnclosure[]
+  alternateEnclosures: EpisodeAlternateEnclosure[] | null
 
   @Column({ nullable: true })
-  chaptersType?: string
+  chaptersType?: string | null
 
   @ValidateIf((a) => a.chaptersUrl != null)
   @IsUrl()
   @Column({ nullable: true })
-  chaptersUrl?: string
+  chaptersUrl?: string | null
 
   @Column({ nullable: true })
-  chaptersUrlLastParsed: Date
+  chaptersUrlLastParsed: Date | null
 
   @Column('simple-json', { nullable: true })
-  contentLinks: EpisodeContentLinks[]
+  contentLinks: EpisodeContentLinks[] | null
 
   @Column({ default: false })
   credentialsRequired: boolean
 
   @Column({ nullable: true })
-  description?: string
+  description?: string | null
 
   @ValidateIf((a) => a.duration != null)
   @IsInt()
@@ -84,19 +84,19 @@ export class Episode {
   duration?: number
 
   @Column({ nullable: true })
-  episodeType?: string
+  episodeType?: string | null
 
   @Column('simple-json', { nullable: true })
-  funding: Funding[]
+  funding: Funding[] | null
 
   @Index()
   @Column({ nullable: true })
-  guid?: string
+  guid?: string | null
 
   @ValidateIf((a) => a.imageUrl != null)
   @IsUrl()
   @Column({ nullable: true })
-  imageUrl?: string
+  imageUrl?: string | null
 
   @Column({ default: false })
   isExplicit: boolean
@@ -107,20 +107,20 @@ export class Episode {
 
   @Index()
   @Column({ nullable: true })
-  itunesEpisode?: number
+  itunesEpisode?: number | null
 
   @Index()
   @Column({ nullable: true })
-  itunesEpisodeType?: string
+  itunesEpisodeType?: string | null
 
   @Index()
   @Column({ nullable: true })
-  itunesSeason?: number
+  itunesSeason?: number | null
 
   @ValidateIf((a) => a.linkUrl != null)
   @IsUrl()
   @Column({ nullable: true })
-  linkUrl?: string
+  linkUrl?: string | null
 
   @ValidateIf((a) => a.mediaFilesize != null)
   @IsInt()
@@ -130,7 +130,7 @@ export class Episode {
 
   @Index()
   @Column({ nullable: true })
-  mediaType?: string
+  mediaType?: string | null
 
   @Index()
   @IsUrl()
@@ -180,23 +180,23 @@ export class Episode {
   pastAllTimeTotalUniquePageviews: number
 
   @Column({ nullable: true })
-  pubDate?: Date
+  pubDate?: Date | null
 
   @Column('simple-json', { nullable: true })
-  socialInteraction: SocialInteraction[]
+  socialInteraction: SocialInteraction[] | null
 
   @Column({ nullable: true })
-  subtitle?: string
+  subtitle?: string | null
 
   @Index()
   @Column({ nullable: true })
-  title?: string
+  title?: string | null
 
   @Column('simple-json', { nullable: true })
-  transcript: Transcript[]
+  transcript: Transcript[] | null
 
   @Column('simple-json', { nullable: true })
-  value: ValueTagOriginal[]
+  value: ValueTagOriginal[] | null
 
   @ManyToMany(() => Author)
   @JoinTable()

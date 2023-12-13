@@ -17,7 +17,7 @@ export class LiveItem {
   id: string
 
   @Column({ nullable: true })
-  chatIRCURL?: string
+  chatIRCURL?: string | null
 
   @Index()
   @Column({
