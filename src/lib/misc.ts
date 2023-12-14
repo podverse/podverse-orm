@@ -1,18 +1,3 @@
-import { performance } from 'perf_hooks'
-
-export const delimitQueryValues = (ctx, keys) => {
-  const query = ctx.state.query
-
-  for (const key of keys) {
-    if (query[key]) {
-      query[key] = query[key].split(',')
-    }
-  }
-
-  ctx.state.query = query
-  return ctx
-}
-
 export const chunkArray = (arr, chunkSize = 10) => {
   let i
   let j
