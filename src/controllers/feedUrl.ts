@@ -6,48 +6,6 @@ import { removeProtocol } from '../lib/misc'
 
 const relations = ['podcast']
 
-const addFeedUrls = async (urls: any[] = []) => {
-  const repository = getRepository(FeedUrl)
-  const feeds = [] as any
-
-  for (const url of urls) {
-    let feedUrl = await repository.findOne({
-      where: {
-        url
-      },
-      relations
-    })
-
-    if (!feedUrl) {
-      feedUrl = new FeedUrl()
-      feedUrl.url = url
-      feedUrl.isAuthority = true
-      await validateClassOrThrow(feedUrl)
-      await repository.save(feedUrl)
-    }
-
-    if (feedUrl) {
-      feeds.push(feedUrl)
-    }
-  }
-
-  return feeds
-}
-
-const deleteFeedUrl = async (id) => {
-  const repository = getRepository(FeedUrl)
-  const feedUrl = await repository.findOne({
-    where: { id }
-  })
-
-  if (!feedUrl) {
-    throw new createError.NotFound('FeedUrl not found')
-  }
-
-  const result = await repository.remove(feedUrl)
-  return result
-}
-
 const getFeedUrl = async (id) => {
   const repository = getRepository(FeedUrl)
   const feedUrl = await repository.findOne({ id }, { relations })
@@ -77,7 +35,7 @@ const getFeedUrlByUrl = async (url) => {
   return feedUrl
 }
 
-const getFeedUrlByUrlIgnoreProtocolForPublicPodcast = async (url, skipNotFound) => {
+const getFeedUrlByUrlIgnoreProtocolForPublicPodcast = async (url: string, skipNotFound = false) => {
   const repository = getRepository(FeedUrl)
   const feedUrlWithoutProtocol = removeProtocol(url)
 
@@ -148,7 +106,6 @@ const getFeedUrlsByPodcastIndexIds = async (podcastIndexIds: string[]) => {
     .select('feedUrl.id')
     .addSelect('feedUrl.url')
     .innerJoinAndSelect('feedUrl.podcast', 'podcast')
-    .where('podcast."podcastIndexId')
     .where('podcast.podcastIndexId IN (:...podcastIndexIds)', { podcastIndexIds })
     .andWhere('feedUrl.isAuthority = TRUE')
     .getMany()
@@ -183,8 +140,6 @@ const updateFeedUrl = async (obj) => {
 }
 
 export {
-  addFeedUrls,
-  deleteFeedUrl,
   getFeedUrl,
   getFeedUrlsByPodcastIndexIds,
   getFeedUrlByUrl,
