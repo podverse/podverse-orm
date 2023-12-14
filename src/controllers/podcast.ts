@@ -145,7 +145,7 @@ const getPodcastIdByFeedUrl = async (url: string) => {
   } else {
     const feedUrl2 = await getFeed(url2)
     if (!feedUrl2?.podcast?.id) {
-      throw new createError.NotFound('FeedUrl1 Podcast not found')
+      throw new createError.NotFound('FeedUrl2 Podcast not found')
     } else {
       return feedUrl2.podcast.id
     }
