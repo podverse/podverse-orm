@@ -1,8 +1,7 @@
 import createError from 'http-errors'
-// import { parseFeedUrlsByPodcastIds } from 'podverse-parser'
 import { removeAllSpaces } from 'podverse-shared'
 import SqlString from 'sqlstring'
-import { getRepository, In } from 'typeorm'
+import { In, getRepository } from 'typeorm'
 import { deleteNotification } from './notification'
 import { getUserSubscribedPodcastIds } from './user'
 import { config } from '../config'
@@ -30,7 +29,7 @@ const getPodcast = async (id, includeRelations = true, allowNonPublic?: boolean)
   return podcast
 }
 
-const getPodcastByPodcastIndexId = async (podcastIndexId, includeRelations = true, allowNonPublic?: boolean) => {
+const getPodcastByPodcastIndexId = async (podcastIndexId: string, includeRelations = true, allowNonPublic?: boolean) => {
   const repository = getRepository(Podcast)
   const podcast = await repository.findOne(
     {
@@ -47,6 +46,15 @@ const getPodcastByPodcastIndexId = async (podcastIndexId, includeRelations = tru
   }
 
   return podcast
+}
+
+const getPodcastsByPodcastIndexIds = (podcastIndexIds: number[]) => {
+  const repository = getRepository(Podcast)
+  return repository.find({
+    where: {
+      podcastIndexId: In(podcastIndexIds)
+    }
+  })
 }
 
 const getPodcastByPodcastGuid = async (podcastGuid: string, includeRelations?: boolean) => {
@@ -458,56 +466,6 @@ const subscribeToPodcast = async (podcastId, loggedInUserId) => {
   return subscribedPodcastIds
 }
 
-const updateHasPodcastIndexValueTags = async (podcastIndexIds: number[]) => {
-  console.log('updateHasPodcastIndexValueTags', podcastIndexIds.length)
-  const repository = getRepository(Podcast)
-
-  // First reset all the podcasts with hasPodcastIndexValueTag=true already to false.
-  const podcastsToResetValueTag = await repository.find({
-    where: {
-      hasPodcastIndexValueTag: true
-    }
-  })
-  console.log('podcastsToResetValueTag', podcastsToResetValueTag.length)
-
-  const podcastsToReparse = podcastsToResetValueTag.filter((podcast: Podcast) => {
-    return !podcastIndexIds.includes(parseInt(podcast.podcastIndexId || '', 10))
-  })
-  console.log('podcastsToReparse', podcastsToReparse.length)
-
-  const newPodcastsToReset = podcastsToResetValueTag.map((podcast) => {
-    podcast.hasPodcastIndexValueTag = false
-    return podcast
-  })
-  console.log('newPodcastsToReset', newPodcastsToReset.length)
-
-  await repository.save(newPodcastsToReset, { chunk: 400 })
-
-  const podcastsToUpdate = await repository.find({
-    where: {
-      podcastIndexId: In(podcastIndexIds)
-    }
-  })
-  console.log('podcastsToUpdate', podcastsToUpdate.length)
-
-  const newPodcastsToUpdate = podcastsToUpdate.map((podcast) => {
-    podcast.hasPodcastIndexValueTag = true
-    return podcast
-  })
-  console.log('newPodcastsToUpdate', newPodcastsToUpdate.length)
-
-  await repository.save(newPodcastsToUpdate, { chunk: 400 })
-
-  console.log('newPodcastsToUpdate saved')
-
-  const podcastsToReparseIds = podcastsToReparse.map((podcast) => podcast.id)
-  console.log('parseFeedUrlsByPodcastIds', podcastsToReparseIds)
-  // TODO: fix!
-  // await parseFeedUrlsByPodcastIds(podcastsToReparseIds)
-
-  console.log('updateHasPodcastIndexValueTags finished')
-}
-
 type GetPodcastWebUrl = {
   podcastGuid?: string
   podcastIndexId?: string
@@ -536,11 +494,11 @@ export {
   getPodcastByFeedUrl,
   getPodcastByPodcastGuid,
   getPodcastByPodcastIndexId,
+  getPodcastsByPodcastIndexIds,
   getPodcastsFromSearchEngine,
   getMetadata,
   getSubscribedPodcasts,
   subscribeToPodcast,
   toggleSubscribeToPodcast,
-  updateHasPodcastIndexValueTags,
   getPodcastWebUrl
 }
