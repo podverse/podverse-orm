@@ -15,61 +15,9 @@ export const offsetDate = (minutesOffset = 0) => {
   return todayDate.toISOString().slice(0, 10)
 }
 
-// NOTE: I am manually offsetting by 5 hours since the server is in UTC but the
-// Google Analytics data is in CST.
-// This WILL cause a problem when DST happens.
-export const lastHour = () => {
-  const todayDate = new Date()
-  todayDate.setMinutes(todayDate.getMinutes() - todayDate.getTimezoneOffset() - 300 - 60)
-  const lastHour = todayDate.toISOString().slice(11, 13)
-  return parseInt(lastHour, 10)
-}
-
 export const convertSecondsToDaysText = (seconds) => {
   const totalDays = Math.round(parseInt(seconds, 10) / 86400)
   return `${totalDays > 1 ? `${totalDays} days` : '24 hours'}`
-}
-
-export const convertSecToHHMMSS = (sec: number) => {
-  const totalSec = Math.floor(sec)
-  const hours = (totalSec / 3600) % 24
-  const minutes = (totalSec / 60) % 60
-  const seconds = totalSec % 60
-  let result = ''
-
-  if (hours > 0) {
-    result += hours + ':'
-  }
-
-  if (minutes > 9) {
-    result += minutes + ':'
-  } else if (minutes > 0 && hours > 0) {
-    result += '0' + minutes + ':'
-  } else if (minutes > 0) {
-    result += minutes + ':'
-  } else if (minutes === 0 && hours > 0) {
-    result += '00:'
-  }
-
-  if (seconds > 9) {
-    result += seconds
-  } else if (seconds > 0 && minutes > 0) {
-    result += '0' + seconds
-  } else if (seconds > 0) {
-    result += seconds
-  } else {
-    result += '00'
-  }
-
-  if (result.length === 2) {
-    result = '0:' + result
-  }
-
-  if (result.length === 1) {
-    result = '0:0' + result
-  }
-
-  return result
 }
 
 export const generateQueryParams = (query: any) => {
@@ -122,13 +70,6 @@ export const addOrderByToQuery = (qb, type, sort, sortDateKey, allowRandom, isFr
   return qb
 }
 
-// eslint-disable-next-line
-// @ts-ignore
-Date.prototype.addDays = function (days) {
-  const date = new Date(this.valueOf())
-  date.setDate(date.getDate() + days)
-  return date
-}
 
 export const removeObjectKeysWithEmptyValues = (obj) =>
   Object.keys(obj).forEach((key) => obj[key] == null && delete obj[key])
