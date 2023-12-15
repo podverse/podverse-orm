@@ -3,11 +3,8 @@ import ManticoreSearch from 'manticoresearch'
 
 /* Connect to Manticore API */
 
-const { manticore } = config
-const { domain, port, protocol } = manticore
-
 const client = new ManticoreSearch.ApiClient()
-client.basePath = `${protocol}://${domain}:${port}`
+client.basePath = `${config.manticore.protocol}://${config.manticore.domain}:${config.manticore.port}`
 
 export const searchApi = new ManticoreSearch.UtilsApi(client)
 
