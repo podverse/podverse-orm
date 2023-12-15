@@ -130,13 +130,6 @@ Date.prototype.addDays = function (days) {
   return date
 }
 
-export const isBeforeDate = (expirationDate, dayOffset = 0) => {
-  const currentDate = new Date() as any
-
-  const offsetDate = currentDate.addDays(dayOffset)
-  return new Date(expirationDate) > offsetDate
-}
-
 export const removeObjectKeysWithEmptyValues = (obj) =>
   Object.keys(obj).forEach((key) => obj[key] == null && delete obj[key])
 
