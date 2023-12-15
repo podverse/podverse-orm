@@ -29,7 +29,7 @@ export const validateClassOrThrow = async (obj) => {
   }
 }
 
-export const errorMessages = {
+export const accountClaimErrorMessages = {
   accountClaimToken: {
     redeem: {
       accountClaimTokenNotFound: 'AccountClaimToken not found. If the issue persists please contact support.',
