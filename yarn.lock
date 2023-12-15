@@ -1655,7 +1655,7 @@ podverse-external-services@^1.0.0:
     axios "^1.6.2"
     crypto-js "^4.2.0"
     podcast-partytime "^4.8.0"
-    podverse-shared "^4.15.2"
+    podverse-shared "^4.15.3"
 
 podverse-shared@^4.15.2, podverse-shared@^4.15.3:
   version "4.15.3"

@@ -1,4 +1,4 @@
-import { parseIntOrDefault } from "podverse-shared";
+import { parseIntOrDefault } from "podverse-shared"
 
 // TODO: pass in config
 export const config = {
