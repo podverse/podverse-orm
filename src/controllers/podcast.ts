@@ -480,12 +480,12 @@ const getPodcastWebUrl = async ({ podcastGuid, podcastIndexId }: GetPodcastWebUr
   if (podcastGuid) {
     const podcast = await getPodcastByPodcastGuid(podcastGuid)
     return {
-      webUrl: `${config.websiteProtocol}://${config.websiteDomain}/podcast/${podcast.id}`
+      webUrl: `${config.website.protocol}://${config.website.domain}/podcast/${podcast.id}`
     }
   } else if (podcastIndexId) {
     const podcast = await getPodcastByPodcastIndexId(podcastIndexId)
     return {
-      webUrl: `${config.websiteProtocol}://${config.websiteDomain}/podcast/${podcast.id}`
+      webUrl: `${config.website.protocol}://${config.website.domain}/podcast/${podcast.id}`
     }
   } else {
     throw new createError.NotFound('Podcast not found')

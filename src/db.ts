@@ -53,20 +53,18 @@ const entities = [
   UserQueueItem
 ]
 
-const options = config.db
-
 const connectionOptions: ConnectionOptions = {
   type: 'postgres',
-  host: options.host,
-  port: options.port,
-  username: options.username,
-  password: options.password,
-  database: options.database,
+  host: config.db.host,
+  port: config.db.port,
+  username: config.db.username,
+  password: config.db.password,
+  database: config.db.database,
   synchronize: false,
   logging: false,
   entities,
   extra: {
-    ssl: options.sslConnection
+    ssl: config.db.sslConnection
   }
 }
 

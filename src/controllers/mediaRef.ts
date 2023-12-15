@@ -9,8 +9,6 @@ import { getManticoreOrderByColumnName, manticoreWildcardSpecialCharacters, sear
 import { addOrderByToQuery } from '../lib/misc'
 import { validateSearchQueryString } from '../lib/validation'
 
-const { superUserId } = config
-
 const relations = [
   'authors',
   'categories',
@@ -335,7 +333,7 @@ const updateSoundBites = async (episodeId, newSoundBites, episodeTitle, podcastT
       existingSoundBite.endTime = endTime
       existingSoundBite.title = finalTitle
 
-      await updateMediaRef(existingSoundBite, superUserId)
+      await updateMediaRef(existingSoundBite, config.superUserId)
 
       // remove existing soundbite from existingSoundBites
       existingSoundBites = existingSoundBites.filter((x: any) => {
@@ -348,7 +346,7 @@ const updateSoundBites = async (episodeId, newSoundBites, episodeTitle, podcastT
         isPublic: true,
         startTime,
         endTime,
-        owner: superUserId,
+        owner: config.superUserId,
         title: finalTitle
       })
     }
@@ -358,7 +356,7 @@ const updateSoundBites = async (episodeId, newSoundBites, episodeTitle, podcastT
   const leftoverExistingSoundBites = existingSoundBites
   for (const leftoverExistingSoundBite of leftoverExistingSoundBites) {
     leftoverExistingSoundBite.isPublic = false
-    await updateMediaRef(leftoverExistingSoundBite, superUserId)
+    await updateMediaRef(leftoverExistingSoundBite, config.superUserId)
   }
 }
 

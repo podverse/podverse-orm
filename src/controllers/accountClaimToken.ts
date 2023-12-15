@@ -1,7 +1,7 @@
 import createError from 'http-errors'
 import { getRepository } from 'typeorm'
 import { AccountClaimToken } from '../entities'
-import { errorMessages, validateClassOrThrow } from '../lib/errors'
+import { accountClaimErrorMessages, validateClassOrThrow } from '../lib/errors'
 import { addYearsToUserMembershipExpiration, getUserByEmail } from './user'
 
 const getAccountClaimToken = async (id: string) => {
@@ -37,9 +37,9 @@ const redeemAccountClaimToken = async (id: string, email: string) => {
   )
 
   if (!accountClaimToken) {
-    throw new createError.NotFound(errorMessages.accountClaimToken.redeem.accountClaimTokenNotFound)
+    throw new createError.NotFound(accountClaimErrorMessages.accountClaimToken.redeem.accountClaimTokenNotFound)
   } else if (accountClaimToken.claimed) {
-    throw new createError.BadRequest(errorMessages.accountClaimToken.redeem.alreadyClaimed)
+    throw new createError.BadRequest(accountClaimErrorMessages.accountClaimToken.redeem.alreadyClaimed)
   } else if (!accountClaimToken.claimed) {
     const user = await getUserByEmail(email)
     await addYearsToUserMembershipExpiration(user.id, accountClaimToken.yearsToAdd)

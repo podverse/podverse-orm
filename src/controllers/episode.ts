@@ -12,8 +12,6 @@ import { validateSearchQueryString } from '../lib/validation'
 import { createMediaRef, updateMediaRef } from './mediaRef'
 import { getPodcast, getPodcastByPodcastGuid } from './podcast'
 
-const { superUserId } = config
-
 const relations = [
   'authors',
   'categories',
@@ -755,7 +753,7 @@ const retrieveLatestChapters = async (id, includeNonToc = true) => {
                 ...existingChapter,
                 isPublic: false
               },
-              superUserId
+              config.superUserId
             )
           }
 
@@ -784,7 +782,7 @@ const retrieveLatestChapters = async (id, includeNonToc = true) => {
                     isChapterToc,
                     chapterHash
                   },
-                  superUserId
+                  config.superUserId
                 )
               } else {
                 await createMediaRef({
@@ -795,7 +793,7 @@ const retrieveLatestChapters = async (id, includeNonToc = true) => {
                   linkUrl: newChapter.url || null,
                   startTime: roundedStartTime,
                   title: newChapter.title,
-                  owner: superUserId,
+                  owner: config.superUserId,
                   episodeId: id,
                   isChapterToc,
                   chapterHash
@@ -949,7 +947,7 @@ const getEpisodeWebUrl = async ({ podcastGuid, podcastIndexId, episodeGuid }: Ge
     }
 
     return {
-      webUrl: `${config.websiteProtocol}://${config.websiteDomain}/episode/${episode.id}`
+      webUrl: `${config.website.protocol}://${config.website.domain}/episode/${episode.id}`
     }
   } else if (episodeGuid && podcastIndexId) {
     const episode = await getRepository(Episode)
@@ -966,7 +964,7 @@ const getEpisodeWebUrl = async ({ podcastGuid, podcastIndexId, episodeGuid }: Ge
     }
 
     return {
-      webUrl: `${config.websiteProtocol}://${config.websiteDomain}/episode/${episode.id}`
+      webUrl: `${config.website.protocol}://${config.website.domain}/episode/${episode.id}`
     }
   } else {
     throw new createError.NotFound('Episode not found')
