@@ -34,10 +34,20 @@ export class FeedService {
     });
   }
 
-  async getBy({ url, podcast_index_id }: FeedCreateDto): Promise<Feed | null> {
+  async getByUrlAndPodcastIndexId({ url, podcast_index_id }: { url: string, podcast_index_id: number }): Promise<Feed | null> {
     return this.repository.findOne({
       where: {
         url,
+        channel: {
+          podcast_index_id
+        }
+      }
+    });
+  }
+  
+  async getByPodcastIndexId({ podcast_index_id }: { podcast_index_id: number }): Promise<Feed | null> {
+    return this.repository.findOne({
+      where: {
         channel: {
           podcast_index_id
         }
