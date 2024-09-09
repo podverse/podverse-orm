@@ -25,12 +25,15 @@ export class FeedService {
   private repository = AppDataSource.getRepository(Feed);
 
   async get(id: number): Promise<Feed | null> {
-    return this.repository.findOne({ where: { id }});
+    return this.repository.findOne({
+      where: { id },
+      relations: ['channel', 'feed_flag_status', 'feed_log'],
+    });
   }
 
   async getAll(): Promise<Feed[]> {
     return await this.repository.find({
-      relations: ['channel']
+      relations: ['channel', 'feed_flag_status', 'feed_log'],
     });
   }
 
@@ -41,7 +44,8 @@ export class FeedService {
         channel: {
           podcast_index_id
         }
-      }
+      },
+      relations: ['channel', 'feed_flag_status', 'feed_log'],
     });
   }
   
@@ -51,14 +55,15 @@ export class FeedService {
         channel: {
           podcast_index_id
         }
-      }
+      },
+      relations: ['channel', 'feed_flag_status', 'feed_log'],
     });
   }
 
   async getOrCreate({ url, podcast_index_id }: FeedCreateDto): Promise<Feed> {
     const feed = await this.repository.findOne({
       where: { url },
-      relations: ['feed_flag_status', 'feed_log'],
+      relations: ['channel', 'feed_flag_status', 'feed_log'],
     });
 
     if (feed) {
