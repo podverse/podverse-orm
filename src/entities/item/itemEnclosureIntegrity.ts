@@ -14,6 +14,6 @@ export class ItemEnclosureIntegrity {
   @Column({ type: 'text' })
   type!: 'sri' | 'pgp-signature';
 
-  @Column({ type: 'text', length: DATABASE_CONSTANTS.varchar_long })
+  @Column({ type: 'varchar', length: DATABASE_CONSTANTS.varchar_long })
   value!: string;
 }

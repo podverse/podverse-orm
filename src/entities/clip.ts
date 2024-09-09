@@ -30,7 +30,7 @@ export class Clip {
   @Column({ type: 'varchar', nullable: true, length: DATABASE_CONSTANTS.varchar_normal })
   title?: string | null;
 
-  @Column({ type: 'text', nullable: true, length: DATABASE_CONSTANTS.varchar_long })
+  @Column({ type: 'varchar', nullable: true, length: DATABASE_CONSTANTS.varchar_long })
   description?: string | null;
 
   @ManyToOne(() => SharableStatus, sharableStatus => sharableStatus.id)
