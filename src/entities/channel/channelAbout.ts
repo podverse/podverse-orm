@@ -1,3 +1,4 @@
+import { DATABASE_CONSTANTS } from 'podverse-helpers';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { Channel } from '@orm/entities/channel/channel';
 import { ChannelItunesType, ChannelItunesTypeItunesTypeEnum } from '@orm/entities/channel/channelItunesType';
@@ -11,7 +12,7 @@ export class ChannelAbout {
   @JoinColumn({ name: 'channel_id' })
   channel!: Channel;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: true, length: DATABASE_CONSTANTS.varchar_normal })
   author!: string | null;
 
   @Column({ type: 'int', nullable: true })
@@ -24,12 +25,12 @@ export class ChannelAbout {
   @JoinColumn({ name: 'itunes_type_id' })
   itunes_type!: ChannelItunesTypeItunesTypeEnum | null;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: true, length: DATABASE_CONSTANTS.varchar_short })
   language!: string | null;
 
   @Column({ type: 'timestamp', nullable: true })
   last_pub_date!: Date | null;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: true, length: DATABASE_CONSTANTS.varchar_url })
   website_link_url!: string | null;
 }

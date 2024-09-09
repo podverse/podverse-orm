@@ -1,3 +1,4 @@
+import { DATABASE_CONSTANTS } from 'podverse-helpers';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { ItemEnclosure } from '@orm/entities/item/itemEnclosure';
 
@@ -13,6 +14,6 @@ export class ItemEnclosureIntegrity {
   @Column({ type: 'text' })
   type!: 'sri' | 'pgp-signature';
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', length: DATABASE_CONSTANTS.varchar_long })
   value!: string;
 }

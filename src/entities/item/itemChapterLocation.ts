@@ -1,3 +1,4 @@
+import { DATABASE_CONSTANTS } from 'podverse-helpers';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Check } from 'typeorm';
 import { ItemChapter } from '@orm/entities/item/itemChapter';
 
@@ -11,12 +12,12 @@ export class ItemChapterLocation {
   @JoinColumn({ name: 'item_chapter_id' })
   item_chapter!: ItemChapter;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: true, length: DATABASE_CONSTANTS.varchar_normal })
   geo?: string | null;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: true, length: DATABASE_CONSTANTS.varchar_normal })
   osm?: string | null;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: true, length: DATABASE_CONSTANTS.varchar_normal })
   name!: string | null;
 }

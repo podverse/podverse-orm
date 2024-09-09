@@ -1,3 +1,4 @@
+import { DATABASE_CONSTANTS } from 'podverse-helpers';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { Account } from '@orm/entities/account/account';
 
@@ -10,9 +11,9 @@ export class AccountProfile {
   @JoinColumn({ name: 'account_id' })
   account!: Account;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: true, length: DATABASE_CONSTANTS.varchar_normal })
   display_name?: string | null;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: true, length: DATABASE_CONSTANTS.varchar_long })
   bio?: string | null;
 }

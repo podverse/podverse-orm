@@ -1,3 +1,4 @@
+import { DATABASE_CONSTANTS } from 'podverse-helpers';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, BeforeInsert } from 'typeorm';
 import { Account } from '@orm/entities/account/account';
 import { SharableStatus } from '@orm/entities/sharableStatus';
@@ -20,10 +21,10 @@ export class Playlist {
   @JoinColumn({ name: 'sharable_status_id' })
   sharable_status!: SharableStatus;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: true, length: DATABASE_CONSTANTS.varchar_normal })
   title?: string | null;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: true, length: DATABASE_CONSTANTS.varchar_long })
   description?: string | null;
 
   @Column({ type: 'boolean', default: false })

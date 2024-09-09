@@ -1,3 +1,4 @@
+import { DATABASE_CONSTANTS } from 'podverse-helpers';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Unique } from 'typeorm';
 import { Channel } from '@orm/entities/channel/channel';
 
@@ -11,6 +12,6 @@ export class ChannelDescription {
   @JoinColumn({ name: 'channel_id' })
   channel!: Channel;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'varchar', length: DATABASE_CONSTANTS.varchar_long })
   value!: string;
 }

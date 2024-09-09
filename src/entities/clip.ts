@@ -1,3 +1,4 @@
+import { DATABASE_CONSTANTS } from 'podverse-helpers';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, BeforeInsert } from 'typeorm';
 import { Account } from '@orm/entities/account/account';
 import { Item } from '@orm/entities/item/item';
@@ -26,10 +27,10 @@ export class Clip {
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
   end_time?: string | null;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: true, length: DATABASE_CONSTANTS.varchar_normal })
   title?: string | null;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text', nullable: true, length: DATABASE_CONSTANTS.varchar_long })
   description?: string | null;
 
   @ManyToOne(() => SharableStatus, sharableStatus => sharableStatus.id)

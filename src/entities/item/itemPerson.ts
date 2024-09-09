@@ -1,3 +1,4 @@
+import { DATABASE_CONSTANTS } from 'podverse-helpers';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, BeforeInsert, BeforeUpdate } from 'typeorm';
 import { Item } from './item';
 
@@ -10,19 +11,19 @@ export class ItemPerson {
   @JoinColumn({ name: 'item_id' })
   item!: Item;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', length: DATABASE_CONSTANTS.varchar_normal })
   name!: string;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: true, length: DATABASE_CONSTANTS.varchar_normal })
   role!: string | null;
 
-  @Column({ type: 'varchar', default: 'cast' })
+  @Column({ type: 'varchar', default: 'cast', length: DATABASE_CONSTANTS.varchar_normal })
   person_group!: string | null;
 
-  @Column({ type: 'varchar', nullable: true  })
+  @Column({ type: 'varchar', nullable: true, length: DATABASE_CONSTANTS.varchar_url })
   img!: string | null;
 
-  @Column({ type: 'varchar', nullable: true  })
+  @Column({ type: 'varchar', nullable: true, length: DATABASE_CONSTANTS.varchar_url })
   href!: string | null;
 
   @BeforeInsert()

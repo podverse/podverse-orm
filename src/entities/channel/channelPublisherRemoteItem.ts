@@ -1,3 +1,4 @@
+import { DATABASE_CONSTANTS } from 'podverse-helpers';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { ChannelPublisher } from '@orm/entities/channel/channelPublisher';
 
@@ -13,12 +14,12 @@ export class ChannelPublisherRemoteItem {
   @Column({ type: 'uuid', name: 'feed_guid' })
   feed_guid!: string;
 
-  @Column({ type: 'varchar', name: 'feed_url', nullable: true })
+  @Column({ type: 'varchar', name: 'feed_url', nullable: true, length: DATABASE_CONSTANTS.varchar_url })
   feed_url!: string | null;
 
-  @Column({ type: 'varchar', name: 'item_guid', nullable: true })
+  @Column({ type: 'varchar', name: 'item_guid', nullable: true, length: DATABASE_CONSTANTS.varchar_uri })
   item_guid!: string | null;
 
-  @Column({ type: 'varchar', name: 'title', nullable: true })
+  @Column({ type: 'varchar', name: 'title', nullable: true, length: DATABASE_CONSTANTS.varchar_normal })
   title!: string | null;
 }

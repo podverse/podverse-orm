@@ -1,3 +1,4 @@
+import { DATABASE_CONSTANTS } from 'podverse-helpers';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Unique } from 'typeorm';
 import { Item } from '@orm/entities/item/item';
 
@@ -11,6 +12,6 @@ export class ItemDescription {
   @JoinColumn({ name: 'item_id' })
   item!: Item;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'varchar', length: DATABASE_CONSTANTS.varchar_long })
   value!: string;
 }

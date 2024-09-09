@@ -1,3 +1,4 @@
+import { DATABASE_CONSTANTS } from 'podverse-helpers';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { Channel } from '@orm/entities/channel/channel';
 import { ChannelSeason } from './channelSeason';
@@ -11,10 +12,10 @@ export class ChannelTrailer {
   @JoinColumn({ name: 'channel_id' })
   channel!: Channel;
 
-  @Column({ type: 'varchar', name: 'title', nullable: true })
+  @Column({ type: 'varchar', name: 'title', nullable: true, length: DATABASE_CONSTANTS.varchar_normal })
   title!: string | null;
 
-  @Column({ type: 'varchar', name: 'url' })
+  @Column({ type: 'varchar', name: 'url', length: DATABASE_CONSTANTS.varchar_url })
   url!: string | null;
 
   @Column({ type: 'timestamptz', name: 'pubdate' })
@@ -23,7 +24,7 @@ export class ChannelTrailer {
   @Column({ type: 'integer', name: 'length', nullable: true })
   length!: number | null;
 
-  @Column({ type: 'varchar', name: 'type', nullable: true })
+  @Column({ type: 'varchar', name: 'type', nullable: true, length: DATABASE_CONSTANTS.varchar_short })
   type!: string | null;
   
   @ManyToOne(() => ChannelSeason, channel_season => channel_season.id, { nullable: true, onDelete: 'CASCADE' })

@@ -1,3 +1,4 @@
+import { DATABASE_CONSTANTS } from 'podverse-helpers';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, BeforeInsert, BeforeUpdate } from 'typeorm';
 import { Channel } from '@orm/entities/channel/channel';
 
@@ -10,19 +11,19 @@ export class ChannelPerson {
   @JoinColumn({ name: 'channel_id' })
   channel!: Channel;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', length: DATABASE_CONSTANTS.varchar_normal })
   name!: string;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: true, length: DATABASE_CONSTANTS.varchar_normal })
   role!: string | null;
 
-  @Column({ type: 'varchar', default: 'cast' })
+  @Column({ type: 'varchar', default: 'cast', length: DATABASE_CONSTANTS.varchar_normal })
   person_group!: string;
 
-  @Column({ type: 'varchar', nullable: true  })
+  @Column({ type: 'varchar', nullable: true, length: DATABASE_CONSTANTS.varchar_url })
   img!: string | null;
 
-  @Column({ type: 'varchar', nullable: true  })
+  @Column({ type: 'varchar', nullable: true, length: DATABASE_CONSTANTS.varchar_url })
   href!: string | null;
 
   @BeforeInsert()

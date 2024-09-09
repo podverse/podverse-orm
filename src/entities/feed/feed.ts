@@ -1,3 +1,4 @@
+import { DATABASE_CONSTANTS } from 'podverse-helpers';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
 import { Channel } from '@orm/entities/channel/channel';
 import { FeedFlagStatus } from '@orm/entities/feed/feedFlagStatus';
@@ -8,7 +9,7 @@ export class Feed {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ type: 'varchar', unique: true })
+  @Column({ type: 'varchar', unique: true, length: DATABASE_CONSTANTS.varchar_url })
   url!: string;
 
   @ManyToOne(() => FeedFlagStatus, feed_flag_status => feed_flag_status.id)
@@ -24,10 +25,10 @@ export class Feed {
   @Column({ type: 'int', default: 0 })
   parsing_priority!: number;
 
-  @Column({ type: 'varchar', length: 32, nullable: true })
+  @Column({ type: 'varchar', length: DATABASE_CONSTANTS.varchar_md5, nullable: true })
   last_parsed_file_hash!: string | null;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: true, length: 12 })
   container_id!: string | null;
 
   @OneToOne(() => Channel, channel => channel.feed)

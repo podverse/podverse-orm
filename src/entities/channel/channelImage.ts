@@ -1,3 +1,4 @@
+import { DATABASE_CONSTANTS } from 'podverse-helpers';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { Channel } from '@orm/entities/channel/channel';
 
@@ -10,7 +11,7 @@ export class ChannelImage {
   @JoinColumn({ name: 'channel_id' })
   channel!: Channel;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', length: DATABASE_CONSTANTS.varchar_url })
   url!: string;
 
   @Column({ type: 'int', nullable: true })

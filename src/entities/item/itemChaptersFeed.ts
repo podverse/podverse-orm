@@ -1,3 +1,4 @@
+import { DATABASE_CONSTANTS } from 'podverse-helpers';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
 import { Item } from '@orm/entities/item/item';
 import { ItemChaptersFeedLog } from '@orm/entities/item/itemChaptersFeedLog';
@@ -11,10 +12,10 @@ export class ItemChaptersFeed {
   @JoinColumn({ name: 'item_id' })
   item!: Item;
 
-  @Column({ type: 'varchar', name: 'url' })
+  @Column({ type: 'varchar', name: 'url', length: DATABASE_CONSTANTS.varchar_url })
   url!: string;
 
-  @Column({ type: 'varchar', name: 'type' })
+  @Column({ type: 'varchar', name: 'type', length: DATABASE_CONSTANTS.varchar_short })
   type!: string;
 
   @OneToOne(() => ItemChaptersFeedLog, item_chapters_feed_log => item_chapters_feed_log.item_chapters_feed)

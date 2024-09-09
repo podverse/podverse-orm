@@ -1,3 +1,4 @@
+import { DATABASE_CONSTANTS } from 'podverse-helpers';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Unique, Index, OneToOne, JoinColumn, BeforeInsert, BeforeUpdate } from 'typeorm';
 import { Feed } from '@orm/entities/feed/feed'; 
 import { Medium, MediumEnum } from '@orm/entities/medium';
@@ -14,7 +15,7 @@ export class Channel {
   @Column({ type: 'varchar', unique: true })
   id_text!: string;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: true, length: DATABASE_CONSTANTS.varchar_slug })
   slug!: string | null;
 
   @OneToOne(() => Feed, { cascade: true })
@@ -30,10 +31,10 @@ export class Channel {
   @Column({ type: 'uuid', nullable: true })
   podcast_guid!: string | null;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: true, length: DATABASE_CONSTANTS.varchar_normal })
   title!: string | null;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: true, length: DATABASE_CONSTANTS.varchar_short })
   sortable_title!: string | null;
 
   @ManyToOne(() => Medium, medium => medium.id, { nullable: true })

@@ -1,3 +1,4 @@
+import { DATABASE_CONSTANTS } from 'podverse-helpers';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { Item } from '@orm/entities/item/item';
 
@@ -10,7 +11,7 @@ export class ItemEnclosure {
   @JoinColumn({ name: 'item_id' })
   item!: Item;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', length: DATABASE_CONSTANTS.varchar_short })
   type!: string;
 
   @Column({ type: 'int', nullable: true })
@@ -22,16 +23,16 @@ export class ItemEnclosure {
   @Column({ type: 'int', nullable: true })
   height?: number | null;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: true, length: DATABASE_CONSTANTS.varchar_short })
   language?: string | null;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: true, length: DATABASE_CONSTANTS.varchar_short })
   title?: string | null;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: true, length: DATABASE_CONSTANTS.varchar_short })
   rel?: string | null;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: true, length: DATABASE_CONSTANTS.varchar_short })
   codecs?: string | null;
 
   @Column({ type: 'boolean', default: false })

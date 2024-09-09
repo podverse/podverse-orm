@@ -1,3 +1,4 @@
+import { DATABASE_CONSTANTS } from 'podverse-helpers';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Unique } from 'typeorm';
 import { Channel } from '@orm/entities/channel/channel';
 
@@ -17,6 +18,6 @@ export class ChannelSeason {
   @Column({ type: 'integer', name: 'number' })
   number!: number;
 
-  @Column({ type: 'varchar', name: 'name', nullable: true })
+  @Column({ type: 'varchar', name: 'name', nullable: true, length: DATABASE_CONSTANTS.varchar_normal })
   name!: string | null;
 }

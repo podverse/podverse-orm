@@ -1,3 +1,4 @@
+import { DATABASE_CONSTANTS } from 'podverse-helpers';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Index, BeforeInsert, OneToOne } from 'typeorm';
 import { Channel } from '@orm/entities/channel/channel';
 import { LiveItem } from '../liveItem/liveItem';
@@ -13,23 +14,23 @@ export class Item {
   @Column({ type: 'varchar', unique: true })
   id_text!: string;
   
-  @Column({ type: 'varchar', name: 'slug', nullable: true })
+  @Column({ type: 'varchar', name: 'slug', nullable: true, length: DATABASE_CONSTANTS.varchar_slug })
   slug?: string | null;
 
   @ManyToOne(() => Channel, channel => channel.id, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'channel_id' })
   channel!: Channel;
   
-  @Column({ type: 'varchar', name: 'guid', nullable: true })
+  @Column({ type: 'varchar', name: 'guid', nullable: true, length: DATABASE_CONSTANTS.varchar_uri })
   guid?: string | null;
 
-  @Column({ type: 'varchar', name: 'guid_enclosure_url' })
+  @Column({ type: 'varchar', name: 'guid_enclosure_url', length: DATABASE_CONSTANTS.varchar_url })
   guid_enclosure_url!: string;
 
   @Column({ type: 'timestamptz', name: 'pubdate', nullable: true })
   pubdate?: Date | null;
 
-  @Column({ type: 'varchar', name: 'title', nullable: true })
+  @Column({ type: 'varchar', name: 'title', nullable: true, length: DATABASE_CONSTANTS.varchar_normal })
   title?: string | null;
 
   @OneToOne(() => LiveItem, liveItem => liveItem.item, { nullable: true })

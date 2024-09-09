@@ -1,3 +1,4 @@
+import { DATABASE_CONSTANTS } from 'podverse-helpers';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { ChannelValue } from '@orm/entities/channel/channelValue';
 
@@ -10,22 +11,22 @@ export class ChannelValueRecipient {
   @JoinColumn({ name: 'channel_value_id' })
   channel_value!: ChannelValue;
 
-  @Column({ type: 'varchar', name: 'type' })
+  @Column({ type: 'varchar', name: 'type', length: DATABASE_CONSTANTS.varchar_short })
   type!: string;
 
-  @Column({ type: 'varchar', name: 'address' })
+  @Column({ type: 'varchar', name: 'address', length: DATABASE_CONSTANTS.varchar_long })
   address!: string;
 
   @Column({ type: 'float', name: 'split' })
   split!: number;
 
-  @Column({ type: 'varchar', name: 'name', nullable: true })
+  @Column({ type: 'varchar', name: 'name', nullable: true, length: DATABASE_CONSTANTS.varchar_normal })
   name!: string | null;
 
-  @Column({ type: 'varchar', name: 'custom_key', nullable: true })
+  @Column({ type: 'varchar', name: 'custom_key', nullable: true, length: DATABASE_CONSTANTS.varchar_long })
   custom_key!: string | null;
 
-  @Column({ type: 'varchar', name: 'custom_value', nullable: true })
+  @Column({ type: 'varchar', name: 'custom_value', nullable: true, length: DATABASE_CONSTANTS.varchar_long })
   custom_value!: string | null;
 
   @Column({ type: 'boolean', name: 'fee', default: false })

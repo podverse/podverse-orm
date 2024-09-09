@@ -1,9 +1,10 @@
+import { DATABASE_CONSTANTS } from 'podverse-helpers';
 import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { Account } from '@orm/entities/account/account';
 
 @Entity()
 export class AccountFCMDevice {
-  @PrimaryColumn()
+  @PrimaryColumn({ type: 'varchar', length: DATABASE_CONSTANTS.varchar_fcm_token })
   fcm_token!: string;
 
   @Column()

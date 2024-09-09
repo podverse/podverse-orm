@@ -1,3 +1,4 @@
+import { DATABASE_CONSTANTS } from 'podverse-helpers';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { Item } from '@orm/entities/item/item';
 import { ItemItunesEpisodeType, ItemItunesEpisodeTypeEnum } from '@orm/entities/item/itemItunesEpisodeType';
@@ -17,7 +18,7 @@ export class ItemAbout {
   @Column({ type: 'boolean', nullable: true })
   explicit?: boolean | null;
 
-  @Column({ type: 'varchar', name: 'website_link_url', nullable: true })
+  @Column({ type: 'varchar', name: 'website_link_url', nullable: true, length: DATABASE_CONSTANTS.varchar_url })
   website_link_url?: string | null;
 
   @ManyToOne(() => ItemItunesEpisodeType, itemItunesEpisodeType => itemItunesEpisodeType.id, { nullable: true })

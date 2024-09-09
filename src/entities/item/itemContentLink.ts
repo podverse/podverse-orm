@@ -1,3 +1,4 @@
+import { DATABASE_CONSTANTS } from 'podverse-helpers';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { Item } from '@orm/entities/item/item';
 
@@ -10,9 +11,9 @@ export class ItemContentLink {
   @JoinColumn({ name: 'item_id' })
   item!: Item;
 
-  @Column({ type: 'varchar', name: 'href' })
+  @Column({ type: 'varchar', name: 'href', length: DATABASE_CONSTANTS.varchar_url })
   href!: string;
 
-  @Column({ type: 'varchar', name: 'title', nullable: true })
+  @Column({ type: 'varchar', name: 'title', nullable: true, length: DATABASE_CONSTANTS.varchar_normal })
   title?: string | null;
 }

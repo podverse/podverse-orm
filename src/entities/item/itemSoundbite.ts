@@ -1,3 +1,4 @@
+import { DATABASE_CONSTANTS } from 'podverse-helpers';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, BeforeInsert } from 'typeorm';
 import { Item } from '@orm/entities/item/item';
 const shortid = require('shortid');
@@ -20,7 +21,7 @@ export class ItemSoundbite {
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   duration!: string;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: true, length: DATABASE_CONSTANTS.varchar_normal })
   title?: string | null;
 
   @BeforeInsert()
