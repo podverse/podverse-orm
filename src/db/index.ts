@@ -103,6 +103,7 @@ export const AppDataSource = new DataSource({
   username: config.database.username,
   password: config.database.password,
   database: config.database.database,
+  cache: false,
   synchronize: false,
   logging: false,
   entities: [

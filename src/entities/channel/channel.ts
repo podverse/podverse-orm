@@ -1,7 +1,7 @@
-import { DATABASE_CONSTANTS } from 'podverse-helpers';
+import { DATABASE_CONSTANTS, MediumEnum } from 'podverse-helpers';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Unique, Index, OneToOne, JoinColumn, BeforeInsert, BeforeUpdate } from 'typeorm';
 import { Feed } from '@orm/entities/feed/feed'; 
-import { Medium, MediumEnum } from '@orm/entities/medium';
+import { Medium } from '@orm/entities/medium';
 const shortid = require('shortid');
 
 @Entity('channel')
@@ -43,6 +43,9 @@ export class Channel {
 
   @Column({ type: 'boolean', default: false })
   has_podcast_index_value!: boolean;
+
+  @Column({ type: 'boolean', default: false })
+  has_value_time_splits!: boolean;
 
   @Column({ type: 'boolean', default: false })
   hidden!: boolean;

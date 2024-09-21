@@ -10,6 +10,10 @@ export class ChannelPodrollService extends BaseOneService<ChannelPodroll, 'chann
     super(ChannelPodroll, 'channel', transactionalEntityManager);
   }
 
+  async get(channel: Channel): Promise<ChannelPodroll | null> {
+    return super._get(channel);
+  }
+
   async update(channel: Channel, dto: ChannelPodrollDto): Promise<ChannelPodroll> {
     return super._update(channel, dto);
   }

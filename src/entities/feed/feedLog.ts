@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from 'typeorm';
 import { Feed } from '@orm/entities/feed/feed';
 
 @Entity('feed_log')
@@ -6,7 +6,8 @@ export class FeedLog {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @ManyToOne(() => Feed, feed => feed.id, { onDelete: 'CASCADE' })
+  @OneToOne(() => Feed, feed => feed.feed_log, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'feed_id' })
   feed!: Feed;
 
   @Column({ type: 'int', nullable: true })

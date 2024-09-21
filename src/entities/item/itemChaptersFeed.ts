@@ -1,5 +1,5 @@
 import { DATABASE_CONSTANTS } from 'podverse-helpers';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, OneToOne } from 'typeorm';
 import { Item } from '@orm/entities/item/item';
 import { ItemChaptersFeedLog } from '@orm/entities/item/itemChaptersFeedLog';
 
@@ -8,7 +8,7 @@ export class ItemChaptersFeed {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @ManyToOne(() => Item, item => item.id, { onDelete: 'CASCADE' })
+  @OneToOne(() => Item, item => item.item_chapters_feed, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'item_id' })
   item!: Item;
 

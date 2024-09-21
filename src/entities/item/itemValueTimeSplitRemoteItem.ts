@@ -1,5 +1,5 @@
 import { DATABASE_CONSTANTS } from 'podverse-helpers';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, OneToOne } from 'typeorm';
 import { ItemValueTimeSplit } from '@orm/entities/item/itemValueTimeSplit';
 
 @Entity()
@@ -7,7 +7,7 @@ export class ItemValueTimeSplitRemoteItem {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @ManyToOne(() => ItemValueTimeSplit, itemValueTimeSplit => itemValueTimeSplit.id, { onDelete: 'CASCADE' })
+  @OneToOne(() => ItemValueTimeSplit, itemValueTimeSplit => itemValueTimeSplit.id, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'item_value_time_split_id' })
   item_value_time_split!: ItemValueTimeSplit;
 

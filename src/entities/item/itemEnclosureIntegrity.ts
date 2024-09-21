@@ -1,5 +1,5 @@
 import { DATABASE_CONSTANTS } from 'podverse-helpers';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, OneToOne } from 'typeorm';
 import { ItemEnclosure } from '@orm/entities/item/itemEnclosure';
 
 @Entity()
@@ -7,7 +7,7 @@ export class ItemEnclosureIntegrity {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @ManyToOne(() => ItemEnclosure, itemEnclosureSource => itemEnclosureSource.id, { onDelete: 'CASCADE' })
+  @OneToOne(() => ItemEnclosure, itemEnclosureSource => itemEnclosureSource.id, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'item_enclosure_id' })
   item_enclosure!: ItemEnclosure;
 

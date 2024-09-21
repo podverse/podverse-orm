@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne } from 'typeorm';
 import { ItemChaptersFeed } from '@orm/entities/item/itemChaptersFeed';
 
 @Entity('item_chapters_feed_log')
@@ -6,7 +6,7 @@ export class ItemChaptersFeedLog {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @ManyToOne(() => ItemChaptersFeed, item_chapters_feed => item_chapters_feed.id, { onDelete: 'CASCADE' })
+  @OneToOne(() => ItemChaptersFeed, item_chapters_feed => item_chapters_feed.id, { onDelete: 'CASCADE' })
   item_chapters_feed!: ItemChaptersFeed;
 
   @Column({ type: 'int', nullable: true })

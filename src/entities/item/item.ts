@@ -1,8 +1,9 @@
 import { DATABASE_CONSTANTS } from 'podverse-helpers';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Index, BeforeInsert, OneToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Index, BeforeInsert, OneToOne, OneToMany } from 'typeorm';
 import { Channel } from '@orm/entities/channel/channel';
 import { LiveItem } from '../liveItem/liveItem';
 import { ItemChaptersFeed } from './itemChaptersFeed';
+import { ItemValue } from './itemValue';
 const shortid = require('shortid');
 
 @Entity()
@@ -38,6 +39,9 @@ export class Item {
 
   @OneToOne(() => ItemChaptersFeed, item_chapters_feed => item_chapters_feed.item, { nullable: true })
   item_chapters_feed!: ItemChaptersFeed | null;
+
+  @OneToMany(() => ItemValue, itemValue => itemValue.item)
+  item_values!: ItemValue;
 
   @Column({ type: 'boolean', name: 'hidden', default: false })
   hidden!: boolean;

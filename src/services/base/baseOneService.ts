@@ -16,7 +16,7 @@ export class BaseOneService<T extends ObjectLiteral, K extends keyof T> {
   }
 
   async _get(parentEntity: T[K], config?: FindOneOptions<T>): Promise<T | null> {
-    const where: FindOptionsWhere<T> = { [this.parentEntityKey]: parentEntity } as FindOptionsWhere<T>;
+    const where: FindOptionsWhere<T> = { [this.parentEntityKey]: { id: parentEntity.id } } as FindOptionsWhere<T>;
     return this.repository.findOne({ where, ...config });
   }
 

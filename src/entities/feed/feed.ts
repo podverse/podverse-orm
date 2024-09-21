@@ -33,4 +33,10 @@ export class Feed {
 
   @OneToOne(() => Channel, channel => channel.feed)
   channel!: Channel;
+
+  @Column({ type: 'timestamp' })
+  created_at!: Date;
+
+  @Column({ type: 'timestamp' })
+  updated_at!: Date;
 }

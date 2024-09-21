@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
 import { ItemValue } from '@orm/entities/item/itemValue';
+import { ItemValueTimeSplitRemoteItem } from '@orm/entities/item/itemValueTimeSplitRemoteItem';
 
 @Entity()
 export class ItemValueTimeSplit {
@@ -9,6 +10,9 @@ export class ItemValueTimeSplit {
   @ManyToOne(() => ItemValue, itemValue => itemValue.id, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'item_value_id' })
   item_value!: ItemValue;
+
+  @OneToOne(() => ItemValueTimeSplitRemoteItem, item_value_time_split_remote_item => item_value_time_split_remote_item.item_value_time_split)
+  item_value_time_split_remote_item!: ItemValueTimeSplitRemoteItem;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   start_time!: string;

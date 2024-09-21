@@ -1,5 +1,5 @@
 import { DATABASE_CONSTANTS } from 'podverse-helpers';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
 import { Channel } from '@orm/entities/channel/channel';
 import { ChannelItunesType, ChannelItunesTypeItunesTypeEnum } from '@orm/entities/channel/channelItunesType';
 
@@ -8,7 +8,7 @@ export class ChannelAbout {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @ManyToOne(() => Channel, channel => channel.id, { onDelete: 'CASCADE' })
+  @OneToOne(() => Channel, channel => channel.id, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'channel_id' })
   channel!: Channel;
 

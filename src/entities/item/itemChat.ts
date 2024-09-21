@@ -1,5 +1,5 @@
 import { DATABASE_CONSTANTS } from 'podverse-helpers';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, OneToOne } from 'typeorm';
 import { Item } from '@orm/entities/item/item';
 
 @Entity()
@@ -7,7 +7,7 @@ export class ItemChat {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @ManyToOne(() => Item, item => item.id, { onDelete: 'CASCADE' })
+  @OneToOne(() => Item, item => item.id, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'item_id' })
   item!: Item;
 

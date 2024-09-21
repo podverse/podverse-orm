@@ -1,5 +1,5 @@
 import { DATABASE_CONSTANTS } from 'podverse-helpers';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
 import { ChannelSeason } from '@orm/entities/channel/channelSeason';
 import { Item } from '@orm/entities/item/item';
 
@@ -15,7 +15,7 @@ export class ItemSeason {
   @JoinColumn({ name: 'channel_season_id' })
   channel_season!: ChannelSeason;
 
-  @ManyToOne(() => Item, item => item.id, { onDelete: 'CASCADE' })
+  @OneToOne(() => Item, item => item.id, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'item_id' })
   item!: Item;
 

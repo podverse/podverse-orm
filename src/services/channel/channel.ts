@@ -1,6 +1,6 @@
+import { MediumEnum } from 'podverse-helpers';
 import { Channel } from '@orm/entities/channel/channel';
 import { Feed } from '@orm/entities/feed/feed';
-import { MediumEnum } from '@orm/entities/medium';
 import { applyProperties } from '@orm/lib/applyProperties';
 import { Repository } from 'typeorm';
 import { AppDataSource } from '@orm/db';
@@ -17,6 +17,7 @@ type ChannelDto = {
   sortable_title: string | null
   medium?: MediumEnum | null
   has_podcast_index_value?: boolean
+  has_value_time_splits?: boolean
   hidden?: boolean
   marked_for_deletion?: boolean
 }
