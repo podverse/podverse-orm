@@ -4,8 +4,10 @@ export const config = {
     type: process.env.DB_TYPE || 'postgres',
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '5432', 10),
-    username: process.env.DB_USERNAME || 'user',
-    password: process.env.DB_PASSWORD || '',
+    read_username: process.env.DB_READ_USERNAME || 'read',
+    read_password: process.env.DB_READ_PASSWORD || '',
+    read_write_username: process.env.DB_READ_WRITE_USERNAME || 'read_write',
+    read_write_password: process.env.DB_READ_WRITE_PASSWORD || '',
     database: process.env.DB_DATABASE || 'db',
     ssl_connection: process.env.DB_SSL_CONNECTION === 'true',
   }

@@ -1,4 +1,4 @@
-import { DataSource } from "typeorm";
+import { DataSource, DataSourceOptions } from "typeorm";
 import { config } from "@orm/config";
 import { Account } from "@orm/entities/account/account";
 import { AccountAdminRoles } from "@orm/entities/account/accountAdminRoles";
@@ -96,12 +96,10 @@ import { MembershipClaimToken } from "@orm/entities/membershipClaimToken";
 import { SharableStatus } from "@orm/entities/sharableStatus";
 import { SnakeNamingStrategy } from "typeorm-naming-strategies";
 
-export const AppDataSource = new DataSource({
+const commonConfig: DataSourceOptions = {
   type: "postgres",
   host: config.database.host,
   port: config.database.port,
-  username: config.database.username,
-  password: config.database.password,
   database: config.database.database,
   cache: false,
   synchronize: false,
@@ -205,4 +203,19 @@ export const AppDataSource = new DataSource({
   migrations: [],
   subscribers: [],
   namingStrategy: new SnakeNamingStrategy()
-});
+};
+
+const readConfig = {
+  ...commonConfig,
+  username: config.database.read_username,
+  password: config.database.read_password
+};
+
+const readWriteConfig = {
+  ...commonConfig,
+  username: config.database.read_write_username,
+  password: config.database.read_write_password
+};
+
+export const AppDataSourceRead = new DataSource(readConfig);
+export const AppDataSourceReadWrite = new DataSource(readWriteConfig);
