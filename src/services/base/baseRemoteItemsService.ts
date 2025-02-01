@@ -4,7 +4,7 @@ import { BaseManyService } from "@orm/services/base/baseManyService";
 export class BaseRemoteItemsService<T extends ObjectLiteral, K extends keyof T> extends BaseManyService<T, K> {
   async getAll(parentEntity: T[K]): Promise<T[]> {
     const where: FindOptionsWhere<T> = { [this.parentEntityKey]: parentEntity } as FindOptionsWhere<T>;
-    return this.repository.find({ where });
+    return this.repositoryRead.find({ where });
   }
 
   async getByItemGuid(parentEntity: T[K], item_guid: keyof T): Promise<T | null> {
@@ -12,7 +12,7 @@ export class BaseRemoteItemsService<T extends ObjectLiteral, K extends keyof T> 
       [this.parentEntityKey]: parentEntity,
       item_guid
     } as unknown as FindOptionsWhere<T>;
-    return this.repository.findOne({ where });
+    return this.repositoryRead.findOne({ where });
   }
 
   async getByFeedGuid(parentEntity: T[K], feed_guid: keyof T): Promise<T | null> {
@@ -20,7 +20,7 @@ export class BaseRemoteItemsService<T extends ObjectLiteral, K extends keyof T> 
       [this.parentEntityKey]: parentEntity,
       feed_guid
     } as unknown as FindOptionsWhere<T>;
-    return this.repository.findOne({ where });
+    return this.repositoryRead.findOne({ where });
   }
 
   async getByFeedUrl(parentEntity: T[K], feed_url: keyof T): Promise<T | null> {
@@ -28,7 +28,7 @@ export class BaseRemoteItemsService<T extends ObjectLiteral, K extends keyof T> 
       [this.parentEntityKey]: parentEntity,
       feed_url
     } as unknown as FindOptionsWhere<T>;
-    return this.repository.findOne({ where });
+    return this.repositoryRead.findOne({ where });
   }
 
   async get(parentEntity: T[K], dto: Partial<T>): Promise<T | null> {

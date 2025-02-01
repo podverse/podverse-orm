@@ -1,4 +1,4 @@
-import { AppDataSource } from '@orm/db';
+import { AppDataSourceRead, AppDataSourceReadWrite } from '@orm/db';
 import { Feed } from '@orm/entities/feed/feed';
 import { FeedFlagStatusStatusEnum } from '@orm/entities/feed/feedFlagStatus';
 import { ChannelService } from '@orm/services/channel/channel';
@@ -22,23 +22,24 @@ type FeedUpdateDto = {
 }
 
 export class FeedService {
-  private repository = AppDataSource.getRepository(Feed);
+  private repositoryRead = AppDataSourceRead.getRepository(Feed);
+  private repositoryReadWrite = AppDataSourceReadWrite.getRepository(Feed);
 
   async get(id: number): Promise<Feed | null> {
-    return this.repository.findOne({
+    return this.repositoryRead.findOne({
       where: { id },
       relations: ['channel', 'feed_flag_status', 'feed_log'],
     });
   }
 
   async getAll(): Promise<Feed[]> {
-    return await this.repository.find({
+    return await this.repositoryRead.find({
       relations: ['channel', 'feed_flag_status', 'feed_log'],
     });
   }
 
   async getByUrlAndPodcastIndexId({ url, podcast_index_id }: { url: string, podcast_index_id: number }): Promise<Feed | null> {
-    return this.repository.findOne({
+    return this.repositoryRead.findOne({
       where: {
         url,
         channel: {
@@ -50,7 +51,7 @@ export class FeedService {
   }
   
   async getByPodcastIndexId({ podcast_index_id }: { podcast_index_id: number }): Promise<Feed | null> {
-    return this.repository.findOne({
+    return this.repositoryRead.findOne({
       where: {
         channel: {
           podcast_index_id
@@ -61,7 +62,7 @@ export class FeedService {
   }
 
   async getOrCreate({ url, podcast_index_id }: FeedCreateDto): Promise<Feed> {
-    const feed = await this.repository.findOne({
+    const feed = await this.repositoryRead.findOne({
       where: { url },
       relations: ['channel', 'feed_flag_status', 'feed_log'],
     });
@@ -87,7 +88,7 @@ export class FeedService {
     feed.parsing_priority = 1;
     feed.container_id = '';
 
-    const newFeed = await this.repository.save(feed);
+    const newFeed = await this.repositoryReadWrite.save(feed);
 
     const channel = await channelService.getOrCreateByPodcastIndexId({
       feed: newFeed,
@@ -95,7 +96,7 @@ export class FeedService {
     });
     
     newFeed.channel = channel;
-    return this.repository.save(newFeed);
+    return this.repositoryReadWrite.save(newFeed);
   }
 
   async update(id: number, dto: FeedUpdateDto): Promise<Feed> {
@@ -107,6 +108,6 @@ export class FeedService {
 
     feed = applyProperties(feed, dto);
 
-    return this.repository.save(feed);
+    return this.repositoryReadWrite.save(feed);
   }
 }

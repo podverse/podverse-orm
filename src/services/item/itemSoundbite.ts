@@ -15,7 +15,7 @@ export class ItemSoundbiteService extends BaseManyService<ItemSoundbite, 'item'>
   }
 
   async _getByIdText(id_text: string): Promise<ItemSoundbite | null> {
-    return this.repository.findOne({ where: { id_text } });
+    return this.repositoryRead.findOne({ where: { id_text } });
   }
 
   async update(item: Item, dto: ItemSoundbiteDto): Promise<ItemSoundbite> {

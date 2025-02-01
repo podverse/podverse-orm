@@ -3,7 +3,7 @@ import { Channel } from '@orm/entities/channel/channel';
 import { Feed } from '@orm/entities/feed/feed';
 import { applyProperties } from '@orm/lib/applyProperties';
 import { Repository } from 'typeorm';
-import { AppDataSource } from '@orm/db';
+import { AppDataSourceRead, AppDataSourceReadWrite } from '@orm/db';
 
 type ChannelInitializeDto = {
   feed: Feed,
@@ -23,22 +23,24 @@ type ChannelDto = {
 }
 
 export class ChannelService {
-  protected repository: Repository<Channel>;
+  protected repositoryRead: Repository<Channel>;
+  protected repositoryReadWrite: Repository<Channel>;
 
   constructor() {
-    this.repository = AppDataSource.getRepository(Channel);
+    this.repositoryRead = AppDataSourceRead.getRepository(Channel);
+    this.repositoryReadWrite = AppDataSourceReadWrite.getRepository(Channel);
   }
 
   async get(id: number): Promise<Channel | null> {
-    return this.repository.findOne({ where: { id } });
+    return this.repositoryRead.findOne({ where: { id } });
   }
 
   async _getByIdText(id_text: string): Promise<Channel | null> {
-    return this.repository.findOne({ where: { id_text } });
+    return this.repositoryRead.findOne({ where: { id_text } });
   }
 
   async getByPodcastIndexId(podcast_index_id: number): Promise<Channel | null> {
-    return this.repository.findOne({ where: { podcast_index_id } });
+    return this.repositoryRead.findOne({ where: { podcast_index_id } });
   }
 
   async getOrCreateByPodcastIndexId(dto: ChannelInitializeDto): Promise<Channel> {
@@ -48,7 +50,7 @@ export class ChannelService {
       channel = new Channel();
       channel.feed_id = dto.feed.id;
       channel.podcast_index_id = dto.podcast_index_id;
-      channel = await this.repository.save(channel);
+      channel = await this.repositoryReadWrite.save(channel);
     }
 
     return channel;
@@ -63,6 +65,6 @@ export class ChannelService {
 
     channel = applyProperties(channel, dto);
 
-    return this.repository.save(channel);
+    return this.repositoryReadWrite.save(channel);
   }
 }

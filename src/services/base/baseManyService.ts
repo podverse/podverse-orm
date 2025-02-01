@@ -1,11 +1,12 @@
 import { EntityManager, FindManyOptions, FindOneOptions, FindOptionsWhere, ObjectLiteral, Repository } from "typeorm";
 import { logger } from "podverse-helpers";
-import { AppDataSource } from "@orm/db";
+import { AppDataSourceRead, AppDataSourceReadWrite } from "@orm/db";
 import { applyProperties } from "@orm/lib/applyProperties";
 import { hasDifferentValues } from "@orm/lib/hasDifferentValues";
 
 export class BaseManyService<T extends ObjectLiteral, K extends keyof T> {
-  protected repository: Repository<T>;
+  protected repositoryRead: Repository<T>;
+  protected repositoryReadWrite: Repository<T>;
   protected parentEntityKey: K;
   protected targetEntity: { new (): T };
   private transactionalEntityManager?: EntityManager;
@@ -13,13 +14,14 @@ export class BaseManyService<T extends ObjectLiteral, K extends keyof T> {
   constructor(targetEntity: { new (): T }, parentEntityKey: K, transactionalEntityManager?: EntityManager) {
     this.targetEntity = targetEntity;
     this.parentEntityKey = parentEntityKey;
-    this.repository = AppDataSource.getRepository(targetEntity) as Repository<T>;
+    this.repositoryRead = AppDataSourceRead.getRepository(targetEntity) as Repository<T>;
+    this.repositoryReadWrite = AppDataSourceReadWrite.getRepository(targetEntity) as Repository<T>;
     this.transactionalEntityManager = transactionalEntityManager;
   }
 
   public async _getAll(parentEntity: T[K], config?: FindManyOptions<T>): Promise<T[]> {
     const where: FindOptionsWhere<T> = { [this.parentEntityKey]: parentEntity } as FindOptionsWhere<T>;
-    return this.repository.find({ where, ...config });
+    return this.repositoryRead.find({ where, ...config });
   }
 
   public async _get(parentEntity: T[K], whereKeyValues: Record<string,unknown>, config?: FindOneOptions<T>): Promise<T | null> {
@@ -27,7 +29,7 @@ export class BaseManyService<T extends ObjectLiteral, K extends keyof T> {
       [this.parentEntityKey]: parentEntity,
       ...whereKeyValues
     } as FindOptionsWhere<T>;
-    return this.repository.findOne({ where, ...config });
+    return this.repositoryRead.findOne({ where, ...config });
   }
 
   public async _update(
@@ -62,7 +64,7 @@ export class BaseManyService<T extends ObjectLiteral, K extends keyof T> {
     logger.debug(`With DTO ${JSON.stringify(dto)}`);
     
     return (this.transactionalEntityManager as EntityManager
-      ?? this.repository).save(entity);
+      ?? this.repositoryReadWrite).save(entity);
   }
 
   public async _updateMany(
@@ -106,7 +108,7 @@ export class BaseManyService<T extends ObjectLiteral, K extends keyof T> {
     }
     
     await (this.transactionalEntityManager as EntityManager
-      ?? this.repository).save(updatedEntities);
+      ?? this.repositoryReadWrite).save(updatedEntities);
   
     const entitiesToDelete = existingEntities.filter(existingEntity => {
       let identifier: Partial<T> = {};
@@ -118,7 +120,7 @@ export class BaseManyService<T extends ObjectLiteral, K extends keyof T> {
 
     if (entitiesToDelete.length > 0) {
       await (this.transactionalEntityManager as EntityManager
-        ?? this.repository).remove(entitiesToDelete);
+        ?? this.repositoryReadWrite).remove(entitiesToDelete);
     }
   
     return updatedEntities;
@@ -128,7 +130,7 @@ export class BaseManyService<T extends ObjectLiteral, K extends keyof T> {
     const rowsToDelete = await this._getAll(value);
     if (rowsToDelete) {
       await (this.transactionalEntityManager as EntityManager
-        ?? this.repository).remove(rowsToDelete);
+        ?? this.repositoryReadWrite).remove(rowsToDelete);
     }
   }
 }

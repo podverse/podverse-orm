@@ -2,7 +2,7 @@ import { Channel } from '@orm/entities/channel/channel';
 import { Item } from '@orm/entities/item/item';
 import { applyProperties } from '@orm/lib/applyProperties';
 import { FindManyOptions, IsNull, Not, Repository } from 'typeorm';
-import { AppDataSource } from '@orm/db';
+import { AppDataSourceRead, AppDataSourceReadWrite } from '@orm/db';
 
 type ItemDto = {
   title: string | null
@@ -17,18 +17,20 @@ type ItemGetByDto = {
 }
 
 export class ItemService {
-  protected repository: Repository<Item>;
+  protected repositoryRead: Repository<Item>;
+  protected repositoryReadWrite: Repository<Item>;
 
   constructor() {
-    this.repository = AppDataSource.getRepository(Item);
+    this.repositoryRead = AppDataSourceRead.getRepository(Item);
+    this.repositoryReadWrite = AppDataSourceReadWrite.getRepository(Item);
   }
 
   async get(id: number): Promise<Item | null> {
-    return this.repository.findOne({ where: { id }, relations: ['item_chapters_feed'] });
+    return this.repositoryRead.findOne({ where: { id }, relations: ['item_chapters_feed'] });
   }
 
   async _getByIdText(id_text: string): Promise<Item | null> {
-    return this.repository.findOne({ where: { id_text } });
+    return this.repositoryRead.findOne({ where: { id_text } });
   }
 
   async getBy(channel: Channel, dto: ItemGetByDto): Promise<Item | null> {
@@ -46,7 +48,7 @@ export class ItemService {
   }
 
   async getByGuid(channel: Channel, guid: string): Promise<Item | null> {
-    return this.repository.findOne({
+    return this.repositoryRead.findOne({
       where: {
         channel,
         guid
@@ -55,7 +57,7 @@ export class ItemService {
   }
 
   async getByEnclosureUrl(channel: Channel, guid_enclosure_url: string): Promise<Item | null> {
-    return this.repository.findOne({
+    return this.repositoryRead.findOne({
       where: {
         channel,
         guid_enclosure_url
@@ -64,7 +66,7 @@ export class ItemService {
   }
 
   async getAllItemsByChannel(channel: Channel, options?: FindManyOptions<Item>): Promise<Item[]> {
-    return this.repository.find({
+    return this.repositoryRead.find({
       where: {
         channel,
         live_item: {
@@ -76,7 +78,7 @@ export class ItemService {
   }
 
   async getAllItemsWithLiveItemByChannel(channel: Channel, options?: FindManyOptions<Item>): Promise<Item[]> {
-    return this.repository.find({
+    return this.repositoryRead.find({
       where: {
         channel,
         live_item: {
@@ -98,21 +100,21 @@ export class ItemService {
       item.guid = dto.guid;
       item.guid_enclosure_url = dto.guid_enclosure_url;
       item.channel = channel;
-      item = await this.repository.save(item);
+      item = await this.repositoryReadWrite.save(item);
     }
 
     item = applyProperties(item, dto);
 
-    return this.repository.save(item);
+    return this.repositoryReadWrite.save(item);
   }
 
   async delete(id: number): Promise<void> {
-    await this.repository.delete(id);
+    await this.repositoryReadWrite.delete(id);
   }
 
   async deleteMany(ids: number[]): Promise<void> {
     if (ids.length) {
-      await this.repository.delete(ids);
+      await this.repositoryReadWrite.delete(ids);
     }
   }
 }

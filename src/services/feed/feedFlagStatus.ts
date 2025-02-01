@@ -1,11 +1,11 @@
-import { AppDataSource } from '@orm/db';
+import { AppDataSourceRead } from '@orm/db';
 import { FeedFlagStatus } from '@orm/entities/feed/feedFlagStatus';
 
 export class FeedFlagStatusService {
-  private repository = AppDataSource.getRepository(FeedFlagStatus);
+  private repositoryRead = AppDataSourceRead.getRepository(FeedFlagStatus);
 
   async get(id: number): Promise<FeedFlagStatus | null> {
-    return await this.repository.findOne({
+    return await this.repositoryRead.findOne({
       where: { id },
     });
   }

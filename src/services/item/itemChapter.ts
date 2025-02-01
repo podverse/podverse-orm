@@ -32,7 +32,7 @@ export class ItemChapterService extends BaseManyService<ItemChapter, 'item_chapt
 
   async deleteMany(ids: number[]): Promise<void> {
     if (ids.length) {
-      await this.repository.delete(ids);
+      await this.repositoryReadWrite.delete(ids);
     }
   }
 }

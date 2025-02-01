@@ -219,3 +219,7 @@ const readWriteConfig = {
 
 export const AppDataSourceRead = new DataSource(readConfig);
 export const AppDataSourceReadWrite = new DataSource(readWriteConfig);
+
+export interface RepositoryOptions {
+  dbuser: 'read' | 'read_write';
+}
