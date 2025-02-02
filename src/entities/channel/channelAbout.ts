@@ -33,4 +33,8 @@ export class ChannelAbout {
 
   @Column({ type: 'varchar', nullable: true, length: DATABASE_CONSTANTS.varchar_url })
   website_link_url!: string | null;
+
+  @OneToOne(() => Channel, channel => channel.channel_about, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'channel_id' })
+  item!: Channel;
 }

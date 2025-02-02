@@ -1,17 +1,22 @@
 import { DATABASE_CONSTANTS } from 'podverse-helpers';
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Index } from 'typeorm';
 
 @Entity()
+@Index('idx_category_parent_id', ['parent_id'])
 export class Category {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ type: 'varchar', length: DATABASE_CONSTANTS.varchar_normal })
-  node_text!: string;
+  @ManyToOne(() => Category, category => category.id, { onDelete: 'CASCADE', nullable: true })
+  @JoinColumn({ name: 'parent_id' })
+  parent_id!: number | null;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', length: DATABASE_CONSTANTS.varchar_normal })
   display_name!: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', length: DATABASE_CONSTANTS.varchar_normal })
   slug!: string;
+
+  @Column({ type: 'varchar', length: DATABASE_CONSTANTS.varchar_normal })
+  mapping_key!: string | null;
 }

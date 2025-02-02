@@ -1,7 +1,9 @@
 import { DATABASE_CONSTANTS, MediumEnum } from 'podverse-helpers';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Unique, Index, OneToOne, JoinColumn, BeforeInsert, BeforeUpdate } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Unique, Index, OneToOne, JoinColumn, BeforeInsert, BeforeUpdate, OneToMany } from 'typeorm';
+import { ChannelAbout } from '@orm/entities/channel/channelAbout';
 import { Feed } from '@orm/entities/feed/feed'; 
 import { Medium } from '@orm/entities/medium';
+import { ChannelCategory } from './channelCategory';
 const shortid = require('shortid');
 
 @Entity('channel')
@@ -52,6 +54,12 @@ export class Channel {
 
   @Column({ type: 'boolean', default: false })
   marked_for_deletion!: boolean;
+
+  @OneToOne(() => ChannelAbout, channel_about => channel_about.channel)
+  channel_about!: ChannelAbout;
+
+  @OneToMany(() => ChannelCategory, channel_category => channel_category.channel)
+  channel_categories!: ChannelCategory[];
 
   @BeforeInsert()
   generateIdText() {

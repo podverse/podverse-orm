@@ -111,6 +111,7 @@ export * from './lib/typeORMTypes';
 export * from './services/channel/channel';
 export * from './services/channel/channelAbout';
 export * from './services/channel/channelChat';
+export * from './services/channel/channelCategory';
 export * from './services/channel/channelDescription';
 export * from './services/channel/channelFunding';
 export * from './services/channel/channelImage';

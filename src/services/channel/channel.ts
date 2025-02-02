@@ -2,7 +2,7 @@ import { MediumEnum } from 'podverse-helpers';
 import { Channel } from '@orm/entities/channel/channel';
 import { Feed } from '@orm/entities/feed/feed';
 import { applyProperties } from '@orm/lib/applyProperties';
-import { Repository } from 'typeorm';
+import { FindOneOptions, Repository } from 'typeorm';
 import { AppDataSourceRead, AppDataSourceReadWrite } from '@orm/db';
 
 type ChannelInitializeDto = {
@@ -31,8 +31,8 @@ export class ChannelService {
     this.repositoryReadWrite = AppDataSourceReadWrite.getRepository(Channel);
   }
 
-  async get(id: number): Promise<Channel | null> {
-    return this.repositoryRead.findOne({ where: { id } });
+  async get(id: number, config?: FindOneOptions<Channel>): Promise<Channel | null> {
+    return this.repositoryRead.findOne({ where: { id }, ...config });
   }
 
   async _getByIdText(id_text: string): Promise<Channel | null> {
