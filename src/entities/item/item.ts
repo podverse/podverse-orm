@@ -1,5 +1,5 @@
 import { DATABASE_CONSTANTS } from 'podverse-helpers';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Index, BeforeInsert, OneToOne, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Index, BeforeInsert, OneToOne, OneToMany, BeforeUpdate } from 'typeorm';
 import { Channel } from '@orm/entities/channel/channel';
 import { LiveItem } from '../liveItem/liveItem';
 import { ItemChaptersFeed } from './itemChaptersFeed';
@@ -26,7 +26,7 @@ export class Item {
   guid?: string | null;
 
   @Column({ type: 'varchar', name: 'guid_enclosure_url', length: DATABASE_CONSTANTS.varchar_url })
-  guid_enclosure_url!: string;
+  guid_enclosure_url?: string | null;
 
   @Column({ type: 'timestamptz', name: 'pubdate', nullable: true })
   pubdate?: Date | null;
@@ -52,5 +52,13 @@ export class Item {
   @BeforeInsert()
   generateIdText() {
     this.id_text = shortid.generate();
+  }
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  checkGuidOrEnclosureUrl() {
+    if (!this.guid && !this.guid_enclosure_url) {
+      throw new Error('Either guid or guid_enclosure_url must be present');
+    }
   }
 }
