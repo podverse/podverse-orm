@@ -26,10 +26,16 @@ export class ItemService {
   }
 
   async get(id: number, config?: FindOneOptions<Item>): Promise<Item | null> {
+    if (!id) {
+      return null;
+    }
     return this.repositoryRead.findOne({ where: { id }, ...config });
   }
 
   async _getByIdText(id_text: string, config?: FindOneOptions<Item>): Promise<Item | null> {
+    if (!id_text) {
+      return null;
+    }
     return this.repositoryRead.findOne({ where: { id_text }, ...config });
   }
 
