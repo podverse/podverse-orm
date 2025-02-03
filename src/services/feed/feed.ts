@@ -38,6 +38,17 @@ export class FeedService {
     });
   }
 
+  async getByPodcastGuid(podcast_guid: string): Promise<Feed | null> {
+    return this.repositoryRead.findOne({
+      where: {
+        channel: {
+          podcast_guid
+        }
+      },
+      relations: ['channel', 'feed_flag_status', 'feed_log'],
+    });
+  }
+
   async getByUrlAndPodcastIndexId({ url, podcast_index_id }: { url: string, podcast_index_id: number }): Promise<Feed | null> {
     return this.repositoryRead.findOne({
       where: {
