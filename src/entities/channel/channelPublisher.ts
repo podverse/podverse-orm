@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, JoinColumn, OneToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, JoinColumn, OneToOne, OneToMany } from 'typeorm';
 import { Channel } from '@orm/entities/channel/channel';
+import { ChannelPublisherRemoteItem } from '@orm/entities/channel/channelPublisherRemoteItem';
 
 @Entity({ name: 'channel_publisher' })
 export class ChannelPublisher {
@@ -9,4 +10,7 @@ export class ChannelPublisher {
   @OneToOne(() => Channel, channel => channel.id, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'channel_id' })
   channel!: Channel;
+
+  @OneToMany(() => ChannelPublisherRemoteItem, remoteItem => remoteItem.channel_publisher)
+  channel_publisher_remote_items!: ChannelPublisherRemoteItem[];
 }
