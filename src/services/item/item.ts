@@ -33,6 +33,19 @@ export class ItemService {
     return this.repositoryRead.findOne({ where: { id_text }, ...config });
   }
 
+  async getByIdOrTextId(idOrIdText: string, config?: FindOneOptions<Item>): Promise<Item | null> {
+    let item = null;
+
+    if (isNaN(Number(idOrIdText))) {
+      item = await this._getByIdText(idOrIdText, config);
+    } else {
+      const id = parseInt(idOrIdText);
+      item = await this.get(id, config);
+    }
+
+    return item;
+  }
+
   async getMany(config: FindManyOptions<Item>): Promise<Item[]> {
     return this.repositoryRead.find(config);
   }
@@ -69,7 +82,7 @@ export class ItemService {
     });
   }
 
-  async getAllItemsByChannel(channel: Channel, options?: FindManyOptions<Item>): Promise<Item[]> {
+  async getManyByChannel(channel: Channel, options?: FindManyOptions<Item>): Promise<Item[]> {
     return this.repositoryRead.find({
       where: {
         channel,
@@ -81,7 +94,7 @@ export class ItemService {
     });
   }
 
-  async getAllItemsWithLiveItemByChannel(channel: Channel, options?: FindManyOptions<Item>): Promise<Item[]> {
+  async getManyWithLiveItemByChannel(channel: Channel, options?: FindManyOptions<Item>): Promise<Item[]> {
     return this.repositoryRead.find({
       where: {
         channel,
