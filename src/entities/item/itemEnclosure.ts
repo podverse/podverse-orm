@@ -1,6 +1,8 @@
 import { DATABASE_CONSTANTS } from 'podverse-helpers';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 import { Item } from '@orm/entities/item/item';
+import { ItemEnclosureSource } from '@orm/entities/item/itemEnclosureSource';
+import { ItemEnclosureIntegrity } from '@orm/entities/item/itemEnclosureIntegrity';
 
 @Entity()
 export class ItemEnclosure {
@@ -37,4 +39,10 @@ export class ItemEnclosure {
 
   @Column({ type: 'boolean', default: false })
   item_enclosure_default!: boolean;
+
+  @OneToOne(() => ItemEnclosureIntegrity, itemEnclosureIntegrity => itemEnclosureIntegrity.item_enclosure)
+  item_enclosure_integrity!: ItemEnclosureIntegrity;
+
+  @OneToMany(() => ItemEnclosureSource, itemEnclosureSource => itemEnclosureSource.item_enclosure)
+  item_enclosure_sources!: ItemEnclosureSource[];
 }

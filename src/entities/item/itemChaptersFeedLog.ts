@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from 'typeorm';
 import { ItemChaptersFeed } from '@orm/entities/item/itemChaptersFeed';
 
 @Entity('item_chapters_feed_log')
@@ -7,6 +7,7 @@ export class ItemChaptersFeedLog {
   id!: number;
 
   @OneToOne(() => ItemChaptersFeed, item_chapters_feed => item_chapters_feed.id, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'item_chapters_feed_id' })
   item_chapters_feed!: ItemChaptersFeed;
 
   @Column({ type: 'int', nullable: true })

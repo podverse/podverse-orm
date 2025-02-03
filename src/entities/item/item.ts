@@ -2,8 +2,24 @@ import { DATABASE_CONSTANTS } from 'podverse-helpers';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Index, BeforeInsert, OneToOne, OneToMany, BeforeUpdate } from 'typeorm';
 import { Channel } from '@orm/entities/channel/channel';
 import { LiveItem } from '../liveItem/liveItem';
-import { ItemChaptersFeed } from './itemChaptersFeed';
-import { ItemValue } from './itemValue';
+import { ItemChaptersFeed } from '@orm/entities/item/itemChaptersFeed';
+import { ItemValue } from '@orm/entities/item/itemValue';
+import { ItemAbout } from '@orm/entities/item/itemAbout';
+import { ItemChat } from '@orm/entities/item/itemChat';
+import { ItemContentLink } from '@orm/entities/item/itemContentLink';
+import { ItemDescription } from '@orm/entities/item/itemDescription';
+import { ItemEnclosure } from '@orm/entities/item/itemEnclosure';
+import { ItemFunding } from '@orm/entities/item/itemFunding';
+import { ItemImage } from '@orm/entities/item/itemImage';
+import { ItemLicense } from '@orm/entities/item/itemLicense';
+import { ItemLocation } from '@orm/entities/item/itemLocation';
+import { ItemPerson } from '@orm/entities/item/itemPerson';
+import { ItemSeason } from '@orm/entities/item/itemSeason';
+import { ItemSeasonEpisode } from '@orm/entities/item/itemSeasonEpisode';
+import { ItemSocialInteract } from '@orm/entities/item/itemSocialInteract';
+import { ItemSoundbite } from '@orm/entities/item/itemSoundbite';
+import { ItemTranscript } from '@orm/entities/item/itemTranscript';
+import { ItemTxt } from '@orm/entities/item/itemTxt';
 const shortid = require('shortid');
 
 @Entity()
@@ -37,18 +53,66 @@ export class Item {
   @OneToOne(() => LiveItem, liveItem => liveItem.item, { nullable: true })
   live_item!: LiveItem | null;
 
-  @OneToOne(() => ItemChaptersFeed, item_chapters_feed => item_chapters_feed.item, { nullable: true })
-  item_chapters_feed!: ItemChaptersFeed | null;
-
-  @OneToMany(() => ItemValue, itemValue => itemValue.item)
-  item_values!: ItemValue;
-
   @Column({ type: 'boolean', name: 'hidden', default: false })
   hidden!: boolean;
 
   @Column({ type: 'boolean', name: 'marked_for_deletion', default: false })
   marked_for_deletion!: boolean;
 
+  @OneToOne(() => ItemAbout, item_about => item_about.item)
+  item_about!: ItemAbout;
+
+  @OneToOne(() => ItemChaptersFeed, item_chapters_feed => item_chapters_feed.item)
+  item_chapters_feed!: ItemChaptersFeed;
+
+  @OneToOne(() => ItemChat, item_chat => item_chat.item)
+  item_chat!: ItemChat;
+
+  @OneToMany(() => ItemContentLink, item_content_link => item_content_link.item)
+  item_content_links!: ItemContentLink[];
+
+  @OneToOne(() => ItemDescription, item_description => item_description.item)
+  item_description!: ItemDescription;
+
+  @OneToMany(() => ItemEnclosure, item_enclosure => item_enclosure.item)
+  item_enclosures!: ItemEnclosure[];
+
+  @OneToMany(() => ItemFunding, item_funding => item_funding.item)
+  item_fundings!: ItemFunding[];
+
+  @OneToMany(() => ItemImage, item_image => item_image.item)
+  item_images!: ItemImage[];
+
+  @OneToOne(() => ItemLicense, item_license => item_license.item)
+  item_license!: ItemLicense;
+
+  @OneToOne(() => ItemLocation, item_location => item_location.item)
+  item_location!: ItemLocation;
+
+  @OneToMany(() => ItemPerson, item_person => item_person.item)
+  item_persons!: ItemPerson[];
+  
+  @OneToOne(() => ItemSeason, item_season => item_season.item)
+  item_season!: ItemSeason;
+
+  @OneToOne(() => ItemSeasonEpisode, item_season_episode => item_season_episode.item)
+  item_season_episode!: ItemSeasonEpisode;
+
+  @OneToMany(() => ItemSocialInteract, item_social_interact => item_social_interact.item)
+  item_social_interacts!: ItemSocialInteract[];
+
+  @OneToMany(() => ItemSoundbite, item_soundbite => item_soundbite.item)
+  item_soundbites!: ItemSoundbite[];
+
+  @OneToMany(() => ItemTranscript, item_transcript => item_transcript.item)
+  item_transcripts!: ItemTranscript[];
+
+  @OneToMany(() => ItemTxt, item_txt => item_txt.item)
+  item_txts!: ItemTxt[];
+
+  @OneToMany(() => ItemValue, itemValue => itemValue.item)
+  item_values!: ItemValue;
+  
   @BeforeInsert()
   generateIdText() {
     this.id_text = shortid.generate();

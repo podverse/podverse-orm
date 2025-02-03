@@ -17,6 +17,6 @@ export class Category {
   @Column({ type: 'varchar', length: DATABASE_CONSTANTS.varchar_normal })
   slug!: string;
 
-  @Column({ type: 'varchar', length: DATABASE_CONSTANTS.varchar_normal })
+  @Column({ type: 'varchar', length: DATABASE_CONSTANTS.varchar_normal, nullable: true })
   mapping_key!: string | null;
 }

@@ -1,8 +1,8 @@
 import { MediumEnum } from 'podverse-helpers';
+import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
 import { Channel } from '@orm/entities/channel/channel';
 import { Feed } from '@orm/entities/feed/feed';
 import { applyProperties } from '@orm/lib/applyProperties';
-import { FindOneOptions, Repository } from 'typeorm';
 import { AppDataSourceRead, AppDataSourceReadWrite } from '@orm/db';
 
 type ChannelInitializeDto = {
@@ -35,12 +35,16 @@ export class ChannelService {
     return this.repositoryRead.findOne({ where: { id }, ...config });
   }
 
-  async _getByIdText(id_text: string): Promise<Channel | null> {
-    return this.repositoryRead.findOne({ where: { id_text } });
+  async _getByIdText(id_text: string, config?: FindOneOptions<Channel>): Promise<Channel | null> {
+    return this.repositoryRead.findOne({ where: { id_text }, ...config });
   }
 
-  async getByPodcastIndexId(podcast_index_id: number): Promise<Channel | null> {
-    return this.repositoryRead.findOne({ where: { podcast_index_id } });
+  async getByPodcastIndexId(podcast_index_id: number, config?: FindOneOptions<Channel>): Promise<Channel | null> {
+    return this.repositoryRead.findOne({ where: { podcast_index_id }, ...config });
+  }
+
+  async getMany(config: FindManyOptions<Channel>): Promise<Channel[]> {
+    return this.repositoryRead.find(config);
   }
 
   async getOrCreateByPodcastIndexId(dto: ChannelInitializeDto): Promise<Channel> {

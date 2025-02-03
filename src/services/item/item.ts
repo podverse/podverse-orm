@@ -1,7 +1,7 @@
+import { FindManyOptions, FindOneOptions, IsNull, Not, Repository } from 'typeorm';
 import { Channel } from '@orm/entities/channel/channel';
 import { Item } from '@orm/entities/item/item';
 import { applyProperties } from '@orm/lib/applyProperties';
-import { FindManyOptions, IsNull, Not, Repository } from 'typeorm';
 import { AppDataSourceRead, AppDataSourceReadWrite } from '@orm/db';
 
 type ItemDto = {
@@ -25,12 +25,16 @@ export class ItemService {
     this.repositoryReadWrite = AppDataSourceReadWrite.getRepository(Item);
   }
 
-  async get(id: number): Promise<Item | null> {
-    return this.repositoryRead.findOne({ where: { id }, relations: ['item_chapters_feed'] });
+  async get(id: number, config?: FindOneOptions<Item>): Promise<Item | null> {
+    return this.repositoryRead.findOne({ where: { id }, ...config });
   }
 
-  async _getByIdText(id_text: string): Promise<Item | null> {
-    return this.repositoryRead.findOne({ where: { id_text } });
+  async _getByIdText(id_text: string, config?: FindOneOptions<Item>): Promise<Item | null> {
+    return this.repositoryRead.findOne({ where: { id_text }, ...config });
+  }
+
+  async getMany(config: FindManyOptions<Item>): Promise<Item[]> {
+    return this.repositoryRead.find(config);
   }
 
   async getBy(channel: Channel, dto: ItemGetByDto): Promise<Item | null> {

@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToOne, OneToMany } from 'typeorm';
 import { ItemValue } from '@orm/entities/item/itemValue';
 import { ItemValueTimeSplitRemoteItem } from '@orm/entities/item/itemValueTimeSplitRemoteItem';
+import { ItemValueTimeSplitRecipient } from '@orm/entities/item/itemValueTimeSplitRecipient';
 
 @Entity()
 export class ItemValueTimeSplit {
@@ -10,6 +11,9 @@ export class ItemValueTimeSplit {
   @ManyToOne(() => ItemValue, itemValue => itemValue.id, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'item_value_id' })
   item_value!: ItemValue;
+
+  @OneToMany(() => ItemValueTimeSplitRecipient, item_value_time_split_recipient => item_value_time_split_recipient.item_value_time_split)
+  item_value_time_split_recipients!: ItemValueTimeSplitRecipient[];
 
   @OneToOne(() => ItemValueTimeSplitRemoteItem, item_value_time_split_remote_item => item_value_time_split_remote_item.item_value_time_split)
   item_value_time_split_remote_item!: ItemValueTimeSplitRemoteItem;
