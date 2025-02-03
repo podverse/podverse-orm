@@ -8,12 +8,12 @@ type ItemDto = {
   title: string | null
   pubdate: Date | null
   guid: string | null
-  guid_enclosure_url: string
+  guid_enclosure_url: string | null
 }
 
 type ItemGetByDto = {
   guid: string | null
-  guid_enclosure_url: string
+  guid_enclosure_url: string | null
 }
 
 export class ItemService {
