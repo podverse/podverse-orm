@@ -4,7 +4,7 @@ import { Medium } from '@orm/entities/medium';
 export class MediumService {
   private repositoryRead = AppDataSourceRead.getRepository(Medium);
 
-  async mediumGetAll(): Promise<Medium[]> {
+  async getAll(): Promise<Medium[]> {
     return await this.repositoryRead.find();
   }
 }
