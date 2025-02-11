@@ -11,6 +11,9 @@ export class AccountCredentials {
   @JoinColumn({ name: 'account_id' })
   account!: Account;
 
+  @Column()
+  account_id!: number;
+
   @Column({ type: 'varchar', unique: true, length: DATABASE_CONSTANTS.varchar_email })
   email!: string;
 
