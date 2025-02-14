@@ -1,4 +1,4 @@
-
+import { ERROR_MESSAGES } from 'podverse-helpers';
 import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
 import { Account } from '@orm/entities/account/account';
 import { AppDataSourceRead, AppDataSourceReadWrite } from '@orm/db';
@@ -50,42 +50,51 @@ export class AccountService {
   }
 
   async create(dto: CreateAccountDto) {
+    console.log('email', dto.email);
     if (!validateEmail(dto.email)) {
       throw new Error('Invalid email');
     }
-    
-    if (validatePassword(dto.password)) {
+    console.log('password', dto.password);
+    if (!validatePassword(dto.password)) {
       throw new Error('Invalid password');
     }
 
+    console.log('Creating account');
     const sharableStatusRepository = AppDataSourceRead.getRepository(SharableStatus);
     const sharableStatus = await sharableStatusRepository.findOne({ where: { id: SharableStatusEnum.Private } });
+    console.log('sharableStatus', sharableStatus);
     if (!sharableStatus) {
       throw new Error('SharableStatus not found');
     }
 
     const accountCredentialsService = new AccountCredentialsService();
     const accountCredentials = await accountCredentialsService.getByEmail(dto.email);
+    console.log('accountCredentials', accountCredentials);
     if (accountCredentials) {
-      throw new Error('Account already exists');
+      throw new Error(ERROR_MESSAGES.ACCOUNT.ALREADY_EXISTS);
     }
 
-    const account = new Account();
-    account.sharable_status = sharableStatus;
-    account.verified = false;
+    const accountObj = this.repositoryReadWrite.create({
+      sharable_status: sharableStatus,
+      verified: false
+    });
 
-    const newAccount = this.repositoryReadWrite.create(account);
+    console.log('before create');
+    const account = await this.repositoryReadWrite.save(accountObj);
+    console.log('account', account);
     const saltedPassword = await hashPassword(dto.password);
-
-    await accountCredentialsService.update(newAccount, {
+    console.log('saltedPassword', saltedPassword);
+    await accountCredentialsService.update(account, {
       email: dto.email,
       password: saltedPassword
     });
-
+    console.log('after creds update');
     const accountMembershipStatusService = new AccountMembershipStatusService();
-    await accountMembershipStatusService.update(newAccount, {
+    await accountMembershipStatusService.update(account, {
       account_membership_id: AccountMembershipEnum.Trial,
       membership_expires_at: new Date()
     });
+
+    console.log('after membership update');
   }
 }

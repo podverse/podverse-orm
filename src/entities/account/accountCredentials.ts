@@ -1,5 +1,5 @@
 import { DATABASE_CONSTANTS } from 'podverse-helpers';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, OneToOne } from 'typeorm';
 import { Account } from '@orm/entities/account/account';
 
 @Entity()
@@ -7,7 +7,7 @@ export class AccountCredentials {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @ManyToOne(() => Account, account => account.id, { onDelete: 'CASCADE' })
+  @OneToOne(() => Account, account => account.id, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'account_id' })
   account!: Account;
 

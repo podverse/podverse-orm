@@ -6,6 +6,13 @@ export class AccountAppStorePurchase {
   @PrimaryColumn()
   transaction_id!: string;
 
+  @Column()
+  account_id!: number;
+
+  @ManyToOne(() => Account, account => account.id, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'account_id' })
+  account!: Account;
+
   @Column({ type: 'varchar', nullable: true })
   cancellation_date?: string | null;
 
@@ -65,11 +72,4 @@ export class AccountAppStorePurchase {
   
   @Column({ type: 'varchar', nullable: true })
   web_order_line_item_id?: string | null;
-
-  @Column()
-  account_id!: number;
-
-  @ManyToOne(() => Account, account => account.id, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'account_id' })
-  account!: Account;
 }

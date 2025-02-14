@@ -1,5 +1,21 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, BeforeInsert } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, BeforeInsert, OneToOne, OneToMany } from 'typeorm';
+import { AccountCredentials } from '@orm/entities/account/accountCredentials';
 import { SharableStatus } from '@orm/entities/sharableStatus';
+import { AccountAdminRoles } from './accountAdminRoles';
+import { AccountAppStorePurchase } from './accountAppStorePurchase';
+import { AccountFCMDevice } from './accountFCMDevice';
+import { AccountFollowingAccount } from './accountFollowingAccount';
+import { AccountFollowingAddByRssChannel } from './accountFollowingAddByRSSChannel';
+import { AccountFollowingChannel } from './accountFollowingChannel';
+import { AccountFollowingPlaylist } from './accountFollowingPlaylist';
+import { AccountGooglePlayPurchase } from './accountGooglePlayPurchase';
+import { AccountMembershipStatus } from './accountMembershipStatus';
+import { AccountNotification } from './accountNotification';
+import { AccountPaypalOrder } from './accountPayPalOrder';
+import { AccountProfile } from './accountProfile';
+import { AccountResetPassword } from './accountResetPassword';
+import { AccountUpDevice } from './accountUPDevice';
+import { AccountVerification } from './accountVerification';
 const shortid = require('shortid');
 
 @Entity()
@@ -16,6 +32,54 @@ export class Account {
   @ManyToOne(() => SharableStatus, sharableStatus => sharableStatus.id)
   @JoinColumn({ name: 'sharable_status_id' })
   sharable_status!: SharableStatus;
+
+  @OneToOne(() => AccountAdminRoles, accountAdminRoles => accountAdminRoles.account)
+  account_admin_roles!: AccountAdminRoles;
+
+  @OneToMany(() => AccountAppStorePurchase, accountAppStorePurchase => accountAppStorePurchase.account)
+  account_app_store_purchases!: AccountAppStorePurchase[];
+
+  @OneToOne(() => AccountCredentials, accountCredentials => accountCredentials.account)
+  account_credentials!: AccountCredentials;
+
+  @OneToMany(() => AccountFCMDevice, accountFCMDevice => accountFCMDevice.account)
+  account_fcm_devices!: AccountFCMDevice[];
+
+  @OneToMany(() => AccountFollowingAccount, accountFollowingAccount => accountFollowingAccount.account)
+  account_following_accounts!: AccountFollowingAccount[];
+
+  @OneToMany(() => AccountFollowingAddByRssChannel, accountFollowingAddByRssChannel => accountFollowingAddByRssChannel.account)
+  account_following_add_by_rss_channels!: AccountFollowingAddByRssChannel[];
+
+  @OneToMany(() => AccountFollowingChannel, accountFollowingChannel => accountFollowingChannel.account)
+  account_following_channels!: AccountFollowingChannel[];
+
+  @OneToMany(() => AccountFollowingPlaylist, accountFollowingPlaylist => accountFollowingPlaylist.account)
+  account_following_playlists!: AccountFollowingPlaylist[];
+
+  @OneToMany(() => AccountGooglePlayPurchase, accountGooglePlayPurchase => accountGooglePlayPurchase.account)
+  account_google_play_purchases!: AccountGooglePlayPurchase[];
+
+  @OneToOne(() => AccountMembershipStatus, accountMembershipStatus => accountMembershipStatus.account)
+  account_membership_status!: AccountMembershipStatus;
+
+  @OneToMany(() => AccountNotification, accountNotification => accountNotification.account)
+  account_notifications!: AccountNotification[];
+
+  @OneToMany(() => AccountPaypalOrder, accountPaypalOrder => accountPaypalOrder.account)
+  account_paypal_orders!: AccountPaypalOrder[];
+
+  @OneToOne(() => AccountProfile, accountProfile => accountProfile.account)
+  account_profile!: AccountProfile;
+
+  @OneToOne(() => AccountResetPassword, accountResetPassword => accountResetPassword.account)
+  account_reset_password!: AccountResetPassword;
+
+  @OneToMany(() => AccountUpDevice, accountUpDevice => accountUpDevice.account)
+  account_up_devices!: AccountUpDevice[];
+
+  @OneToOne(() => AccountVerification, accountVerification => accountVerification.account)
+  account_verification!: AccountVerification;
 
   @BeforeInsert()
   generateIdText() {

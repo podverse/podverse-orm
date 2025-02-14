@@ -110,6 +110,7 @@ export * from './lib/typeORMTypes';
 
 export * from './services/category';
 
+export * from './services/account/account';
 export * from './services/channel/channel';
 export * from './services/channel/channelAbout';
 export * from './services/channel/channelChat';

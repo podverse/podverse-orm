@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
 import { Account } from '@orm/entities/account/account';
 import { AccountMembership } from '@orm/entities/account/accountMembership';
 
@@ -7,7 +7,7 @@ export class AccountMembershipStatus {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @ManyToOne(() => Account, account => account.id, { onDelete: 'CASCADE' })
+  @OneToOne(() => Account, account => account.id, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'account_id' })
   account!: Account;
 

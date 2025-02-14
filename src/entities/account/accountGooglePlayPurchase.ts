@@ -6,6 +6,13 @@ export class AccountGooglePlayPurchase {
   @PrimaryColumn()
   transaction_id!: string;
 
+  @Column()
+  account_id!: number;
+
+  @ManyToOne(() => Account, account => account.id, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'account_id' })
+  account!: Account;
+
   @Column({ type: 'int', nullable: true })
   acknowledgement_state?: number | null;
 
@@ -29,11 +36,4 @@ export class AccountGooglePlayPurchase {
 
   @Column({ type: 'varchar', unique: true })
   purchase_token!: string;
-
-  @Column()
-  account_id!: number;
-
-  @ManyToOne(() => Account, account => account.id, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'account_id' })
-  account!: Account;
 }
