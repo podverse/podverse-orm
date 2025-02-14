@@ -111,6 +111,11 @@ export * from './lib/typeORMTypes';
 export * from './services/category';
 
 export * from './services/account/account';
+export * from './services/account/accountCredentials';
+export * from './services/account/accountMembership';
+export * from './services/account/accountMembershipStatus';
+export * from './services/account/accountResetPassword';
+export * from './services/account/accountVerification';
 export * from './services/channel/channel';
 export * from './services/channel/channelAbout';
 export * from './services/channel/channelChat';
