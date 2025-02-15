@@ -6,6 +6,8 @@ import { AccountMembershipEnum, SharableStatusEnum, hashPassword, validateEmail,
 import { SharableStatus } from '@orm/entities/sharableStatus';
 import { AccountCredentialsService } from './accountCredentials';
 import { AccountMembershipStatusService } from './accountMembershipStatus';
+import { AccountVerificationService } from './accountVerification';
+import { AccountResetPasswordService } from './accountResetPassword';
 
 type CreateAccountDto = {
   email: string
@@ -88,5 +90,37 @@ export class AccountService {
       account_membership_id: AccountMembershipEnum.Trial,
       membership_expires_at: new Date()
     });
+  }
+
+  async verifyEmail(id: number): Promise<void> {
+    const account = await this.repositoryReadWrite.findOne({ where: { id } });
+
+    if (!account) {
+      throw new Error('Account not found');
+    }
+
+    account.verified = true;
+    await this.repositoryReadWrite.save(account);
+
+    const accountVerificationService = new AccountVerificationService();
+    await accountVerificationService.deleteByAccountId(id);
+  }
+
+  async resetPassword(accountId: number, newPassword: string): Promise<void> {
+    const account = await this.repositoryReadWrite.findOne({ where: { id: accountId } });
+
+    if (!account) {
+      throw new Error('Account not found');
+    }
+
+    const saltedPassword = await hashPassword(newPassword);
+
+    const accountCredentialsService = new AccountCredentialsService();
+    await accountCredentialsService.update(account, {
+      password: saltedPassword
+    });
+
+    const accountResetPasswordService = new AccountResetPasswordService();
+    await accountResetPasswordService.deleteByAccountId(account.id);
   }
 }

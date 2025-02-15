@@ -17,7 +17,18 @@ export class AccountResetPasswordService extends BaseOneService<AccountResetPass
     return super._get(account);
   }
 
+  async getByToken(reset_token: string): Promise<AccountResetPassword | null> {
+    return this.repositoryRead.findOne({
+      where: { reset_token },
+      relations: ['account']
+    });
+  }
+
   async update(account: Account, dto: AccountResetPasswordDto): Promise<AccountResetPasswordDto> {
     return super._update(account, dto);
+  }
+
+  async deleteByAccountId(account_id: number): Promise<void> {
+    await this.repositoryReadWrite.delete({ account: { id: account_id } });
   }
 }

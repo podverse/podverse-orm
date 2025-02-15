@@ -17,7 +17,18 @@ export class AccountVerificationService extends BaseOneService<AccountVerificati
     return super._get(account);
   }
 
+  async getByToken(verification_token: string): Promise<AccountVerification | null> {
+    return this.repositoryRead.findOne({
+      where: { verification_token },
+      relations: ['account']
+    });
+  }
+
   async update(account: Account, dto: AccountVerificationDto): Promise<AccountVerificationDto> {
     return super._update(account, dto);
+  }
+
+  async deleteByAccountId(account_id: number): Promise<void> {
+    await this.repositoryReadWrite.delete({ account: { id: account_id } });
   }
 }
