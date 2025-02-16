@@ -5,7 +5,7 @@ import { AccountAdminRoles } from './accountAdminRoles';
 import { AccountAppStorePurchase } from './accountAppStorePurchase';
 import { AccountFCMDevice } from './accountFCMDevice';
 import { AccountFollowingAccount } from './accountFollowingAccount';
-import { AccountFollowingAddByRssChannel } from './accountFollowingAddByRSSChannel';
+import { AccountFollowingAddByRSSChannel } from './accountFollowingAddByRSSChannel';
 import { AccountFollowingChannel } from './accountFollowingChannel';
 import { AccountFollowingPlaylist } from './accountFollowingPlaylist';
 import { AccountGooglePlayPurchase } from './accountGooglePlayPurchase';
@@ -48,8 +48,8 @@ export class Account {
   @OneToMany(() => AccountFollowingAccount, accountFollowingAccount => accountFollowingAccount.account)
   account_following_accounts!: AccountFollowingAccount[];
 
-  @OneToMany(() => AccountFollowingAddByRssChannel, accountFollowingAddByRssChannel => accountFollowingAddByRssChannel.account)
-  account_following_add_by_rss_channels!: AccountFollowingAddByRssChannel[];
+  @OneToMany(() => AccountFollowingAddByRSSChannel, AccountFollowingAddByRSSChannel => AccountFollowingAddByRSSChannel.account)
+  account_following_add_by_rss_channels!: AccountFollowingAddByRSSChannel[];
 
   @OneToMany(() => AccountFollowingChannel, accountFollowingChannel => accountFollowingChannel.account)
   account_following_channels!: AccountFollowingChannel[];

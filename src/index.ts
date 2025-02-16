@@ -113,6 +113,7 @@ export * from './services/category';
 export * from './services/account/account';
 export * from './services/account/accountCredentials';
 export * from './services/account/accountFollowingAccount';
+export * from './services/account/accountFollowingAddByRSSChannel';
 export * from './services/account/accountMembership';
 export * from './services/account/accountMembershipStatus';
 export * from './services/account/accountResetPassword';

@@ -6,7 +6,7 @@ import { AccountAppStorePurchase } from "@orm/entities/account/accountAppStorePu
 import { AccountCredentials } from "@orm/entities/account/accountCredentials";
 import { AccountFCMDevice } from "@orm/entities/account/accountFCMDevice";
 import { AccountFollowingAccount } from "@orm/entities/account/accountFollowingAccount";
-import { AccountFollowingAddByRssChannel } from "@orm/entities/account/accountFollowingAddByRSSChannel";
+import { AccountFollowingAddByRSSChannel } from "@orm/entities/account/accountFollowingAddByRSSChannel";
 import { AccountFollowingChannel } from "@orm/entities/account/accountFollowingChannel";
 import { AccountFollowingPlaylist } from "@orm/entities/account/accountFollowingPlaylist";
 import { AccountGooglePlayPurchase } from "@orm/entities/account/accountGooglePlayPurchase";
@@ -111,7 +111,7 @@ const commonConfig: DataSourceOptions = {
     AccountCredentials,
     AccountFCMDevice,
     AccountFollowingAccount,
-    AccountFollowingAddByRssChannel,
+    AccountFollowingAddByRSSChannel,
     AccountFollowingChannel,
     AccountFollowingPlaylist,
     AccountGooglePlayPurchase,

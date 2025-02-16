@@ -3,7 +3,7 @@ import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { Account } from '@orm/entities/account/account';
 
 @Entity()
-export class AccountFollowingAddByRssChannel {
+export class AccountFollowingAddByRSSChannel {
   @PrimaryColumn()
   account_id!: number;
 
