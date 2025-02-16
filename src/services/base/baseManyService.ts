@@ -126,6 +126,20 @@ export class BaseManyService<T extends ObjectLiteral, K extends keyof T> {
     return updatedEntities;
   }
 
+  public async _delete(parentEntity: T[K], whereKeyValues: Record<string, unknown>): Promise<void> {
+    const where: FindOptionsWhere<T> = {
+      [this.parentEntityKey]: parentEntity,
+      ...whereKeyValues
+    } as FindOptionsWhere<T>;
+  
+    const rowToDelete = await this.repositoryRead.findOne({ where });
+  
+    if (rowToDelete) {
+      await (this.transactionalEntityManager as EntityManager
+        ?? this.repositoryReadWrite).remove(rowToDelete);
+    }
+  }
+
   public async _deleteAll(value: T[K]): Promise<void> {
     const rowsToDelete = await this._getAll(value);
     if (rowsToDelete) {
