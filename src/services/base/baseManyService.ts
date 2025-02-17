@@ -34,7 +34,7 @@ export class BaseManyService<T extends ObjectLiteral, K extends keyof T> {
 
   public async _update(
     parentEntity: T[K],
-    whereKeys: (keyof T)[],
+    whereKeys: (keyof T)[], // If whereKeys is empty, it will always create a new entity
     dto: Partial<T>,
     config?: FindOneOptions<T>,
     existingEntity?: T
@@ -48,7 +48,7 @@ export class BaseManyService<T extends ObjectLiteral, K extends keyof T> {
 
     let entity: T | null = existingEntity || null;
     
-    if (!entity) {
+    if (!entity && Object.keys(whereObject).length > 0) {
       entity = await this._get(parentEntity, whereObject, config);
     }
 

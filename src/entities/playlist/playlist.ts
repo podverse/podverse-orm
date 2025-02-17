@@ -1,11 +1,12 @@
-import { DATABASE_CONSTANTS } from 'podverse-helpers';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, BeforeInsert } from 'typeorm';
+import { DATABASE_CONSTANTS, MediumEnum, SharableStatusEnum } from 'podverse-helpers';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, BeforeInsert, Unique } from 'typeorm';
 import { Account } from '@orm/entities/account/account';
 import { SharableStatus } from '@orm/entities/sharableStatus';
 import { Medium } from '@orm/entities/medium';
 const shortid = require('shortid');
 
 @Entity()
+@Unique(['account', 'medium', 'is_default_favorites'])
 export class Playlist {
   @PrimaryGeneratedColumn()
   id!: number;
@@ -19,7 +20,7 @@ export class Playlist {
 
   @ManyToOne(() => SharableStatus, sharableStatus => sharableStatus.id)
   @JoinColumn({ name: 'sharable_status_id' })
-  sharable_status!: SharableStatus;
+  sharable_status!: SharableStatusEnum;
 
   @Column({ type: 'varchar', nullable: true, length: DATABASE_CONSTANTS.varchar_normal })
   title?: string | null;
@@ -30,15 +31,12 @@ export class Playlist {
   @Column({ type: 'boolean', default: false })
   is_default_favorites!: boolean;
 
-  @Column({ type: 'boolean', default: false })
-  is_public!: boolean;
-
   @Column({ type: 'int', default: 0 })
   item_count!: number;
 
   @ManyToOne(() => Medium, medium => medium.id)
   @JoinColumn({ name: 'medium_id' })
-  medium!: Medium;
+  medium!: MediumEnum;
 
   @BeforeInsert()
   generateIdText() {

@@ -177,3 +177,5 @@ export * from './services/item/itemValueTimeSplitRemoteItem';
 export * from './services/liveItem/liveItem';
 
 export * from './services/medium';
+
+export * from './services/playlist';
