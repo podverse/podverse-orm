@@ -1,4 +1,4 @@
-import { DATABASE_CONSTANTS } from 'podverse-helpers';
+import { DATABASE_CONSTANTS, SharableStatusEnum } from 'podverse-helpers';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, BeforeInsert } from 'typeorm';
 import { Account } from '@orm/entities/account/account';
 import { Item } from '@orm/entities/item/item';
@@ -35,10 +35,11 @@ export class Clip {
 
   @ManyToOne(() => SharableStatus, sharableStatus => sharableStatus.id)
   @JoinColumn({ name: 'sharable_status_id' })
-  sharable_status!: SharableStatus;
+  sharable_status!: SharableStatusEnum;
 
   @BeforeInsert()
   generateIdText() {
+    console.log('this', this);
     this.id_text = shortid.generate();
   }
 }

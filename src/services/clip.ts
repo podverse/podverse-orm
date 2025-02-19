@@ -1,0 +1,113 @@
+import { SharableStatusEnum } from 'podverse-helpers';
+import { EntityManager, FindOneOptions, FindManyOptions } from 'typeorm';
+import { Clip } from '@orm/entities/clip';
+import { BaseManyService } from '@orm/services/base/baseManyService';
+import { AccountService } from '@orm/services/account/account';
+import { ItemService } from './item/item';
+
+export type ClipDto = {
+  start_time: string;
+  end_time?: string | null;
+  title?: string | null;
+  description?: string | null;
+  account_id: number;
+  item_id_text: string;
+  sharable_status: SharableStatusEnum;
+};
+
+export class ClipService extends BaseManyService<Clip, 'account'> {
+  private accountService: AccountService;
+  private itemService: ItemService;
+
+  constructor(transactionalEntityManager?: EntityManager) {
+    super(Clip, 'account', transactionalEntityManager);
+    this.accountService = new AccountService();
+    this.itemService = new ItemService();
+  }
+
+  async create(account_id: number, dto: ClipDto): Promise<Clip> {
+    const account = await this.accountService.get(account_id);
+    if (!account) {
+      throw new Error("Account not found.");
+    }
+
+    const item = await this.itemService.getByIdOrIdText(dto.item_id_text);
+    if (!item) {
+      throw new Error("Item not found.");
+    }
+
+    const finalDto = {
+      start_time: dto.start_time,
+      end_time: dto.end_time || null,
+      title: dto.title || null,
+      description: dto.description || null,
+      account,
+      item,
+      sharable_status: dto.sharable_status
+    };
+
+    const whereKeys = [] as (keyof Clip)[];
+    return this._update(account, whereKeys, finalDto);
+  }
+
+  async update(account_id: number, clip_id_text: string, dto: ClipDto): Promise<Clip> {
+    const account = await this.accountService.get(account_id);
+    if (!account) {
+      throw new Error("Account not found.");
+    }
+
+    const clip = await this._get(account, { id_text: clip_id_text });
+    if (!clip) {
+      throw new Error("Clip not found.");
+    }
+
+    const item = await this.itemService.getByIdOrIdText(dto.item_id_text);
+    if (!item) {
+      throw new Error("Item not found.");
+    }
+
+    const finalDto = {
+      start_time: dto.start_time,
+      end_time: dto.end_time || null,
+      title: dto.title || null,
+      description: dto.description || null,
+      account,
+      item,
+      sharable_status: dto.sharable_status
+    };
+
+    const whereKeys = ['id_text'] as (keyof Clip)[];
+    return this._update(account, whereKeys, finalDto, undefined, clip);
+  }
+
+  async delete(account_id: number, clip_id_text: string): Promise<void> {
+    const account = await this.accountService.get(account_id);
+    if (!account) {
+      throw new Error("Account not found.");
+    }
+
+    return this._delete(account, { id_text: clip_id_text });
+  }
+
+  async get(clip_id_text: string): Promise<Clip | null> {
+    const options: FindOneOptions<Clip> = {
+      where: { id_text: clip_id_text },
+      relations: ['account']
+    };
+
+    return this.repositoryRead.findOne(options);
+  }
+
+  async getMany(options?: FindManyOptions<Clip>): Promise<Clip[]> {
+    return this.repositoryRead.find(options);
+  }
+
+  async getManyByAccount(account_id: number): Promise<Clip[]> {
+    const account = await this.accountService.get(account_id);
+    if (!account) {
+      throw new Error("Account not found.");
+    }
+
+    return this._getAll(account);
+  }
+}
