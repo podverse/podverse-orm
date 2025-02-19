@@ -142,6 +142,8 @@ export * from './services/channel/channelTxt';
 export * from './services/channel/channelValue';
 export * from './services/channel/channelValueRecipient';
 
+export * from './services/clip';
+
 export * from './services/feed/feed';
 export * from './services/feed/feedFlagStatus';
 export * from './services/feed/feedLog';
@@ -178,4 +180,4 @@ export * from './services/liveItem/liveItem';
 
 export * from './services/medium';
 
-export * from './services/playlist';
+export * from './services/playlist/playlist';

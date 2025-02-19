@@ -1,5 +1,5 @@
 import { MediumEnum, SharableStatusEnum } from 'podverse-helpers';
-import { EntityManager } from 'typeorm';
+import { EntityManager, FindManyOptions, FindOneOptions } from 'typeorm';
 import { Playlist } from '@orm/entities/playlist/playlist';
 import { BaseManyService } from '@orm/services/base/baseManyService';
 import { AccountService } from '@orm/services/account/account';
@@ -20,7 +20,7 @@ export class PlaylistService extends BaseManyService<Playlist, 'account'> {
     this.accountService = new AccountService();
   }
 
-  async createPlaylist(account_id: number, dto: PlaylistDto): Promise<Playlist> {
+  async create(account_id: number, dto: PlaylistDto): Promise<Playlist> {
     const account = await this.accountService.get(account_id);
     if (!account) {
       throw new Error("Account not found.");
@@ -30,7 +30,7 @@ export class PlaylistService extends BaseManyService<Playlist, 'account'> {
     return this._update(account, whereKeys, dto);
   }
 
-  async updatePlaylist(account_id: number, playlist_id_text: string, dto: PlaylistDto): Promise<Playlist> {
+  async update(account_id: number, playlist_id_text: string, dto: PlaylistDto): Promise<Playlist> {
     const account = await this.accountService.get(account_id);
     if (!account) {
       throw new Error("Account not found.");
@@ -45,7 +45,7 @@ export class PlaylistService extends BaseManyService<Playlist, 'account'> {
     return this._update(account, whereKeys, dto, undefined, playlist);
   }
 
-  async deletePlaylist(account_id: number, playlist_id_text: string): Promise<void> {
+  async delete(account_id: number, playlist_id_text: string): Promise<void> {
     const account = await this.accountService.get(account_id);
     if (!account) {
       throw new Error("Account not found.");
@@ -54,7 +54,20 @@ export class PlaylistService extends BaseManyService<Playlist, 'account'> {
     return this._delete(account, { id_text: playlist_id_text });
   }
 
-  async getPlaylists(account_id: number): Promise<Playlist[]> {
+  async get(playlist_id_text: string): Promise<Playlist | null> {
+    const options: FindOneOptions<Playlist> = {
+      where: { id_text: playlist_id_text },
+      relations: ['account']
+    };
+
+    return this.repositoryRead.findOne(options);
+  }
+
+  async getMany(options?: FindManyOptions<Playlist>): Promise<Playlist[]> {
+    return this.repositoryRead.find(options);
+  }
+
+  async getManyByAccount(account_id: number): Promise<Playlist[]> {
     const account = await this.accountService.get(account_id);
     if (!account) {
       throw new Error("Account not found.");
