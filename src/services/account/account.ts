@@ -40,7 +40,7 @@ export class AccountService {
     return this.get(accountCredentials.account_id, config);
   }
 
-  async _getByIdText(id_text: string, config?: FindOneOptions<Account>): Promise<Account | null> {
+  async getByIdText(id_text: string, config?: FindOneOptions<Account>): Promise<Account | null> {
     if (!id_text) {
       return null;
     }
