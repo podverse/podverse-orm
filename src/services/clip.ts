@@ -36,6 +36,10 @@ export class ClipService extends BaseManyService<Clip, 'account'> {
       throw new Error("Item not found.");
     }
 
+    if (dto.end_time && parseFloat(dto.end_time) <= parseFloat(dto.start_time)) {
+      throw new Error("End time must be greater than start time.");
+    }
+
     const finalDto = {
       start_time: dto.start_time,
       end_time: dto.end_time || null,
@@ -64,6 +68,10 @@ export class ClipService extends BaseManyService<Clip, 'account'> {
     const item = await this.itemService.getByIdOrIdText(dto.item_id_text);
     if (!item) {
       throw new Error("Item not found.");
+    }
+
+    if (dto.end_time && parseFloat(dto.end_time) <= parseFloat(dto.start_time)) {
+      throw new Error("End time must be greater than start time.");
     }
 
     const finalDto = {
