@@ -97,10 +97,10 @@ export class ClipService extends BaseManyService<Clip, 'account'> {
     return this._delete(account, { id_text: clip_id_text });
   }
 
-  async get(clip_id_text: string): Promise<Clip | null> {
+  async getByIdText(clip_id_text: string, config?: FindOneOptions<Clip>): Promise<Clip | null> {
     const options: FindOneOptions<Clip> = {
       where: { id_text: clip_id_text },
-      relations: ['account']
+      ...config
     };
 
     return this.repositoryRead.findOne(options);
