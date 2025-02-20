@@ -32,7 +32,7 @@ export class ItemService {
     return this.repositoryRead.findOne({ where: { id }, ...config });
   }
 
-  async _getByIdText(id_text: string, config?: FindOneOptions<Item>): Promise<Item | null> {
+  async getByIdText(id_text: string, config?: FindOneOptions<Item>): Promise<Item | null> {
     if (!id_text) {
       return null;
     }
@@ -43,7 +43,7 @@ export class ItemService {
     let item = null;
 
     if (isNaN(Number(idOrIdText))) {
-      item = await this._getByIdText(idOrIdText, config);
+      item = await this.getByIdText(idOrIdText, config);
     } else {
       const id = parseInt(idOrIdText);
       item = await this.get(id, config);
