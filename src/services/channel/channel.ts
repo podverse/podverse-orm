@@ -38,7 +38,7 @@ export class ChannelService {
     return this.repositoryRead.findOne({ where: { id }, ...config });
   }
 
-  async _getByIdText(id_text: string, config?: FindOneOptions<Channel>): Promise<Channel | null> {
+  async getByIdText(id_text: string, config?: FindOneOptions<Channel>): Promise<Channel | null> {
     if (!id_text) {
       return null;
     }
@@ -49,7 +49,7 @@ export class ChannelService {
     let channel = null;
 
     if (isNaN(Number(idOrIdText))) {
-      channel = await this._getByIdText(idOrIdText, config);
+      channel = await this.getByIdText(idOrIdText, config);
     } else {
       const id = parseInt(idOrIdText);
       channel = await this.get(id, config);
