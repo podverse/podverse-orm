@@ -12,5 +12,5 @@ export class PlaylistResourceBase {
   playlist!: Playlist;
 
   @Column({ type: 'numeric' })
-  list_position!: number;
+  list_position!: string;
 }

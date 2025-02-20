@@ -181,3 +181,5 @@ export * from './services/liveItem/liveItem';
 export * from './services/medium';
 
 export * from './services/playlist/playlist';
+export * from './services/playlist/playlistResourceBase';
+export * from './services/playlist/playlistResourceClip';
