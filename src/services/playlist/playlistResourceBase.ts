@@ -24,4 +24,23 @@ export class PlaylistResourceBaseService extends BaseManyService<PlaylistResourc
 
     return this.repositoryRead.find(options);
   }
+
+  async getFirstAndLastItemsByPlaylistIdText(playlist_id_text: string): Promise<{ firstItem: PlaylistResourceBase | null, lastItem: PlaylistResourceBase | null }> {
+    const playlist = await this.playlistService.getByIdText(playlist_id_text);
+    if (!playlist) {
+      throw new Error("Playlist not found.");
+    }
+
+    const firstItem = await this.repositoryRead.findOne({
+      where: { playlist },
+      order: { list_position: 'ASC' }
+    });
+
+    const lastItem = await this.repositoryRead.findOne({
+      where: { playlist },
+      order: { list_position: 'DESC' }
+    });
+
+    return { firstItem, lastItem };
+  }
 }

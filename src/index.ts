@@ -183,3 +183,4 @@ export * from './services/medium';
 export * from './services/playlist/playlist';
 export * from './services/playlist/playlistResourceBase';
 export * from './services/playlist/playlistResourceClip';
+export * from './services/playlist/playlistResourceItem';

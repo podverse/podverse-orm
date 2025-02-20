@@ -3,15 +3,18 @@ import { PlaylistResourceClip } from '@orm/entities/playlist/playlistResourceCli
 import { BaseManyService } from '@orm/services/base/baseManyService';
 import { PlaylistService } from '@orm/services/playlist/playlist';
 import { ClipService } from '../clip';
+import { PlaylistResourceBaseService } from '@orm/services/playlist/playlistResourceBase';
 
 export class PlaylistResourceClipService extends BaseManyService<PlaylistResourceClip, 'playlist'> {
   private playlistService: PlaylistService;
   private clipService: ClipService;
+  private playlistResourceBaseService: PlaylistResourceBaseService;
 
   constructor(transactionalEntityManager?: EntityManager) {
     super(PlaylistResourceClip, 'playlist', transactionalEntityManager);
     this.playlistService = new PlaylistService(transactionalEntityManager);
     this.clipService = new ClipService(transactionalEntityManager);
+    this.playlistResourceBaseService = new PlaylistResourceBaseService(transactionalEntityManager);
   }
 
   private async addClipToPlaylist(
@@ -29,17 +32,9 @@ export class PlaylistResourceClipService extends BaseManyService<PlaylistResourc
       throw new Error("Clip not found.");
     }
 
-    const firstItem = await this.repositoryRead.findOne({
-      where: { playlist },
-      order: { list_position: 'ASC' }
-    });
+    const { firstItem, lastItem } = await this.playlistResourceBaseService.getFirstAndLastItemsByPlaylistIdText(playlist_id_text);
 
-    const lastItem = await this.repositoryRead.findOne({
-      where: { playlist },
-      order: { list_position: 'DESC' }
-    });
-
-    const list_position = calculatePosition(firstItem, lastItem).toString();
+    const list_position = calculatePosition(firstItem as PlaylistResourceClip, lastItem as PlaylistResourceClip).toString();
 
     const finalDto = {
       clip,
