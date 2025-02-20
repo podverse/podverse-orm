@@ -54,13 +54,11 @@ export class PlaylistService extends BaseManyService<Playlist, 'account'> {
     return this._delete(account, { id_text: playlist_id_text });
   }
 
-  async get(playlist_id_text: string): Promise<Playlist | null> {
-    const options: FindOneOptions<Playlist> = {
+  async getByIdText(playlist_id_text: string, options?: FindOneOptions<Playlist>): Promise<Playlist | null> {
+    return this.repositoryRead.findOne({
       where: { id_text: playlist_id_text },
-      relations: ['account']
-    };
-
-    return this.repositoryRead.findOne(options);
+      ...options
+    });
   }
 
   async getMany(options?: FindManyOptions<Playlist>): Promise<Playlist[]> {

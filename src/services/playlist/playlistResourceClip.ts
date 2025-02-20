@@ -19,12 +19,12 @@ export class PlaylistResourceClipService extends BaseManyService<PlaylistResourc
     clip_id_text: string,
     calculatePosition: (firstItem: PlaylistResourceClip | null, lastItem: PlaylistResourceClip | null) => number
   ): Promise<PlaylistResourceClip> {
-    const playlist = await this.playlistService.get(playlist_id_text);
+    const playlist = await this.playlistService.getByIdText(playlist_id_text);
     if (!playlist) {
       throw new Error("Playlist not found.");
     }
 
-    const clip = await this.clipService.get(clip_id_text);
+    const clip = await this.clipService.getByIdText(clip_id_text);
     if (!clip) {
       throw new Error("Clip not found.");
     }
@@ -95,12 +95,12 @@ export class PlaylistResourceClipService extends BaseManyService<PlaylistResourc
   }
 
   async removeClipFromPlaylist(playlist_id_text: string, clip_id_text: string): Promise<void> {
-    const playlist = await this.playlistService.get(playlist_id_text);
+    const playlist = await this.playlistService.getByIdText(playlist_id_text);
     if (!playlist) {
       throw new Error("Playlist not found.");
     }
 
-    const clip = await this.clipService.get(clip_id_text);
+    const clip = await this.clipService.getByIdText(clip_id_text);
     if (!clip) {
       throw new Error("Clip not found.");
     }

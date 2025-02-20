@@ -12,7 +12,7 @@ export class PlaylistResourceBaseService extends BaseManyService<PlaylistResourc
   }
 
   async getAllByPlaylistIdText(playlist_id_text: string): Promise<PlaylistResourceBase[]> {
-    const playlist = await this.playlistService.get(playlist_id_text);
+    const playlist = await this.playlistService.getByIdText(playlist_id_text);
     if (!playlist) {
       throw new Error("Playlist not found.");
     }
