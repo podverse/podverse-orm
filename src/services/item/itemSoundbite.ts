@@ -14,7 +14,7 @@ export class ItemSoundbiteService extends BaseManyService<ItemSoundbite, 'item'>
     super(ItemSoundbite, 'item', transactionalEntityManager);
   }
 
-  async _getByIdText(id_text: string): Promise<ItemSoundbite | null> {
+  async getByIdText(id_text: string): Promise<ItemSoundbite | null> {
     return this.repositoryRead.findOne({ where: { id_text } });
   }
 
