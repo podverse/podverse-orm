@@ -184,3 +184,4 @@ export * from './services/playlist/playlist';
 export * from './services/playlist/playlistResourceBase';
 export * from './services/playlist/playlistResourceClip';
 export * from './services/playlist/playlistResourceItem';
+export * from './services/playlist/playlistResourceItemAddByRSS';
