@@ -186,3 +186,4 @@ export * from './services/playlist/playlistResourceClip';
 export * from './services/playlist/playlistResourceItem';
 export * from './services/playlist/playlistResourceItemAddByRSS';
 export * from './services/playlist/playlistResourceItemChapter';
+export * from './services/playlist/playlistResourceItemSoundbite';

@@ -1,7 +1,7 @@
 import { EntityManager } from 'typeorm';
 import { PlaylistResourceClip } from '@orm/entities/playlist/playlistResourceClip';
 import { BaseManyService } from '@orm/services/base/baseManyService';
-import { PlaylistService } from '@orm/services/playlist/playlist';
+import { PlaylistService, LIST_POSITION_INCREMENT } from '@orm/services/playlist/playlist';
 import { ClipService } from '../clip';
 import { PlaylistResourceBaseService } from '@orm/services/playlist/playlistResourceBase';
 
@@ -20,7 +20,7 @@ export class PlaylistResourceClipService extends BaseManyService<PlaylistResourc
   private async addClipToPlaylist(
     playlist_id_text: string,
     clip_id_text: string,
-    calculatePosition: (firstItem: PlaylistResourceClip | null, lastItem: PlaylistResourceClip | null) => number
+    calculatePosition: (firstItem: PlaylistResourceClip | null, lastItem: PlaylistResourceClip | null) => string
   ): Promise<PlaylistResourceClip> {
     const playlist = await this.playlistService.getByIdText(playlist_id_text);
     if (!playlist) {
@@ -34,7 +34,7 @@ export class PlaylistResourceClipService extends BaseManyService<PlaylistResourc
 
     const { firstItem, lastItem } = await this.playlistResourceBaseService.getFirstAndLastItemsByPlaylistIdText(playlist_id_text);
 
-    const list_position = calculatePosition(firstItem as PlaylistResourceClip, lastItem as PlaylistResourceClip).toString();
+    const list_position = calculatePosition(firstItem as PlaylistResourceClip, lastItem as PlaylistResourceClip);
 
     const finalDto = {
       clip,
@@ -51,20 +51,21 @@ export class PlaylistResourceClipService extends BaseManyService<PlaylistResourc
   private async addClipToPlaylistHelper(
     playlist_id_text: string,
     clip_id_text: string,
-    calculatePosition: (firstItem: PlaylistResourceClip | null, lastItem: PlaylistResourceClip | null) => number
+    calculatePosition: (firstItem: PlaylistResourceClip | null, lastItem: PlaylistResourceClip | null) => string
   ): Promise<PlaylistResourceClip> {
     return this.addClipToPlaylist(playlist_id_text, clip_id_text, calculatePosition);
   }
 
   async addClipToPlaylistFirst(playlist_id_text: string, clip_id_text: string): Promise<PlaylistResourceClip> {
     return this.addClipToPlaylistHelper(playlist_id_text, clip_id_text, (firstItem) => {
-      return firstItem ? parseFloat(firstItem.list_position) / 2 : 1;
+      const newPosition = firstItem ? parseFloat(firstItem.list_position) - LIST_POSITION_INCREMENT : 1;
+      return newPosition < 0 ? '0' : newPosition.toString();
     });
   }
 
   async addClipToPlaylistLast(playlist_id_text: string, clip_id_text: string): Promise<PlaylistResourceClip> {
     return this.addClipToPlaylistHelper(playlist_id_text, clip_id_text, (_, lastItem) => {
-      return lastItem ? parseFloat(lastItem.list_position) + 0.0000001 : 1;
+      return lastItem ? (parseFloat(lastItem.list_position) + LIST_POSITION_INCREMENT).toString() : '1';
     });
   }
 
@@ -85,7 +86,7 @@ export class PlaylistResourceClipService extends BaseManyService<PlaylistResourc
         throw new Error("Invalid positions provided.");
       }
 
-      return (pos1 + pos2) / 2;
+      return ((pos1 + pos2) / 2).toString();
     });
   }
 

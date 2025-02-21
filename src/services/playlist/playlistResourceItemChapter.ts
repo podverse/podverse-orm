@@ -3,6 +3,7 @@ import { PlaylistResourceItemChapter } from '@orm/entities/playlist/playlistReso
 import { BaseManyService } from '@orm/services/base/baseManyService';
 import { PlaylistService } from '@orm/services/playlist/playlist';
 import { ItemChapterService } from '@orm/services/item/itemChapter';
+import { LIST_POSITION_INCREMENT } from '@orm/services/playlist/playlist';
 import { PlaylistResourceBaseService } from '@orm/services/playlist/playlistResourceBase';
 
 export class PlaylistResourceItemChapterService extends BaseManyService<PlaylistResourceItemChapter, 'playlist'> {
@@ -20,7 +21,7 @@ export class PlaylistResourceItemChapterService extends BaseManyService<Playlist
   private async addItemChapterToPlaylist(
     playlist_id_text: string,
     item_chapter_id_text: string,
-    calculatePosition: (firstItem: PlaylistResourceItemChapter | null, lastItem: PlaylistResourceItemChapter | null) => number
+    calculatePosition: (firstItem: PlaylistResourceItemChapter | null, lastItem: PlaylistResourceItemChapter | null) => string
   ): Promise<PlaylistResourceItemChapter> {
     const playlist = await this.playlistService.getByIdText(playlist_id_text);
     if (!playlist) {
@@ -34,7 +35,7 @@ export class PlaylistResourceItemChapterService extends BaseManyService<Playlist
 
     const { firstItem, lastItem } = await this.playlistResourceBaseService.getFirstAndLastItemsByPlaylistIdText(playlist_id_text);
 
-    const list_position = calculatePosition(firstItem as PlaylistResourceItemChapter, lastItem as PlaylistResourceItemChapter).toString();
+    const list_position = calculatePosition(firstItem as PlaylistResourceItemChapter, lastItem as PlaylistResourceItemChapter);
 
     const finalDto = {
       item_chapter: itemChapter,
@@ -51,20 +52,21 @@ export class PlaylistResourceItemChapterService extends BaseManyService<Playlist
   private async addItemChapterToPlaylistHelper(
     playlist_id_text: string,
     item_chapter_id_text: string,
-    calculatePosition: (firstItem: PlaylistResourceItemChapter | null, lastItem: PlaylistResourceItemChapter | null) => number
+    calculatePosition: (firstItem: PlaylistResourceItemChapter | null, lastItem: PlaylistResourceItemChapter | null) => string
   ): Promise<PlaylistResourceItemChapter> {
     return this.addItemChapterToPlaylist(playlist_id_text, item_chapter_id_text, calculatePosition);
   }
 
   async addItemChapterToPlaylistFirst(playlist_id_text: string, item_chapter_id_text: string): Promise<PlaylistResourceItemChapter> {
     return this.addItemChapterToPlaylistHelper(playlist_id_text, item_chapter_id_text, (firstItem) => {
-      return firstItem ? parseFloat(firstItem.list_position) / 2 : 1;
+      const newPosition = firstItem ? parseFloat(firstItem.list_position) - LIST_POSITION_INCREMENT : 1;
+      return newPosition < 0 ? '0' : newPosition.toString();
     });
   }
 
   async addItemChapterToPlaylistLast(playlist_id_text: string, item_chapter_id_text: string): Promise<PlaylistResourceItemChapter> {
     return this.addItemChapterToPlaylistHelper(playlist_id_text, item_chapter_id_text, (_, lastItem) => {
-      return lastItem ? parseFloat(lastItem.list_position) + 0.0000001 : 1;
+      return lastItem ? (parseFloat(lastItem.list_position) + LIST_POSITION_INCREMENT).toString() : '1';
     });
   }
 
@@ -85,7 +87,7 @@ export class PlaylistResourceItemChapterService extends BaseManyService<Playlist
         throw new Error("Invalid positions provided.");
       }
 
-      return (pos1 + pos2) / 2;
+      return ((pos1 + pos2) / 2).toString();
     });
   }
 
