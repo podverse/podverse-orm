@@ -1,7 +1,7 @@
+import { FindManyOptions, FindOneOptions, EntityManager } from 'typeorm';
 import { ItemChapter } from '@orm/entities/item/itemChapter';
 import { ItemChaptersFeed } from '@orm/entities/item/itemChaptersFeed';
 import { BaseManyService } from '@orm/services/base/baseManyService';
-import { FindManyOptions } from 'typeorm';
 
 export type ItemChapterDto = {
   start_time: string
@@ -12,12 +12,21 @@ export type ItemChapterDto = {
 }
 
 export class ItemChapterService extends BaseManyService<ItemChapter, 'item_chapters_feed'> {
-  constructor() {
-    super(ItemChapter, 'item_chapters_feed');
+  constructor(transactionalEntityManager?: EntityManager) {
+    super(ItemChapter, 'item_chapters_feed', transactionalEntityManager);
   }
 
   async getAll(item_chapters_feed: ItemChaptersFeed, config?: FindManyOptions<ItemChapter>): Promise<ItemChapter[]> {
     return super._getAll(item_chapters_feed, config);
+  }
+
+  async getByIdText(id_text: string, config?: FindOneOptions<ItemChapter>): Promise<ItemChapter | null> {
+    const options: FindOneOptions<ItemChapter> = {
+      where: { id_text },
+      ...config
+    };
+
+    return this.repositoryRead.findOne(options);
   }
 
   async update(item_chapters_feed: ItemChaptersFeed, dto: ItemChapterDto): Promise<ItemChapter> {    
