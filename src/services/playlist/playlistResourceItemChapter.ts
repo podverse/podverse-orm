@@ -97,11 +97,11 @@ export class PlaylistResourceItemChapterService extends BaseManyService<Playlist
       throw new Error("Playlist not found.");
     }
 
-    const itemChapter = await this.itemChapterService.getByIdText(item_chapter_id_text);
-    if (!itemChapter) {
-      throw new Error("Item chapter not found.");
+    const item_chapter = await this.itemChapterService.getByIdText(item_chapter_id_text);
+    if (!item_chapter) {
+      throw new Error("Chapter not found.");
     }
 
-    return this._delete(playlist, { item_chapter_id: itemChapter.id });
+    return this._delete(playlist, { item_chapter_id: item_chapter.id });
   }
 }
