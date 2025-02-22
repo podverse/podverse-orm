@@ -3,6 +3,9 @@ import { PlaylistResourceBase } from "@orm/entities/playlist/playlistResourceBas
 
 @Entity()
 export class PlaylistResourceItemAddByRss extends PlaylistResourceBase {
+  @Column()
+  hash_id!: string;
+
   @Column({ type: 'jsonb' })
   resource_data!: object;
 }
