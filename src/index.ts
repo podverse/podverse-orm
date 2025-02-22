@@ -187,3 +187,7 @@ export * from './services/playlist/playlistResourceItem';
 export * from './services/playlist/playlistResourceItemAddByRSS';
 export * from './services/playlist/playlistResourceItemChapter';
 export * from './services/playlist/playlistResourceItemSoundbite';
+
+export * from './services/queue/queue';
+export * from './services/queue/queueResourceBase';
+export * from './services/queue/queueResourceItem';
