@@ -2,7 +2,7 @@ import { EntityManager } from 'typeorm';
 import { PlaylistResourceItem } from '@orm/entities/playlist/playlistResourceItem';
 import { BaseManyService } from '@orm/services/base/baseManyService';
 import { ItemService } from '@orm/services/item/item';
-import { PlaylistService, LIST_POSITION_INCREMENT } from '@orm/services/playlist/playlist';
+import { PlaylistService, PLAYLIST_LIST_POSITION_INCREMENT } from '@orm/services/playlist/playlist';
 import { PlaylistResourceBaseService } from '@orm/services/playlist/playlistResourceBase';
 
 export class PlaylistResourceItemService extends BaseManyService<PlaylistResourceItem, 'playlist'> {
@@ -58,14 +58,14 @@ export class PlaylistResourceItemService extends BaseManyService<PlaylistResourc
 
   async addItemToPlaylistFirst(playlist_id_text: string, item_id_text: string): Promise<PlaylistResourceItem> {
     return this.addItemToPlaylistHelper(playlist_id_text, item_id_text, (firstItem) => {
-      const newPosition = firstItem ? parseFloat(firstItem.list_position) - LIST_POSITION_INCREMENT : 1;
+      const newPosition = firstItem ? parseFloat(firstItem.list_position) - PLAYLIST_LIST_POSITION_INCREMENT : 1;
       return newPosition < 0 ? '0' : newPosition.toString();
     });
   }
 
   async addItemToPlaylistLast(playlist_id_text: string, item_id_text: string): Promise<PlaylistResourceItem> {
     return this.addItemToPlaylistHelper(playlist_id_text, item_id_text, (_, lastItem) => {
-      return lastItem ? (parseFloat(lastItem.list_position) + LIST_POSITION_INCREMENT).toString() : '1';
+      return lastItem ? (parseFloat(lastItem.list_position) + PLAYLIST_LIST_POSITION_INCREMENT).toString() : '1';
     });
   }
 

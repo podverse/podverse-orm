@@ -3,7 +3,7 @@ import { PlaylistResourceItemSoundbite } from '@orm/entities/playlist/playlistRe
 import { BaseManyService } from '@orm/services/base/baseManyService';
 import { PlaylistService } from '@orm/services/playlist/playlist';
 import { ItemSoundbiteService } from '@orm/services/item/itemSoundbite';
-import { LIST_POSITION_INCREMENT } from '@orm/services/playlist/playlist';
+import { PLAYLIST_LIST_POSITION_INCREMENT } from '@orm/services/playlist/playlist';
 import { PlaylistResourceBaseService } from '@orm/services/playlist/playlistResourceBase';
 
 export class PlaylistResourceItemSoundbiteService extends BaseManyService<PlaylistResourceItemSoundbite, 'playlist'> {
@@ -51,14 +51,14 @@ export class PlaylistResourceItemSoundbiteService extends BaseManyService<Playli
 
   async addItemSoundbiteToPlaylistFirst(playlist_id_text: string, soundbite_id_text: string): Promise<PlaylistResourceItemSoundbite> {
     return this.addItemSoundbiteToPlaylist(playlist_id_text, soundbite_id_text, (firstItem) => {
-      const newPosition = firstItem ? parseFloat(firstItem.list_position) - LIST_POSITION_INCREMENT : 1;
+      const newPosition = firstItem ? parseFloat(firstItem.list_position) - PLAYLIST_LIST_POSITION_INCREMENT : 1;
       return newPosition < 0 ? '0' : newPosition.toString();
     });
   }
 
   async addItemSoundbiteToPlaylistLast(playlist_id_text: string, soundbite_id_text: string): Promise<PlaylistResourceItemSoundbite> {
     return this.addItemSoundbiteToPlaylist(playlist_id_text, soundbite_id_text, (_, lastItem) => {
-      return lastItem ? (parseFloat(lastItem.list_position) + LIST_POSITION_INCREMENT).toString() : '1';
+      return lastItem ? (parseFloat(lastItem.list_position) + PLAYLIST_LIST_POSITION_INCREMENT).toString() : '1';
     });
   }
 
