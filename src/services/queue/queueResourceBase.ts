@@ -25,6 +25,17 @@ export class QueueResourceBaseService extends BaseManyService<QueueResourceBase,
     return this.repositoryRead.find(options);
   }
 
+  async getItemsByQueueIdTextAndPosition(queue_id_text: string, position: string): Promise<QueueResourceBase[]> {
+    const queue = await this.queueService.getByIdText(queue_id_text);
+    if (!queue) {
+      throw new Error("Queue not found.");
+    }
+
+    return this.repositoryRead.find({
+      where: { queue, list_position: position }
+    });
+  }
+
   async getFirstAndLastQueuedItemsByQueueIdText(queue_id_text: string): Promise<{ firstQueued: QueueResourceBase | null, lastQueued: QueueResourceBase | null }> {
     const queue = await this.queueService.getByIdText(queue_id_text);
     if (!queue) {
