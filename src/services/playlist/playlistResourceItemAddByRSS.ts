@@ -1,3 +1,4 @@
+import { getMd5Hash } from 'podverse-helpers';
 import { EntityManager } from 'typeorm';
 import { PlaylistResourceItemAddByRss } from '@orm/entities/playlist/playlistResourceItemAddByRSS';
 import { BaseManyService } from '@orm/services/base/baseManyService';
@@ -27,15 +28,17 @@ export class PlaylistResourceItemAddByRSSService extends BaseManyService<Playlis
     const { firstItem, lastItem } = await this.playlistResourceBaseService.getFirstAndLastItemsByPlaylistIdText(playlist_id_text);
 
     const list_position = calculatePosition(firstItem as PlaylistResourceItemAddByRss, lastItem as PlaylistResourceItemAddByRss);
+    const hash_id = getMd5Hash(resource_data);
 
     const finalDto = {
       resource_data,
-      list_position
+      list_position,
+      hash_id
     };
 
     return this._update(
       playlist,
-      ['playlist', 'resource_data'],
+      ['playlist', 'hash_id'],
       finalDto
     );
   }
@@ -82,12 +85,12 @@ export class PlaylistResourceItemAddByRSSService extends BaseManyService<Playlis
     });
   }
 
-  async removeItemFromPlaylist(playlist_id_text: string, resource_data: object): Promise<void> {
+  async removeItemFromPlaylist(playlist_id_text: string, hash_id: string): Promise<void> {
     const playlist = await this.playlistService.getByIdText(playlist_id_text);
     if (!playlist) {
       throw new Error("Playlist not found.");
     }
 
-    return this._delete(playlist, { resource_data });
+    return this._delete(playlist, { hash_id });
   }
 }
