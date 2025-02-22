@@ -190,4 +190,5 @@ export * from './services/playlist/playlistResourceItemSoundbite';
 
 export * from './services/queue/queue';
 export * from './services/queue/queueResourceBase';
+export * from './services/queue/queueResourceClip';
 export * from './services/queue/queueResourceItem';

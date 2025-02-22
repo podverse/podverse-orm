@@ -25,25 +25,25 @@ export class QueueResourceBaseService extends BaseManyService<QueueResourceBase,
     return this.repositoryRead.find(options);
   }
 
-  async getFirstAndLastQueuedItemsByQueueIdText(queue_id_text: string): Promise<{ firstQueuedItem: QueueResourceBase | null, lastQueuedItem: QueueResourceBase | null }> {
+  async getFirstAndLastQueuedItemsByQueueIdText(queue_id_text: string): Promise<{ firstQueued: QueueResourceBase | null, lastQueued: QueueResourceBase | null }> {
     const queue = await this.queueService.getByIdText(queue_id_text);
     if (!queue) {
       throw new Error("Queue not found.");
     }
 
-    const firstQueuedItem = await this.repositoryRead.findOne({
+    const firstQueued = await this.repositoryRead.findOne({
       // TODO: how to handle numeric string type?
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       where: { queue, list_position: MoreThan(0) as any },
       order: { list_position: 'ASC' }
     });
 
-    const lastQueuedItem = await this.repositoryRead.findOne({
+    const lastQueued = await this.repositoryRead.findOne({
       where: { queue },
       order: { list_position: 'DESC' }
     });
 
-    return { firstQueuedItem, lastQueuedItem };
+    return { firstQueued, lastQueued };
   }
 
   async getMostRecentHistoryItemByQueueIdText(queue_id_text: string): Promise<QueueResourceBase | null> {
