@@ -93,12 +93,7 @@ export * from './entities/playlist/playlistResourceItemChapter';
 export * from './entities/playlist/playlistResourceItemSoundbite';
 
 export * from './entities/queue/queue';
-export * from './entities/queue/queueResourceBase';
-export * from './entities/queue/queueResourceClip';
-export * from './entities/queue/queueResourceItem';
-export * from './entities/queue/queueResourceItemAddByRSS';
-export * from './entities/queue/queueResourceItemChapter';
-export * from './entities/queue/queueResourceItemSoundbite';
+export * from './entities/queue/queueResource';
 
 export * from './entities/category';
 export * from './entities/clip';
@@ -189,9 +184,4 @@ export * from './services/playlist/playlistResourceItemChapter';
 export * from './services/playlist/playlistResourceItemSoundbite';
 
 export * from './services/queue/queue';
-export * from './services/queue/queueResourceBase';
-export * from './services/queue/queueResourceClip';
-export * from './services/queue/queueResourceItem';
-export * from './services/queue/queueResourceItemAddByRSS';
-export * from './services/queue/queueResourceItemChapter';
-export * from './services/queue/queueResourceItemSoundbite';
+export * from './services/queue/queueResource';

@@ -8,8 +8,6 @@ export type QueueDto = {
   medium: MediumEnum;
 };
 
-export const QUEUE_LIST_POSITION_INCREMENT = 0.00000001;
-
 export class QueueService extends BaseManyService<Queue, 'account'> {
   private accountService: AccountService;
 

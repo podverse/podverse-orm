@@ -85,12 +85,7 @@ import { PlaylistResourceItemAddByRss } from "@orm/entities/playlist/playlistRes
 import { PlaylistResourceItemChapter } from "@orm/entities/playlist/playlistResourceItemChapter";
 import { PlaylistResourceItemSoundbite } from "@orm/entities/playlist/playlistResourceItemSoundbite";
 import { Queue } from "@orm/entities/queue/queue";
-import { QueueResourceBase } from "@orm/entities/queue/queueResourceBase";
-import { QueueResourceClip } from "@orm/entities/queue/queueResourceClip";
-import { QueueResourceItem } from "@orm/entities/queue/queueResourceItem";
-import { QueueResourceItemAddByRSS } from "@orm/entities/queue/queueResourceItemAddByRSS";
-import { QueueResourceItemChapter } from "@orm/entities/queue/queueResourceItemChapter";
-import { QueueResourceItemSoundbite } from "@orm/entities/queue/queueResourceItemSoundbite";
+import { QueueResource } from "@orm/entities/queue/queueResource";
 import { Clip } from "@orm/entities/clip";
 import { MembershipClaimToken } from "@orm/entities/membershipClaimToken";
 import { SharableStatus } from "@orm/entities/sharableStatus";
@@ -192,12 +187,7 @@ const commonConfig: DataSourceOptions = {
     PlaylistResourceItemChapter,
     PlaylistResourceItemSoundbite,
     Queue,
-    QueueResourceBase,
-    QueueResourceClip,
-    QueueResourceItem,
-    QueueResourceItemAddByRSS,
-    QueueResourceItemChapter,
-    QueueResourceItemSoundbite,
+    QueueResource,
     SharableStatus
   ],
   migrations: [],
