@@ -4,6 +4,9 @@ import { QueueResourceBase } from "@orm/entities/queue/queueResourceBase";
 @Entity()
 @Unique(['queue'])
 export class QueueResourceItemAddByRss extends QueueResourceBase {
+  @Column()
+  hash_id!: string;
+  
   @Column({ type: 'jsonb' })
   resource_data!: object;
 }
