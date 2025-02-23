@@ -78,12 +78,7 @@ import { ItemValueTimeSplitRemoteItem } from "@orm/entities/item/itemValueTimeSp
 import { LiveItem } from "@orm/entities/liveItem/liveItem";
 import { LiveItemStatus } from "@orm/entities/liveItem/liveItemStatus";
 import { Playlist } from "@orm/entities/playlist/playlist";
-import { PlaylistResourceBase } from "@orm/entities/playlist/playlistResourceBase";
-import { PlaylistResourceClip } from "@orm/entities/playlist/playlistResourceClip";
-import { PlaylistResourceItem } from "@orm/entities/playlist/playlistResourceItem";
-import { PlaylistResourceItemAddByRss } from "@orm/entities/playlist/playlistResourceItemAddByRSS";
-import { PlaylistResourceItemChapter } from "@orm/entities/playlist/playlistResourceItemChapter";
-import { PlaylistResourceItemSoundbite } from "@orm/entities/playlist/playlistResourceItemSoundbite";
+import { PlaylistResource } from "@orm/entities/playlist/playlistResource";
 import { Queue } from "@orm/entities/queue/queue";
 import { QueueResource } from "@orm/entities/queue/queueResource";
 import { Clip } from "@orm/entities/clip";
@@ -180,12 +175,7 @@ const commonConfig: DataSourceOptions = {
     MembershipClaimToken,
     Medium,
     Playlist,
-    PlaylistResourceBase,
-    PlaylistResourceClip,
-    PlaylistResourceItem,
-    PlaylistResourceItemAddByRss,
-    PlaylistResourceItemChapter,
-    PlaylistResourceItemSoundbite,
+    PlaylistResource,
     Queue,
     QueueResource,
     SharableStatus

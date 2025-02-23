@@ -85,12 +85,7 @@ export * from './entities/liveItem/liveItem';
 export * from './entities/liveItem/liveItemStatus';
 
 export * from './entities/playlist/playlist';
-export * from './entities/playlist/playlistResourceBase';
-export * from './entities/playlist/playlistResourceClip';
-export * from './entities/playlist/playlistResourceItem';
-export * from './entities/playlist/playlistResourceItemAddByRSS';
-export * from './entities/playlist/playlistResourceItemChapter';
-export * from './entities/playlist/playlistResourceItemSoundbite';
+export * from './entities/playlist/playlistResource';
 
 export * from './entities/queue/queue';
 export * from './entities/queue/queueResource';
@@ -176,12 +171,7 @@ export * from './services/liveItem/liveItem';
 export * from './services/medium';
 
 export * from './services/playlist/playlist';
-export * from './services/playlist/playlistResourceBase';
-export * from './services/playlist/playlistResourceClip';
-export * from './services/playlist/playlistResourceItem';
-export * from './services/playlist/playlistResourceItemAddByRSS';
-export * from './services/playlist/playlistResourceItemChapter';
-export * from './services/playlist/playlistResourceItemSoundbite';
+export * from './services/playlist/playlistResource';
 
 export * from './services/queue/queue';
 export * from './services/queue/queueResource';

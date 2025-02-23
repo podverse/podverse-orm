@@ -12,8 +12,6 @@ export type PlaylistDto = {
   is_default_favorites: boolean;
 };
 
-export const PLAYLIST_LIST_POSITION_INCREMENT = 0.00000001;
-
 export class PlaylistService extends BaseManyService<Playlist, 'account'> {
   private accountService: AccountService;
 
