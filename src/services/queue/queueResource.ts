@@ -1,3 +1,5 @@
+// TODO: get rid of "any" in the file 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { EntityManager, FindOptionsOrderValue, LessThan, MoreThan } from 'typeorm';
 import { QueueResource } from '@orm/entities/queue/queueResource';
 import { BaseManyService } from '@orm/services/base/baseManyService';
@@ -59,8 +61,6 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     }
 
     const firstQueued = await this.repositoryRead.findOne({
-      // TODO: how to handle numeric string type?
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       where: { queue, list_position: MoreThan(0) as any },
       order: { list_position: 'ASC' }
     });
@@ -80,8 +80,6 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     }
 
     const mostRecentHistoryItem = await this.repositoryRead.findOne({
-      // TODO: how to handle numeric string type?
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       where: { queue, list_position: LessThan(0) as any },
       order: { list_position: 'DESC' }
     });
@@ -89,9 +87,11 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     return mostRecentHistoryItem;
   }
 
-  private async addClipToQueue(
+  private async addResourceToQueue(
     queue_id_text: string,
-    clip_id_text: string,
+    resource_id_text: string,
+    resourceService: any,
+    resourceKey: keyof QueueResource,
     calculatePosition: (firstQueued: QueueResource | null, lastQueued: QueueResource | null) => string
   ): Promise<QueueResource> {
     const queue = await this.queueService.getByIdText(queue_id_text);
@@ -99,258 +99,212 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
       throw new Error("Queue not found.");
     }
 
-    const clip = await this.clipService.getByIdText(clip_id_text);
-    if (!clip) {
-      throw new Error("Clip not found.");
+    const resource = await resourceService.getByIdText(resource_id_text);
+    if (!resource) {
+      throw new Error(`${resourceKey} not found.`);
     }
 
     const { firstQueued, lastQueued } = await this.getFirstAndLastQueuedItemsByQueueIdText(queue_id_text);
-
-    const list_position = calculatePosition(firstQueued as QueueResource, lastQueued as QueueResource);
+    const list_position = calculatePosition(firstQueued, lastQueued);
 
     const finalDto = {
-      clip,
+      [resourceKey]: resource,
       list_position
     };
 
-    return this._update(
-      queue,
-      ['queue', 'clip'],
-      finalDto
-    );
+    return this._update(queue, ['queue', resourceKey], finalDto);
   }
 
-  private async addClipToQueueHelper(
+  private async addResourceToQueueHelper(
     queue_id_text: string,
-    clip_id_text: string,
+    resource_id_text: string,
+    resourceService: any,
+    resourceKey: keyof QueueResource,
     calculatePosition: (firstQueued: QueueResource | null, lastQueued: QueueResource | null) => string
   ): Promise<QueueResource> {
-    return this.addClipToQueue(queue_id_text, clip_id_text, calculatePosition);
+    return this.addResourceToQueue(queue_id_text, resource_id_text, resourceService, resourceKey, calculatePosition);
+  }
+
+  async addResourceToQueueNext(queue_id_text: string, resource_id_text: string, resourceService: any, resourceKey: keyof QueueResource): Promise<QueueResource> {
+    const { firstQueued } = await this.getFirstAndLastQueuedItemsByQueueIdText(queue_id_text);
+    const newPosition = firstQueued ? parseFloat(firstQueued.list_position) - QUEUE_LIST_POSITION_INCREMENT : 1;
+    return this.addResourceToQueueHelper(queue_id_text, resource_id_text, resourceService, resourceKey, () => newPosition.toString());
+  }
+
+  async addResourceToQueueLast(queue_id_text: string, resource_id_text: string, resourceService: any, resourceKey: keyof QueueResource): Promise<QueueResource> {
+    const { lastQueued } = await this.getFirstAndLastQueuedItemsByQueueIdText(queue_id_text);
+    const newPosition = lastQueued ? parseFloat(lastQueued.list_position) + QUEUE_LIST_POSITION_INCREMENT : '1';
+    return this.addResourceToQueueHelper(queue_id_text, resource_id_text, resourceService, resourceKey, () => newPosition.toString());
+  }
+
+  async addResourceToQueueBetween(queue_id_text: string, resource_id_text: string, resourceService: any, resourceKey: keyof QueueResource, position1: number, position2: number): Promise<QueueResource> {
+    if (position1 >= position2) {
+      throw new Error("Position1 should be less than Position2.");
+    }
+
+    return this.addResourceToQueueHelper(queue_id_text, resource_id_text, resourceService, resourceKey, () => {
+      const pos1 = parseFloat(position1.toString());
+      const pos2 = parseFloat(position2.toString());
+
+      if (isNaN(pos1) || isNaN(pos2)) {
+        throw new Error("Invalid positions provided.");
+      }
+
+      return ((pos1 + pos2) / 2).toString();
+    });
+  }
+
+  async addResourceToNowPlaying(queue_id_text: string, resource_id_text: string, resourceService: any, resourceKey: keyof QueueResource): Promise<QueueResource> {
+    const queue = await this.queueService.getByIdText(queue_id_text);
+    if (!queue) {
+      throw new Error("Queue not found.");
+    }
+
+    const resource = await resourceService.getByIdText(resource_id_text);
+    if (!resource) {
+      throw new Error(`${resourceKey} not found.`);
+    }
+
+    const finalDto = {
+      [resourceKey]: resource,
+      list_position: '0'
+    };
+
+    return this._update(queue, ['queue', resourceKey], finalDto);
+  }
+
+  async addResourceToHistory(queue_id_text: string, resource_id_text: string, resourceService: any, resourceKey: keyof QueueResource): Promise<QueueResource> {
+    const queue = await this.queueService.getByIdText(queue_id_text);
+    if (!queue) {
+      throw new Error("Queue not found.");
+    }
+
+    const resource = await resourceService.getByIdText(resource_id_text);
+    if (!resource) {
+      throw new Error(`${resourceKey} not found.`);
+    }
+
+    const mostRecentHistoryItem = await this.getMostRecentHistoryItemByQueueIdText(queue_id_text);
+    const newPosition = mostRecentHistoryItem ? parseFloat(mostRecentHistoryItem.list_position) + QUEUE_LIST_POSITION_INCREMENT : -1;
+
+    const finalDto = {
+      [resourceKey]: resource,
+      list_position: newPosition.toString()
+    };
+
+    return this._update(queue, ['queue', resourceKey], finalDto);
+  }
+
+  async removeResourceFromQueue(queue_id_text: string, resource_id_text: string, resourceService: any, resourceKey: keyof QueueResource): Promise<void> {
+    const queue = await this.queueService.getByIdText(queue_id_text);
+    if (!queue) {
+      throw new Error("Queue not found.");
+    }
+
+    const resource = await resourceService.getByIdText(resource_id_text);
+    if (!resource) {
+      throw new Error(`${resourceKey} not found.`);
+    }
+
+    return this._delete(queue, { [`${resourceKey}_id`]: resource.id });
   }
 
   async addClipToQueueNext(queue_id_text: string, clip_id_text: string): Promise<QueueResource> {
-    const { firstQueued } = await this.getFirstAndLastQueuedItemsByQueueIdText(queue_id_text);
-    const newPosition = firstQueued ? parseFloat(firstQueued.list_position) - QUEUE_LIST_POSITION_INCREMENT : 1;
-    return this.addClipToQueueHelper(queue_id_text, clip_id_text, () => newPosition.toString());
+    return this.addResourceToQueueNext(queue_id_text, clip_id_text, this.clipService, 'clip');
   }
 
   async addClipToQueueLast(queue_id_text: string, clip_id_text: string): Promise<QueueResource> {
-    const { lastQueued } = await this.getFirstAndLastQueuedItemsByQueueIdText(queue_id_text);
-    const newPosition = lastQueued ? parseFloat(lastQueued.list_position) + QUEUE_LIST_POSITION_INCREMENT : '1';
-    return this.addClipToQueueHelper(queue_id_text, clip_id_text, () => newPosition.toString());
+    return this.addResourceToQueueLast(queue_id_text, clip_id_text, this.clipService, 'clip');
   }
 
   async addClipToQueueBetween(queue_id_text: string, clip_id_text: string, position1: number, position2: number): Promise<QueueResource> {
-    if (position1 >= position2) {
-      throw new Error("Position1 should be less than Position2.");
-    }
-
-    return this.addClipToQueueHelper(queue_id_text, clip_id_text, () => {
-      const pos1 = parseFloat(position1.toString());
-      const pos2 = parseFloat(position2.toString());
-
-      if (isNaN(pos1) || isNaN(pos2)) {
-        throw new Error("Invalid positions provided.");
-      }
-
-      return ((pos1 + pos2) / 2).toString();
-    });
+    return this.addResourceToQueueBetween(queue_id_text, clip_id_text, this.clipService, 'clip', position1, position2);
   }
 
   async addClipToNowPlaying(queue_id_text: string, clip_id_text: string): Promise<QueueResource> {
-    const queue = await this.queueService.getByIdText(queue_id_text);
-    if (!queue) {
-      throw new Error("Queue not found.");
-    }
-
-    const clip = await this.clipService.getByIdText(clip_id_text);
-    if (!clip) {
-      throw new Error("Clip not found.");
-    }
-
-    const finalDto = {
-      clip,
-      list_position: '0'
-    };
-
-    return this._update(
-      queue,
-      ['queue', 'clip'],
-      finalDto
-    );
+    return this.addResourceToNowPlaying(queue_id_text, clip_id_text, this.clipService, 'clip');
   }
 
   async addClipToHistory(queue_id_text: string, clip_id_text: string): Promise<QueueResource> {
-    const queue = await this.queueService.getByIdText(queue_id_text);
-    if (!queue) {
-      throw new Error("Queue not found.");
-    }
-
-    const clip = await this.clipService.getByIdText(clip_id_text);
-    if (!clip) {
-      throw new Error("Clip not found.");
-    }
-
-    const mostRecentHistoryItem = await this.getMostRecentHistoryItemByQueueIdText(queue_id_text);
-    const newPosition = mostRecentHistoryItem ? parseFloat(mostRecentHistoryItem.list_position) + QUEUE_LIST_POSITION_INCREMENT : -1;
-
-    const finalDto = {
-      clip,
-      list_position: newPosition.toString()
-    };
-
-    return this._update(
-      queue,
-      ['queue', 'clip'],
-      finalDto
-    );
+    return this.addResourceToHistory(queue_id_text, clip_id_text, this.clipService, 'clip');
   }
 
   async removeClipFromQueue(queue_id_text: string, clip_id_text: string): Promise<void> {
-    const queue = await this.queueService.getByIdText(queue_id_text);
-    if (!queue) {
-      throw new Error("Queue not found.");
-    }
-
-    const clip = await this.clipService.getByIdText(clip_id_text);
-    if (!clip) {
-      throw new Error("Clip not found.");
-    }
-
-    return this._delete(queue, { clip_id: clip.id });
-  }
-
-  private async addItemToQueue(
-    queue_id_text: string,
-    item_id_text: string,
-    calculatePosition: (firstQueued: QueueResource | null, lastQueued: QueueResource | null) => string
-  ): Promise<QueueResource> {
-    const queue = await this.queueService.getByIdText(queue_id_text);
-    if (!queue) {
-      throw new Error("Queue not found.");
-    }
-
-    const item = await this.itemService.getByIdText(item_id_text);
-    if (!item) {
-      throw new Error("Item not found.");
-    }
-
-    const { firstQueued, lastQueued } = await this.getFirstAndLastQueuedItemsByQueueIdText(queue_id_text);
-
-    const list_position = calculatePosition(firstQueued as QueueResource, lastQueued as QueueResource);
-
-    const finalDto = {
-      item,
-      list_position
-    };
-
-    return this._update(
-      queue,
-      ['queue', 'item'],
-      finalDto
-    );
-  }
-
-  private async addItemToQueueHelper(
-    queue_id_text: string,
-    item_id_text: string,
-    calculatePosition: (firstQueued: QueueResource | null, lastQueued: QueueResource | null) => string
-  ): Promise<QueueResource> {
-    return this.addItemToQueue(queue_id_text, item_id_text, calculatePosition);
+    return this.removeResourceFromQueue(queue_id_text, clip_id_text, this.clipService, 'clip');
   }
 
   async addItemToQueueNext(queue_id_text: string, item_id_text: string): Promise<QueueResource> {
-    const { firstQueued } = await this.getFirstAndLastQueuedItemsByQueueIdText(queue_id_text);
-    const newPosition = firstQueued ? parseFloat(firstQueued.list_position) - QUEUE_LIST_POSITION_INCREMENT : 1;
-    return this.addItemToQueueHelper(queue_id_text, item_id_text, () => newPosition.toString());
+    return this.addResourceToQueueNext(queue_id_text, item_id_text, this.itemService, 'item');
   }
 
   async addItemToQueueLast(queue_id_text: string, item_id_text: string): Promise<QueueResource> {
-    const { lastQueued } = await this.getFirstAndLastQueuedItemsByQueueIdText(queue_id_text);
-    const newPosition = lastQueued ? parseFloat(lastQueued.list_position) + QUEUE_LIST_POSITION_INCREMENT : '1';
-    return this.addItemToQueueHelper(queue_id_text, item_id_text, () => newPosition.toString());
+    return this.addResourceToQueueLast(queue_id_text, item_id_text, this.itemService, 'item');
   }
 
   async addItemToQueueBetween(queue_id_text: string, item_id_text: string, position1: number, position2: number): Promise<QueueResource> {
-    if (position1 >= position2) {
-      throw new Error("Position1 should be less than Position2.");
-    }
-
-    return this.addItemToQueueHelper(queue_id_text, item_id_text, () => {
-      const pos1 = parseFloat(position1.toString());
-      const pos2 = parseFloat(position2.toString());
-
-      if (isNaN(pos1) || isNaN(pos2)) {
-        throw new Error("Invalid positions provided.");
-      }
-
-      return ((pos1 + pos2) / 2).toString();
-    });
+    return this.addResourceToQueueBetween(queue_id_text, item_id_text, this.itemService, 'item', position1, position2);
   }
 
   async addItemToNowPlaying(queue_id_text: string, item_id_text: string): Promise<QueueResource> {
-    const queue = await this.queueService.getByIdText(queue_id_text);
-    if (!queue) {
-      throw new Error("Queue not found.");
-    }
-
-    const item = await this.itemService.getByIdText(item_id_text);
-    if (!item) {
-      throw new Error("Item not found.");
-    }
-
-    const finalDto = {
-      item,
-      list_position: '0'
-    };
-
-    return this._update(
-      queue,
-      ['queue', 'item'],
-      finalDto
-    );
+    return this.addResourceToNowPlaying(queue_id_text, item_id_text, this.itemService, 'item');
   }
 
   async addItemToHistory(queue_id_text: string, item_id_text: string): Promise<QueueResource> {
-    const queue = await this.queueService.getByIdText(queue_id_text);
-    if (!queue) {
-      throw new Error("Queue not found.");
-    }
-
-    const item = await this.itemService.getByIdText(item_id_text);
-    if (!item) {
-      throw new Error("Item not found.");
-    }
-
-    const mostRecentHistoryItem = await this.getMostRecentHistoryItemByQueueIdText(queue_id_text);
-    const newPosition = mostRecentHistoryItem ? parseFloat(mostRecentHistoryItem.list_position) + QUEUE_LIST_POSITION_INCREMENT : -1;
-
-    const finalDto = {
-      item,
-      list_position: newPosition.toString()
-    };
-
-    return this._update(
-      queue,
-      ['queue', 'item'],
-      finalDto
-    );
+    return this.addResourceToHistory(queue_id_text, item_id_text, this.itemService, 'item');
   }
 
   async removeItemFromQueue(queue_id_text: string, item_id_text: string): Promise<void> {
-    const queue = await this.queueService.getByIdText(queue_id_text);
-    if (!queue) {
-      throw new Error("Queue not found.");
-    }
-
-    const item = await this.itemService.getByIdText(item_id_text);
-    if (!item) {
-      throw new Error("Item not found.");
-    }
-
-    return this._delete(queue, { item_id: item.id });
+    return this.removeResourceFromQueue(queue_id_text, item_id_text, this.itemService, 'item');
   }
-  
+
+  async addItemChapterToQueueNext(queue_id_text: string, item_chapter_id_text: string): Promise<QueueResource> {
+    return this.addResourceToQueueNext(queue_id_text, item_chapter_id_text, this.itemChapterService, 'item_chapter');
+  }
+
+  async addItemChapterToQueueLast(queue_id_text: string, item_chapter_id_text: string): Promise<QueueResource> {
+    return this.addResourceToQueueLast(queue_id_text, item_chapter_id_text, this.itemChapterService, 'item_chapter');
+  }
+
+  async addItemChapterToQueueBetween(queue_id_text: string, item_chapter_id_text: string, position1: number, position2: number): Promise<QueueResource> {
+    return this.addResourceToQueueBetween(queue_id_text, item_chapter_id_text, this.itemChapterService, 'item_chapter', position1, position2);
+  }
+
+  async addItemChapterToNowPlaying(queue_id_text: string, item_chapter_id_text: string): Promise<QueueResource> {
+    return this.addResourceToNowPlaying(queue_id_text, item_chapter_id_text, this.itemChapterService, 'item_chapter');
+  }
+
+  async addItemChapterToHistory(queue_id_text: string, item_chapter_id_text: string): Promise<QueueResource> {
+    return this.addResourceToHistory(queue_id_text, item_chapter_id_text, this.itemChapterService, 'item_chapter');
+  }
+
+  async removeItemChapterFromQueue(queue_id_text: string, item_chapter_id_text: string): Promise<void> {
+    return this.removeResourceFromQueue(queue_id_text, item_chapter_id_text, this.itemChapterService, 'item_chapter');
+  }
+
+  async addItemSoundbiteToQueueNext(queue_id_text: string, item_soundbite_id_text: string): Promise<QueueResource> {
+    return this.addResourceToQueueNext(queue_id_text, item_soundbite_id_text, this.itemSoundbiteService, 'item_soundbite');
+  }
+
+  async addItemSoundbiteToQueueLast(queue_id_text: string, item_soundbite_id_text: string): Promise<QueueResource> {
+    return this.addResourceToQueueLast(queue_id_text, item_soundbite_id_text, this.itemSoundbiteService, 'item_soundbite');
+  }
+
+  async addItemSoundbiteToQueueBetween(queue_id_text: string, item_soundbite_id_text: string, position1: number, position2: number): Promise<QueueResource> {
+    return this.addResourceToQueueBetween(queue_id_text, item_soundbite_id_text, this.itemSoundbiteService, 'item_soundbite', position1, position2);
+  }
+
+  async addItemSoundbiteToNowPlaying(queue_id_text: string, item_soundbite_id_text: string): Promise<QueueResource> {
+    return this.addResourceToNowPlaying(queue_id_text, item_soundbite_id_text, this.itemSoundbiteService, 'item_soundbite');
+  }
+
+  async addItemSoundbiteToHistory(queue_id_text: string, item_soundbite_id_text: string): Promise<QueueResource> {
+    return this.addResourceToHistory(queue_id_text, item_soundbite_id_text, this.itemSoundbiteService, 'item_soundbite');
+  }
+
+  async removeItemSoundbiteFromQueue(queue_id_text: string, item_soundbite_id_text: string): Promise<void> {
+    return this.removeResourceFromQueue(queue_id_text, item_soundbite_id_text, this.itemSoundbiteService, 'item_soundbite');
+  }
+
   private async addItemAddByRSSToQueue(
     queue_id_text: string,
     add_by_rss_resource_data: object,
@@ -360,9 +314,9 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     if (!queue) {
       throw new Error("Queue not found.");
     }
-
+    console.log('queue', queue);
     const { firstQueued, lastQueued } = await this.getFirstAndLastQueuedItemsByQueueIdText(queue_id_text);
-
+    console.log('firstQueued', firstQueued);
     const list_position = calculatePosition(firstQueued as QueueResource, lastQueued as QueueResource);
     const add_by_rss_hash_id = getMd5Hash(add_by_rss_resource_data);
 
@@ -372,6 +326,7 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
       add_by_rss_hash_id
     };
 
+    console.log('finalDto', finalDto);
     return this._update(
       queue,
       ['queue', 'add_by_rss_hash_id'],
@@ -388,6 +343,7 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
   }
 
   async addItemAddByRSSToQueueNext(queue_id_text: string, add_by_rss_resource_data: object): Promise<QueueResource> {
+    console.log('addItemAddByRSSToQueueNext');
     return this.addItemAddByRSSToQueueHelper(queue_id_text, add_by_rss_resource_data, (firstQueued) => {
       const newPosition = firstQueued ? parseFloat(firstQueued.list_position) - QUEUE_LIST_POSITION_INCREMENT : 1;
       return newPosition < 0 ? '0' : newPosition.toString();
@@ -469,267 +425,5 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     }
 
     return this._delete(queue, { add_by_rss_hash_id });
-  }
-
-  private async addItemChapterToQueue(
-    queue_id_text: string,
-    item_chapter_id_text: string,
-    calculatePosition: (firstQueued: QueueResource | null, lastQueued: QueueResource | null) => string
-  ): Promise<QueueResource> {
-    const queue = await this.queueService.getByIdText(queue_id_text);
-    if (!queue) {
-      throw new Error("Queue not found.");
-    }
-
-    const itemChapter = await this.itemChapterService.getByIdText(item_chapter_id_text);
-    if (!itemChapter) {
-      throw new Error("Item chapter not found.");
-    }
-
-    const { firstQueued, lastQueued } = await this.getFirstAndLastQueuedItemsByQueueIdText(queue_id_text);
-
-    const list_position = calculatePosition(firstQueued as QueueResource, lastQueued as QueueResource);
-
-    const finalDto = {
-      item_chapter: itemChapter,
-      list_position
-    };
-
-    return this._update(
-      queue,
-      ['queue', 'item_chapter'],
-      finalDto
-    );
-  }
-
-  private async addItemChapterToQueueHelper(
-    queue_id_text: string,
-    item_chapter_id_text: string,
-    calculatePosition: (firstQueued: QueueResource | null, lastQueued: QueueResource | null) => string
-  ): Promise<QueueResource> {
-    return this.addItemChapterToQueue(queue_id_text, item_chapter_id_text, calculatePosition);
-  }
-
-  async addItemChapterToQueueNext(queue_id_text: string, item_chapter_id_text: string): Promise<QueueResource> {
-    const { firstQueued } = await this.getFirstAndLastQueuedItemsByQueueIdText(queue_id_text);
-    const newPosition = firstQueued ? parseFloat(firstQueued.list_position) - QUEUE_LIST_POSITION_INCREMENT : 1;
-    return this.addItemChapterToQueueHelper(queue_id_text, item_chapter_id_text, () => newPosition.toString());
-  }
-
-  async addItemChapterToQueueLast(queue_id_text: string, item_chapter_id_text: string): Promise<QueueResource> {
-    const { lastQueued } = await this.getFirstAndLastQueuedItemsByQueueIdText(queue_id_text);
-    const newPosition = lastQueued ? parseFloat(lastQueued.list_position) + QUEUE_LIST_POSITION_INCREMENT : '1';
-    return this.addItemChapterToQueueHelper(queue_id_text, item_chapter_id_text, () => newPosition.toString());
-  }
-
-  async addItemChapterToQueueBetween(queue_id_text: string, item_chapter_id_text: string, position1: number, position2: number): Promise<QueueResource> {
-    if (position1 >= position2) {
-      throw new Error("Position1 should be less than Position2.");
-    }
-
-    return this.addItemChapterToQueueHelper(queue_id_text, item_chapter_id_text, () => {
-      const pos1 = parseFloat(position1.toString());
-      const pos2 = parseFloat(position2.toString());
-
-      if (isNaN(pos1) || isNaN(pos2)) {
-        throw new Error("Invalid positions provided.");
-      }
-
-      return ((pos1 + pos2) / 2).toString();
-    });
-  }
-
-  async addItemChapterToNowPlaying(queue_id_text: string, item_chapter_id_text: string): Promise<QueueResource> {
-    const queue = await this.queueService.getByIdText(queue_id_text);
-    if (!queue) {
-      throw new Error("Queue not found.");
-    }
-
-    const itemChapter = await this.itemChapterService.getByIdText(item_chapter_id_text);
-    if (!itemChapter) {
-      throw new Error("Item chapter not found.");
-    }
-
-    const finalDto = {
-      item_chapter: itemChapter,
-      list_position: '0'
-    };
-
-    return this._update(
-      queue,
-      ['queue', 'item_chapter'],
-      finalDto
-    );
-  }
-
-  async addItemChapterToHistory(queue_id_text: string, item_chapter_id_text: string): Promise<QueueResource> {
-    const queue = await this.queueService.getByIdText(queue_id_text);
-    if (!queue) {
-      throw new Error("Queue not found.");
-    }
-
-    const itemChapter = await this.itemChapterService.getByIdText(item_chapter_id_text);
-    if (!itemChapter) {
-      throw new Error("Item chapter not found.");
-    }
-
-    const mostRecentHistoryItem = await this.getMostRecentHistoryItemByQueueIdText(queue_id_text);
-    const newPosition = mostRecentHistoryItem ? parseFloat(mostRecentHistoryItem.list_position) + QUEUE_LIST_POSITION_INCREMENT : -1;
-
-    const finalDto = {
-      item_chapter: itemChapter,
-      list_position: newPosition.toString()
-    };
-
-    return this._update(
-      queue,
-      ['queue', 'item_chapter'],
-      finalDto
-    );
-  }
-
-  async removeItemChapterFromQueue(queue_id_text: string, item_chapter_id_text: string): Promise<void> {
-    const queue = await this.queueService.getByIdText(queue_id_text);
-    if (!queue) {
-      throw new Error("Queue not found.");
-    }
-
-    const itemChapter = await this.itemChapterService.getByIdText(item_chapter_id_text);
-    if (!itemChapter) {
-      throw new Error("Item chapter not found.");
-    }
-
-    return this._delete(queue, { item_chapter_id: itemChapter.id });
-  }
-
-  private async addItemSoundbiteToQueue(
-    queue_id_text: string,
-    item_soundbite_id_text: string,
-    calculatePosition: (firstQueued: QueueResource | null, lastQueued: QueueResource | null) => string
-  ): Promise<QueueResource> {
-    const queue = await this.queueService.getByIdText(queue_id_text);
-    if (!queue) {
-      throw new Error("Queue not found.");
-    }
-
-    const item_soundbite = await this.itemSoundbiteService.getByIdText(item_soundbite_id_text);
-    if (!item_soundbite) {
-      throw new Error("Soundbite not found.");
-    }
-
-    const { firstQueued, lastQueued } = await this.getFirstAndLastQueuedItemsByQueueIdText(queue_id_text);
-
-    const list_position = calculatePosition(firstQueued as QueueResource, lastQueued as QueueResource);
-
-    const finalDto = {
-      item_soundbite,
-      list_position
-    };
-
-    return this._update(
-      queue,
-      ['queue', 'item_soundbite'],
-      finalDto
-    );
-  }
-
-  private async addItemSoundbiteToQueueHelper(
-    queue_id_text: string,
-    item_soundbite_id_text: string,
-    calculatePosition: (firstQueued: QueueResource | null, lastQueued: QueueResource | null) => string
-  ): Promise<QueueResource> {
-    return this.addItemSoundbiteToQueue(queue_id_text, item_soundbite_id_text, calculatePosition);
-  }
-
-  async addItemSoundbiteToQueueNext(queue_id_text: string, item_soundbite_id_text: string): Promise<QueueResource> {
-    const { firstQueued } = await this.getFirstAndLastQueuedItemsByQueueIdText(queue_id_text);
-    const newPosition = firstQueued ? parseFloat(firstQueued.list_position) - QUEUE_LIST_POSITION_INCREMENT : 1;
-    return this.addItemSoundbiteToQueueHelper(queue_id_text, item_soundbite_id_text, () => newPosition.toString());
-  }
-
-  async addItemSoundbiteToQueueLast(queue_id_text: string, item_soundbite_id_text: string): Promise<QueueResource> {
-    const { lastQueued } = await this.getFirstAndLastQueuedItemsByQueueIdText(queue_id_text);
-    const newPosition = lastQueued ? parseFloat(lastQueued.list_position) + QUEUE_LIST_POSITION_INCREMENT : '1';
-    return this.addItemSoundbiteToQueueHelper(queue_id_text, item_soundbite_id_text, () => newPosition.toString());
-  }
-
-  async addItemSoundbiteToQueueBetween(queue_id_text: string, item_soundbite_id_text: string, position1: number, position2: number): Promise<QueueResource> {
-    if (position1 >= position2) {
-      throw new Error("Position1 should be less than Position2.");
-    }
-
-    return this.addItemSoundbiteToQueueHelper(queue_id_text, item_soundbite_id_text, () => {
-      const pos1 = parseFloat(position1.toString());
-      const pos2 = parseFloat(position2.toString());
-
-      if (isNaN(pos1) || isNaN(pos2)) {
-        throw new Error("Invalid positions provided.");
-      }
-
-      return ((pos1 + pos2) / 2).toString();
-    });
-  }
-
-  async addItemSoundbiteToNowPlaying(queue_id_text: string, item_soundbite_id_text: string): Promise<QueueResource> {
-    const queue = await this.queueService.getByIdText(queue_id_text);
-    if (!queue) {
-      throw new Error("Queue not found.");
-    }
-
-    const item_soundbite = await this.itemSoundbiteService.getByIdText(item_soundbite_id_text);
-    if (!item_soundbite) {
-      throw new Error("Soundbite not found.");
-    }
-
-    const finalDto = {
-      item_soundbite,
-      list_position: '0'
-    };
-
-    return this._update(
-      queue,
-      ['queue', 'item_soundbite'],
-      finalDto
-    );
-  }
-
-  async addItemSoundbiteToHistory(queue_id_text: string, item_soundbite_id_text: string): Promise<QueueResource> {
-    const queue = await this.queueService.getByIdText(queue_id_text);
-    if (!queue) {
-      throw new Error("Queue not found.");
-    }
-
-    const item_soundbite = await this.itemSoundbiteService.getByIdText(item_soundbite_id_text);
-    if (!item_soundbite) {
-      throw new Error("Soundbite not found.");
-    }
-
-    const mostRecentHistoryItem = await this.getMostRecentHistoryItemByQueueIdText(queue_id_text);
-    const newPosition = mostRecentHistoryItem ? parseFloat(mostRecentHistoryItem.list_position) + QUEUE_LIST_POSITION_INCREMENT : -1;
-
-    const finalDto = {
-      item_soundbite,
-      list_position: newPosition.toString()
-    };
-
-    return this._update(
-      queue,
-      ['queue', 'item_soundbite'],
-      finalDto
-    );
-  }
-
-  async removeItemSoundbiteFromQueue(queue_id_text: string, item_soundbite_id_text: string): Promise<void> {
-    const queue = await this.queueService.getByIdText(queue_id_text);
-    if (!queue) {
-      throw new Error("Queue not found.");
-    }
-
-    const item_soundbite = await this.itemSoundbiteService.getByIdText(item_soundbite_id_text);
-    if (!item_soundbite) {
-      throw new Error("Soundbite not found.");
-    }
-
-    return this._delete(queue, { item_soundbite_id: item_soundbite.id });
   }
 }
