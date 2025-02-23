@@ -314,9 +314,8 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     if (!queue) {
       throw new Error("Queue not found.");
     }
-    console.log('queue', queue);
+    
     const { firstQueued, lastQueued } = await this.getFirstAndLastQueuedItemsByQueueIdText(queue_id_text);
-    console.log('firstQueued', firstQueued);
     const list_position = calculatePosition(firstQueued as QueueResource, lastQueued as QueueResource);
     const add_by_rss_hash_id = getMd5Hash(add_by_rss_resource_data);
 
@@ -326,7 +325,6 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
       add_by_rss_hash_id
     };
 
-    console.log('finalDto', finalDto);
     return this._update(
       queue,
       ['queue', 'add_by_rss_hash_id'],
@@ -343,7 +341,6 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
   }
 
   async addItemAddByRSSToQueueNext(queue_id_text: string, add_by_rss_resource_data: object): Promise<QueueResource> {
-    console.log('addItemAddByRSSToQueueNext');
     return this.addItemAddByRSSToQueueHelper(queue_id_text, add_by_rss_resource_data, (firstQueued) => {
       const newPosition = firstQueued ? parseFloat(firstQueued.list_position) - QUEUE_LIST_POSITION_INCREMENT : 1;
       return newPosition < 0 ? '0' : newPosition.toString();

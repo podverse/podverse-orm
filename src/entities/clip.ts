@@ -39,7 +39,6 @@ export class Clip {
 
   @BeforeInsert()
   generateIdText() {
-    console.log('this', this);
     this.id_text = shortid.generate();
   }
 }
