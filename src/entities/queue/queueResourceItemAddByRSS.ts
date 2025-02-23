@@ -3,7 +3,7 @@ import { QueueResourceBase } from "@orm/entities/queue/queueResourceBase";
 
 @Entity()
 @Unique(['queue'])
-export class QueueResourceItemAddByRss extends QueueResourceBase {
+export class QueueResourceItemAddByRSS extends QueueResourceBase {
   @Column()
   hash_id!: string;
   

@@ -1,16 +1,16 @@
 import { EntityManager } from 'typeorm';
-import { QueueResourceItemAddByRss } from '@orm/entities/queue/queueResourceItemAddByRSS';
+import { QueueResourceItemAddByRSS } from '@orm/entities/queue/queueResourceItemAddByRSS';
 import { BaseManyService } from '@orm/services/base/baseManyService';
 import { QueueService, QUEUE_LIST_POSITION_INCREMENT } from '@orm/services/queue/queue';
 import { QueueResourceBaseService } from '@orm/services/queue/queueResourceBase';
 import { getMd5Hash } from 'podverse-helpers';
 
-export class QueueResourceItemAddByRSSService extends BaseManyService<QueueResourceItemAddByRss, 'queue'> {
+export class QueueResourceItemAddByRSSService extends BaseManyService<QueueResourceItemAddByRSS, 'queue'> {
   private queueService: QueueService;
   private queueResourceBaseService: QueueResourceBaseService;
 
   constructor(transactionalEntityManager?: EntityManager) {
-    super(QueueResourceItemAddByRss, 'queue', transactionalEntityManager);
+    super(QueueResourceItemAddByRSS, 'queue', transactionalEntityManager);
     this.queueService = new QueueService(transactionalEntityManager);
     this.queueResourceBaseService = new QueueResourceBaseService(transactionalEntityManager);
   }
@@ -18,8 +18,8 @@ export class QueueResourceItemAddByRSSService extends BaseManyService<QueueResou
   private async addItemToQueue(
     queue_id_text: string,
     resource_data: object,
-    calculatePosition: (firstQueued: QueueResourceItemAddByRss | null, lastQueued: QueueResourceItemAddByRss | null) => string
-  ): Promise<QueueResourceItemAddByRss> {
+    calculatePosition: (firstQueued: QueueResourceItemAddByRSS | null, lastQueued: QueueResourceItemAddByRSS | null) => string
+  ): Promise<QueueResourceItemAddByRSS> {
     const queue = await this.queueService.getByIdText(queue_id_text);
     if (!queue) {
       throw new Error("Queue not found.");
@@ -27,7 +27,7 @@ export class QueueResourceItemAddByRSSService extends BaseManyService<QueueResou
 
     const { firstQueued, lastQueued } = await this.queueResourceBaseService.getFirstAndLastQueuedItemsByQueueIdText(queue_id_text);
 
-    const list_position = calculatePosition(firstQueued as QueueResourceItemAddByRss, lastQueued as QueueResourceItemAddByRss);
+    const list_position = calculatePosition(firstQueued as QueueResourceItemAddByRSS, lastQueued as QueueResourceItemAddByRSS);
     const hash_id = getMd5Hash(resource_data);
 
     const finalDto = {
@@ -46,25 +46,25 @@ export class QueueResourceItemAddByRSSService extends BaseManyService<QueueResou
   private async addItemToQueueHelper(
     queue_id_text: string,
     resource_data: object,
-    calculatePosition: (firstQueued: QueueResourceItemAddByRss | null, lastQueued: QueueResourceItemAddByRss | null) => string
-  ): Promise<QueueResourceItemAddByRss> {
+    calculatePosition: (firstQueued: QueueResourceItemAddByRSS | null, lastQueued: QueueResourceItemAddByRSS | null) => string
+  ): Promise<QueueResourceItemAddByRSS> {
     return this.addItemToQueue(queue_id_text, resource_data, calculatePosition);
   }
 
-  async addItemToQueueNext(queue_id_text: string, resource_data: object): Promise<QueueResourceItemAddByRss> {
+  async addItemToQueueNext(queue_id_text: string, resource_data: object): Promise<QueueResourceItemAddByRSS> {
     return this.addItemToQueueHelper(queue_id_text, resource_data, (firstQueued) => {
       const newPosition = firstQueued ? parseFloat(firstQueued.list_position) - QUEUE_LIST_POSITION_INCREMENT : 1;
       return newPosition < 0 ? '0' : newPosition.toString();
     });
   }
 
-  async addItemToQueueLast(queue_id_text: string, resource_data: object): Promise<QueueResourceItemAddByRss> {
+  async addItemToQueueLast(queue_id_text: string, resource_data: object): Promise<QueueResourceItemAddByRSS> {
     return this.addItemToQueueHelper(queue_id_text, resource_data, (_, lastQueued) => {
       return lastQueued ? (parseFloat(lastQueued.list_position) + QUEUE_LIST_POSITION_INCREMENT).toString() : '1';
     });
   }
 
-  async addItemToQueueBetween(queue_id_text: string, resource_data: object, position1: number, position2: number): Promise<QueueResourceItemAddByRss> {
+  async addItemToQueueBetween(queue_id_text: string, resource_data: object, position1: number, position2: number): Promise<QueueResourceItemAddByRSS> {
     if (position1 >= position2) {
       throw new Error("Position1 should be less than Position2.");
     }
@@ -81,12 +81,12 @@ export class QueueResourceItemAddByRSSService extends BaseManyService<QueueResou
     });
   }
 
-  async addItemToNowPlaying(queue_id_text: string, resource_data: object): Promise<QueueResourceItemAddByRss> {
+  async addItemToNowPlaying(queue_id_text: string, resource_data: object): Promise<QueueResourceItemAddByRSS> {
     const queue = await this.queueService.getByIdText(queue_id_text);
     if (!queue) {
       throw new Error("Queue not found.");
     }
-  
+    
     const hash_id = getMd5Hash(resource_data);
   
     const finalDto = {
@@ -102,7 +102,7 @@ export class QueueResourceItemAddByRSSService extends BaseManyService<QueueResou
     );
   }
   
-  async addItemToHistory(queue_id_text: string, resource_data: object): Promise<QueueResourceItemAddByRss> {
+  async addItemToHistory(queue_id_text: string, resource_data: object): Promise<QueueResourceItemAddByRSS> {
     const queue = await this.queueService.getByIdText(queue_id_text);
     if (!queue) {
       throw new Error("Queue not found.");

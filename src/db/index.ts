@@ -88,7 +88,7 @@ import { Queue } from "@orm/entities/queue/queue";
 import { QueueResourceBase } from "@orm/entities/queue/queueResourceBase";
 import { QueueResourceClip } from "@orm/entities/queue/queueResourceClip";
 import { QueueResourceItem } from "@orm/entities/queue/queueResourceItem";
-import { QueueResourceItemAddByRss } from "@orm/entities/queue/queueResourceItemAddByRSS";
+import { QueueResourceItemAddByRSS } from "@orm/entities/queue/queueResourceItemAddByRSS";
 import { QueueResourceItemChapter } from "@orm/entities/queue/queueResourceItemChapter";
 import { QueueResourceItemSoundbite } from "@orm/entities/queue/queueResourceItemSoundbite";
 import { Clip } from "@orm/entities/clip";
@@ -195,7 +195,7 @@ const commonConfig: DataSourceOptions = {
     QueueResourceBase,
     QueueResourceClip,
     QueueResourceItem,
-    QueueResourceItemAddByRss,
+    QueueResourceItemAddByRSS,
     QueueResourceItemChapter,
     QueueResourceItemSoundbite,
     SharableStatus
