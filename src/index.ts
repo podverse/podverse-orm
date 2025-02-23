@@ -193,3 +193,4 @@ export * from './services/queue/queueResourceBase';
 export * from './services/queue/queueResourceClip';
 export * from './services/queue/queueResourceItem';
 export * from './services/queue/queueResourceItemAddByRSS';
+export * from './services/queue/queueResourceItemChapter';
