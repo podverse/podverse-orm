@@ -194,3 +194,4 @@ export * from './services/queue/queueResourceClip';
 export * from './services/queue/queueResourceItem';
 export * from './services/queue/queueResourceItemAddByRSS';
 export * from './services/queue/queueResourceItemChapter';
+export * from './services/queue/queueResourceItemSoundbite';
