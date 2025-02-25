@@ -1,10 +1,11 @@
-import { EntityManager } from 'typeorm';
+import { EntityManager, FindManyOptions, Not } from 'typeorm';
 import { AccountFollowingAccount } from '@orm/entities/account/accountFollowingAccount';
 import { BaseManyService } from '@orm/services/base/baseManyService';
 import { AccountService } from '@orm/services/account/account';
+import { SharableStatusEnum } from 'podverse-helpers';
 
 export type AccountFollowingAccountDto = {
-  following_account_id: number;
+  following_account_id_text: string;
 };
 
 export class AccountFollowingAccountService extends BaseManyService<AccountFollowingAccount, 'account'> {
@@ -15,21 +16,58 @@ export class AccountFollowingAccountService extends BaseManyService<AccountFollo
     this.accountService = new AccountService();
   }
 
+  async getFollowedAccountsPrivate(account_id: number, config?: FindManyOptions<AccountFollowingAccount>): Promise<AccountFollowingAccount[]> {
+    const account = await this.accountService.get(account_id);
+    if (!account) {
+      throw new Error("Account not found.");
+    }
+
+    return this._getAll(account, config);
+  }
+
+  async getFollowedAccountsPublic(account_id: number, config?: FindManyOptions<AccountFollowingAccount>): Promise<AccountFollowingAccount[]> {
+    const account = await this.accountService.get(account_id);
+    if (!account) {
+      throw new Error("Account not found.");
+    }
+
+    const publicConfig = {
+      ...config,
+      where: {
+        ...config?.where,
+        following_account: {
+          sharable_status: Not(SharableStatusEnum.Private)
+        }
+      },
+      relations: ['following_account']
+    };
+
+    return this.repositoryRead.find(publicConfig);
+  }
+
   async followAccount(account_id: number, dto: AccountFollowingAccountDto): Promise<AccountFollowingAccount> {
     const account = await this.accountService.get(account_id);
     if (!account) {
       throw new Error("Account not found.");
     }
 
-    if (account.id === dto.following_account_id) {
-      console.error("You cannot follow your own account.");
+    const accountToFollow = await this.accountService.getByIdText(dto.following_account_id_text);
+    if (!accountToFollow) {
+      throw new Error("Account to follow not found.");
+    }
+
+    if (account.id === accountToFollow.id) {
       throw new Error("You cannot follow your own account.");
     }
+
+    const finalDto = {
+      following_account_id: accountToFollow.id
+    };
 
     return this._update(
       account,
       ['account_id', 'following_account_id'],
-      dto
+      finalDto
     );
   }
 
@@ -39,10 +77,15 @@ export class AccountFollowingAccountService extends BaseManyService<AccountFollo
       throw new Error("Account not found.");
     }
 
-    if (account.id === dto.following_account_id) {
+    const accountToUnfollow = await this.accountService.getByIdText(dto.following_account_id_text);
+    if (!accountToUnfollow) {
+      throw new Error("Account to unfollow not found.");
+    }
+
+    if (account.id === accountToUnfollow.id) {
       throw new Error("You cannot unfollow your own account.");
     }
 
-    return this._delete(account, { following_account_id: dto.following_account_id });
+    return this._delete(account, { following_account_id: accountToUnfollow.id });
   }
 }

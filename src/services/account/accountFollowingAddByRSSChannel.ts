@@ -1,4 +1,4 @@
-import { EntityManager } from 'typeorm';
+import { EntityManager, FindManyOptions } from 'typeorm';
 import { AccountFollowingAddByRSSChannel } from '@orm/entities/account/accountFollowingAddByRSSChannel';
 import { BaseManyService } from '@orm/services/base/baseManyService';
 import { AccountService } from '@orm/services/account/account';
@@ -15,6 +15,15 @@ export class AccountFollowingAddByRSSChannelService extends BaseManyService<Acco
   constructor(transactionalEntityManager?: EntityManager) {
     super(AccountFollowingAddByRSSChannel, 'account', transactionalEntityManager);
     this.accountService = new AccountService();
+  }
+
+  async getFollowedAddByRSSChannels(account_id: number, config?: FindManyOptions<AccountFollowingAddByRSSChannel>): Promise<AccountFollowingAddByRSSChannel[]> {
+    const account = await this.accountService.get(account_id);
+    if (!account) {
+      throw new Error("Account not found.");
+    }
+
+    return this._getAll(account, config);
   }
 
   async addOrUpdateRSSChannel(account_id: number, dto: AccountFollowingAddByRSSChannelDto): Promise<AccountFollowingAddByRSSChannel> {
