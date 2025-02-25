@@ -13,8 +13,8 @@ type ChannelInitializeDto = {
 type ChannelDto = {
   slug?: string | null
   podcast_guid?: string | null
-  title: string | null
-  sortable_title: string | null
+  title?: string | null
+  sortable_title?: string | null
   medium?: MediumEnum | null
   has_podcast_index_value?: boolean
   has_value_time_splits?: boolean
