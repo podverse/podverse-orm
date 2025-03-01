@@ -108,6 +108,7 @@ export * from './services/account/accountFollowingChannel';
 export * from './services/account/accountFollowingPlaylist';
 export * from './services/account/accountMembership';
 export * from './services/account/accountMembershipStatus';
+export * from './services/account/accountProfile';
 export * from './services/account/accountResetPassword';
 export * from './services/account/accountVerification';
 export * from './services/channel/channel';

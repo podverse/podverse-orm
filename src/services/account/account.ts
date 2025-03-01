@@ -8,11 +8,18 @@ import { AccountCredentialsService } from './accountCredentials';
 import { AccountMembershipStatusService } from './accountMembershipStatus';
 import { AccountVerificationService } from './accountVerification';
 import { AccountResetPasswordService } from './accountResetPassword';
+import { AccountProfileService } from './accountProfile';
 
 type CreateAccountDto = {
   email: string
   password: string
 }
+
+type UpdateAccountDto = {
+  display_name?: string;
+  bio?: string;
+  sharable_status?: SharableStatusEnum;
+};
 
 export class AccountService {
   protected repositoryRead: Repository<Account>;
@@ -90,6 +97,35 @@ export class AccountService {
       account_membership_id: AccountMembershipEnum.Trial,
       membership_expires_at: new Date()
     });
+  }
+
+  async update(account_id: number, dto: UpdateAccountDto): Promise<Account | null> {
+    const account = await this.repositoryReadWrite.findOne({ where: { id: account_id }, relations: ['sharable_status'] });
+  
+    if (!account) {
+      throw new Error('Account not found');
+    }
+  
+    if (dto.display_name !== undefined || dto.bio !== undefined) {
+      const accountProfileService = new AccountProfileService();
+      const accountProfileDto = {
+        display_name: dto.display_name,
+        bio: dto.bio
+      };
+      await accountProfileService.update(account, accountProfileDto);
+    }
+  
+    if (dto.sharable_status !== undefined) {
+      const sharableStatusRepository = AppDataSourceRead.getRepository(SharableStatus);
+      const sharableStatus = await sharableStatusRepository.findOne({ where: { id: dto.sharable_status } });
+      if (!sharableStatus) {
+        throw new Error('SharableStatus not found');
+      }
+      account.sharable_status = sharableStatus;
+      await this.repositoryReadWrite.save(account);
+    }
+  
+    return this.repositoryReadWrite.findOne({ where: { id: account_id }, relations: ['account_profile', 'sharable_status'] });
   }
 
   async verifyEmail(id: number): Promise<void> {
