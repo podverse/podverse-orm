@@ -8,6 +8,7 @@ export * from './entities/account/account';
 export * from './entities/account/accountAdminRoles';
 export * from './entities/account/accountAppStorePurchase';
 export * from './entities/account/accountCredentials';
+export * from './entities/account/accountEmailChangeVerification';
 export * from './entities/account/accountFCMDevice';
 export * from './entities/account/accountFollowingAccount';
 export * from './entities/account/accountFollowingAddByRSSChannel';
@@ -102,6 +103,7 @@ export * from './services/category';
 
 export * from './services/account/account';
 export * from './services/account/accountCredentials';
+export * from './services/account/accountEmailChangeVerification';
 export * from './services/account/accountFollowingAccount';
 export * from './services/account/accountFollowingAddByRSSChannel';
 export * from './services/account/accountFollowingChannel';
@@ -111,6 +113,7 @@ export * from './services/account/accountMembershipStatus';
 export * from './services/account/accountProfile';
 export * from './services/account/accountResetPassword';
 export * from './services/account/accountVerification';
+
 export * from './services/channel/channel';
 export * from './services/channel/channelAbout';
 export * from './services/channel/channelChat';

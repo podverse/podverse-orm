@@ -85,6 +85,7 @@ import { Clip } from "@orm/entities/clip";
 import { MembershipClaimToken } from "@orm/entities/membershipClaimToken";
 import { SharableStatus } from "@orm/entities/sharableStatus";
 import { SnakeNamingStrategy } from "typeorm-naming-strategies";
+import { AccountEmailChangeVerification } from "@orm/entities/account/accountEmailChangeVerification";
 
 const commonConfig: DataSourceOptions = {
   type: "postgres",
@@ -99,6 +100,7 @@ const commonConfig: DataSourceOptions = {
     AccountAdminRoles,
     AccountAppStorePurchase,
     AccountCredentials,
+    AccountEmailChangeVerification,
     AccountFCMDevice,
     AccountFollowingAccount,
     AccountFollowingAddByRSSChannel,
