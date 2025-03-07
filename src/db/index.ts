@@ -13,7 +13,7 @@ import { AccountGooglePlayPurchase } from "@orm/entities/account/accountGooglePl
 import { AccountMembership } from "@orm/entities/account/accountMembership";
 import { AccountMembershipStatus } from "@orm/entities/account/accountMembershipStatus";
 import { AccountNotification } from "@orm/entities/account/accountNotification";
-import { AccountPaypalOrder } from "@orm/entities/account/accountPayPalOrder";
+import { AccountPayPalOrder } from "@orm/entities/account/accountPayPalOrder";
 import { AccountProfile } from "@orm/entities/account/accountProfile";
 import { AccountResetPassword } from "@orm/entities/account/accountResetPassword";
 import { AccountUpDevice } from "@orm/entities/account/accountUPDevice";
@@ -110,7 +110,7 @@ const commonConfig: DataSourceOptions = {
     AccountMembership,
     AccountMembershipStatus,
     AccountNotification,
-    AccountPaypalOrder,
+    AccountPayPalOrder,
     AccountProfile,
     AccountResetPassword,
     AccountUpDevice,

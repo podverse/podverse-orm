@@ -2,7 +2,7 @@ import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { Account } from '@orm/entities/account/account';
 
 @Entity()
-export class AccountPaypalOrder {
+export class AccountPayPalOrder {
   @PrimaryColumn()
   payment_id!: string;
 
