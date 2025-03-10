@@ -10,7 +10,7 @@ import { AccountFollowingChannel } from './accountFollowingChannel';
 import { AccountFollowingPlaylist } from './accountFollowingPlaylist';
 import { AccountGooglePlayPurchase } from './accountGooglePlayPurchase';
 import { AccountMembershipStatus } from './accountMembershipStatus';
-import { AccountNotification } from './accountNotification';
+import { AccountNotificationChannel } from './accountNotificationChannel';
 import { AccountPayPalOrder } from './accountPayPalOrder';
 import { AccountProfile } from './accountProfile';
 import { AccountResetPassword } from './accountResetPassword';
@@ -63,8 +63,8 @@ export class Account {
   @OneToOne(() => AccountMembershipStatus, accountMembershipStatus => accountMembershipStatus.account)
   account_membership_status!: AccountMembershipStatus;
 
-  @OneToMany(() => AccountNotification, accountNotification => accountNotification.account)
-  account_notifications!: AccountNotification[];
+  @OneToMany(() => AccountNotificationChannel, accountNotificationChannel => accountNotificationChannel.account)
+  account_notification_channels!: AccountNotificationChannel[];
 
   @OneToMany(() => AccountPayPalOrder, accountPayPalOrder => accountPayPalOrder.account)
   account_paypal_orders!: AccountPayPalOrder[];

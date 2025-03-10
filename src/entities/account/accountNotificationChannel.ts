@@ -3,7 +3,7 @@ import { Account } from '@orm/entities/account/account';
 import { Channel } from '@orm/entities/channel/channel';
 
 @Entity()
-export class AccountNotification {
+export class AccountNotificationChannel {
   @PrimaryColumn()
   channel_id!: number;
 

@@ -1,7 +1,9 @@
+import { FindManyOptions } from 'typeorm';
+import { Channel } from '@orm/entities/channel/channel';
 import { Item } from '@orm/entities/item/item';
 import { LiveItem } from '@orm/entities/liveItem/liveItem';
 import { LiveItemStatusEnum } from '@orm/entities/liveItem/liveItemStatus';
-import { BaseOneService } from '../base/baseOneService';
+import { BaseOneService } from '@orm/services/base/baseOneService';
 
 type LiveItemDto = {
   live_item_status: LiveItemStatusEnum
@@ -16,5 +18,12 @@ export class LiveItemService extends BaseOneService<LiveItem, 'item'> {
 
   async update(item: Item, dto: LiveItemDto): Promise<LiveItem> {
     return super._update(item, dto, { relations: ['live_item_status'] });
+  }
+
+  async getManyByChannel(channel: Channel, config?: FindManyOptions<LiveItem>): Promise<LiveItem[]> {
+    return this.repositoryRead.find({
+      where: { item: { channel } },
+      ...config
+    });
   }
 }
