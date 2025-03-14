@@ -1,4 +1,4 @@
-import { FindManyOptions, FindOneOptions, IsNull, Not, Repository } from 'typeorm';
+import { FindManyOptions, FindOneOptions, In, IsNull, Not, Repository } from 'typeorm';
 import { Channel } from '@orm/entities/channel/channel';
 import { Item } from '@orm/entities/item/item';
 import { applyProperties } from '@orm/lib/applyProperties';
@@ -85,6 +85,26 @@ export class ItemService {
         channel,
         guid_enclosure_url
       }
+    });
+  }
+
+  async getManyByGuid(channel: Channel, guids: string[], options?: FindManyOptions<Item>): Promise<Item[]> {
+    return this.repositoryRead.find({
+      where: {
+        channel,
+        guid: In(guids),
+      },
+      ...options,
+    });
+  }
+
+  async getManyByGuidEnclosureUrl(channel: Channel, guidEnclosureUrls: string[], options?: FindManyOptions<Item>): Promise<Item[]> {
+    return this.repositoryRead.find({
+      where: {
+        channel,
+        guid_enclosure_url: In(guidEnclosureUrls),
+      },
+      ...options,
     });
   }
 
