@@ -159,4 +159,14 @@ export class AccountService {
     const accountResetPasswordService = new AccountResetPasswordService();
     await accountResetPasswordService.deleteByAccountId(account.id);
   }
+
+  async delete(accountId: number): Promise<void> {
+    const account = await this.repositoryReadWrite.findOne({ where: { id: accountId } });
+
+    if (!account) {
+      throw new Error('Account not found');
+    }
+
+    await this.repositoryReadWrite.remove(account);
+  }
 }
