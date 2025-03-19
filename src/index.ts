@@ -184,3 +184,15 @@ export * from './services/playlist/playlistResource';
 
 export * from './services/queue/queue';
 export * from './services/queue/queueResource';
+
+export * from './services/stats/statsAggregatedAccount';
+export * from './services/stats/statsAggregatedChannel';
+export * from './services/stats/statsAggregatedClip';
+export * from './services/stats/statsAggregatedItem';
+export * from './services/stats/statsAggregatedPlaylist';
+export * from './services/stats/statsTrackAccountGuid';
+export * from './services/stats/statsTrackEventAccount';
+export * from './services/stats/statsTrackEventChannel';
+export * from './services/stats/statsTrackEventClip';
+export * from './services/stats/statsTrackEventItem';
+export * from './services/stats/statsTrackEventPlaylist';

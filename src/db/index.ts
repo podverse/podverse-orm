@@ -1,4 +1,5 @@
 import { DataSource, DataSourceOptions } from "typeorm";
+import { SnakeNamingStrategy } from "typeorm-naming-strategies";
 import { config } from "@orm/config";
 import { Account } from "@orm/entities/account/account";
 import { AccountAdminRoles } from "@orm/entities/account/accountAdminRoles";
@@ -84,8 +85,18 @@ import { QueueResource } from "@orm/entities/queue/queueResource";
 import { Clip } from "@orm/entities/clip";
 import { MembershipClaimToken } from "@orm/entities/membershipClaimToken";
 import { SharableStatus } from "@orm/entities/sharableStatus";
-import { SnakeNamingStrategy } from "typeorm-naming-strategies";
 import { AccountEmailChangeVerification } from "@orm/entities/account/accountEmailChangeVerification";
+import { StatsAggregatedChannel } from "@orm/entities/stats/statsAggregatedChannel";
+import { StatsTrackAccountGuid } from "@orm/entities/stats/statsTrackAccountGuid";
+import { StatsTrackEventChannel } from "@orm/entities/stats/statsTrackEventChannel";
+import { StatsAggregatedAccount } from "@orm/entities/stats/statsAggregatedAccount";
+import { StatsAggregatedClip } from "@orm/entities/stats/statsAggregatedClip";
+import { StatsAggregatedItem } from "@orm/entities/stats/statsAggregatedItem";
+import { StatsAggregatedPlaylist } from "@orm/entities/stats/statsAggregatedPlaylist";
+import { StatsTrackEventAccount } from "@orm/entities/stats/statsTrackEventAccount";
+import { StatsTrackEventClip } from "@orm/entities/stats/statsTrackEventClip";
+import { StatsTrackEventItem } from "@orm/entities/stats/statsTrackEventItem";
+import { StatsTrackEventPlaylist } from "@orm/entities/stats/statsTrackEventPlaylist";
 
 const commonConfig: DataSourceOptions = {
   type: "postgres",
@@ -180,7 +191,18 @@ const commonConfig: DataSourceOptions = {
     PlaylistResource,
     Queue,
     QueueResource,
-    SharableStatus
+    SharableStatus,
+    StatsAggregatedAccount,
+    StatsAggregatedChannel,
+    StatsAggregatedClip,
+    StatsAggregatedItem,
+    StatsAggregatedPlaylist,
+    StatsTrackAccountGuid,
+    StatsTrackEventAccount,
+    StatsTrackEventChannel,
+    StatsTrackEventClip,
+    StatsTrackEventItem,
+    StatsTrackEventPlaylist
   ],
   migrations: [],
   subscribers: [],
