@@ -93,9 +93,11 @@ export class AccountService {
     });
 
     const accountMembershipStatusService = new AccountMembershipStatusService();
+    const membership_expires_at = new Date();
+    membership_expires_at.setMonth(membership_expires_at.getMonth() + 3);
     await accountMembershipStatusService.update(account, {
       account_membership_id: AccountMembershipEnum.Trial,
-      membership_expires_at: new Date()
+      membership_expires_at
     });
   }
 
