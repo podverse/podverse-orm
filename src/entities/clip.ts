@@ -3,9 +3,11 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, BeforeIn
 import { Account } from '@orm/entities/account/account';
 import { Item } from '@orm/entities/item/item';
 import { SharableStatus } from '@orm/entities/sharableStatus';
+import { AppDataSourceRead } from '@orm/db';
+import { ClipArchived } from './clipArchived';
 const shortid = require('shortid');
 
-@Entity()
+@Entity('clip')
 export class Clip {
   @PrimaryGeneratedColumn()
   id!: number;
@@ -38,7 +40,21 @@ export class Clip {
   sharable_status!: SharableStatusEnum;
 
   @BeforeInsert()
-  generateIdText() {
-    this.id_text = shortid.generate();
+  async generateIdText() {
+    const clipArchivedRepository = AppDataSourceRead.getRepository(ClipArchived);
+    let retries = 5;
+    let idText;
+
+    do {
+      idText = shortid.generate();
+      const existingClipArchived = await clipArchivedRepository.findOne({ where: { id_text: idText } });
+      if (!existingClipArchived) {
+        this.id_text = idText;
+        return;
+      }
+      retries--;
+    } while (retries > 0);
+
+    throw new Error('Failed to generate unique id_text after 5 attempts');
   }
 }

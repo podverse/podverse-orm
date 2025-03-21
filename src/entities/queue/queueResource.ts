@@ -4,6 +4,7 @@ import { Clip } from '../clip';
 import { Item } from '../item/item';
 import { ItemChapter } from '../item/itemChapter';
 import { ItemSoundbite } from '../item/itemSoundbite';
+import { ClipArchived } from '../clipArchived';
 
 @Entity()
 export class QueueResource {
@@ -32,6 +33,13 @@ export class QueueResource {
   @ManyToOne(() => Clip, clip => clip.id, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'clip_id' })
   clip!: Clip;
+
+  @Column()
+  clip_archived_id!: string;
+
+  @ManyToOne(() => ClipArchived, clipArchived => clipArchived.id, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'clip_archived_id' })
+  clip_archived!: ClipArchived;
 
   @Column()
   item_id!: string;

@@ -5,6 +5,7 @@ import { Account } from "@orm/entities/account/account";
 import { AccountAdminRoles } from "@orm/entities/account/accountAdminRoles";
 import { AccountAppStorePurchase } from "@orm/entities/account/accountAppStorePurchase";
 import { AccountCredentials } from "@orm/entities/account/accountCredentials";
+import { AccountEmailChangeVerification } from "@orm/entities/account/accountEmailChangeVerification";
 import { AccountFCMDevice } from "@orm/entities/account/accountFCMDevice";
 import { AccountFollowingAccount } from "@orm/entities/account/accountFollowingAccount";
 import { AccountFollowingAddByRSSChannel } from "@orm/entities/account/accountFollowingAddByRSSChannel";
@@ -23,7 +24,6 @@ import { Category } from "@orm/entities/category";
 import { Feed } from "@orm/entities/feed/feed";
 import { FeedFlagStatus } from "@orm/entities/feed/feedFlagStatus";
 import { FeedLog } from "@orm/entities/feed/feedLog";
-import { Medium } from "@orm/entities/medium";
 import { Channel } from "@orm/entities/channel/channel";
 import { ChannelAbout } from "@orm/entities/channel/channelAbout";
 import { ChannelCategory } from "@orm/entities/channel/channelCategory";
@@ -47,6 +47,8 @@ import { ChannelTrailer } from "@orm/entities/channel/channelTrailer";
 import { ChannelTxt } from "@orm/entities/channel/channelTxt";
 import { ChannelValue } from "@orm/entities/channel/channelValue";
 import { ChannelValueRecipient } from "@orm/entities/channel/channelValueRecipient";
+import { Clip } from "@orm/entities/clip";
+import { ClipArchived } from "@orm/entities/clipArchived";
 import { Item } from "@orm/entities/item/item";
 import { ItemAbout } from "@orm/entities/item/itemAbout";
 import { ItemChapter } from "@orm/entities/item/itemChapter";
@@ -78,14 +80,13 @@ import { ItemValueTimeSplitRecipient } from "@orm/entities/item/itemValueTimeSpl
 import { ItemValueTimeSplitRemoteItem } from "@orm/entities/item/itemValueTimeSplitRemoteItem";
 import { LiveItem } from "@orm/entities/liveItem/liveItem";
 import { LiveItemStatus } from "@orm/entities/liveItem/liveItemStatus";
+import { Medium } from "@orm/entities/medium";
+import { MembershipClaimToken } from "@orm/entities/membershipClaimToken";
 import { Playlist } from "@orm/entities/playlist/playlist";
 import { PlaylistResource } from "@orm/entities/playlist/playlistResource";
 import { Queue } from "@orm/entities/queue/queue";
 import { QueueResource } from "@orm/entities/queue/queueResource";
-import { Clip } from "@orm/entities/clip";
-import { MembershipClaimToken } from "@orm/entities/membershipClaimToken";
 import { SharableStatus } from "@orm/entities/sharableStatus";
-import { AccountEmailChangeVerification } from "@orm/entities/account/accountEmailChangeVerification";
 import { StatsAggregatedChannel } from "@orm/entities/stats/statsAggregatedChannel";
 import { StatsTrackAccountGuid } from "@orm/entities/stats/statsTrackAccountGuid";
 import { StatsTrackEventChannel } from "@orm/entities/stats/statsTrackEventChannel";
@@ -151,6 +152,7 @@ const commonConfig: DataSourceOptions = {
     ChannelValue,
     ChannelValueRecipient,
     Clip,
+    ClipArchived,
     Feed,
     FeedFlagStatus,
     FeedLog,
