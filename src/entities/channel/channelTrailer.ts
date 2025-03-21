@@ -18,8 +18,8 @@ export class ChannelTrailer {
   @Column({ type: 'varchar', name: 'url', length: DATABASE_CONSTANTS.varchar_url })
   url!: string | null;
 
-  @Column({ type: 'timestamptz', name: 'pubdate' })
-  pubdate!: Date;
+  @Column({ type: 'timestamptz', name: 'pub_date' })
+  pub_date!: Date;
 
   @Column({ type: 'integer', name: 'length', nullable: true })
   length!: number | null;

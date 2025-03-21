@@ -6,7 +6,7 @@ import { BaseManyService } from '@orm/services/base/baseManyService';
 
 export type ChannelTrailerDto = {
   url: string
-  pubdate: Date
+  pub_date: Date
   title: string | null
   length: number | null
   type: string | null

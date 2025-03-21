@@ -6,7 +6,7 @@ import { AppDataSourceRead, AppDataSourceReadWrite } from '@orm/db';
 
 type ItemDto = {
   title: string | null
-  pubdate: Date | null
+  pub_date: Date | null
   guid: string | null
   guid_enclosure_url: string | null
 }

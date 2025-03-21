@@ -44,8 +44,8 @@ export class Item {
   @Column({ type: 'varchar', name: 'guid_enclosure_url', length: DATABASE_CONSTANTS.varchar_url })
   guid_enclosure_url?: string | null;
 
-  @Column({ type: 'timestamptz', name: 'pubdate', nullable: true })
-  pubdate?: Date | null;
+  @Column({ type: 'timestamptz', name: 'pub_date', nullable: true })
+  pub_date?: Date | null;
 
   @Column({ type: 'varchar', name: 'title', nullable: true, length: DATABASE_CONSTANTS.varchar_normal })
   title?: string | null;
