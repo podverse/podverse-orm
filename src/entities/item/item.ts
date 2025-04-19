@@ -111,7 +111,7 @@ export class Item {
   item_txts!: ItemTxt[];
 
   @OneToMany(() => ItemValue, itemValue => itemValue.item)
-  item_values!: ItemValue;
+  item_values!: ItemValue[];
   
   @BeforeInsert()
   generateIdText() {

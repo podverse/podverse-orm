@@ -1,8 +1,25 @@
-import { FindManyOptions, FindOneOptions, In, IsNull, Not, Repository } from 'typeorm';
+import { FindManyOptions, FindOptionsRelations, FindOptionsWhere,
+  In, IsNull, Not, Repository } from 'typeorm';
 import { Channel } from '@orm/entities/channel/channel';
 import { Item } from '@orm/entities/item/item';
 import { applyProperties } from '@orm/lib/applyProperties';
 import { AppDataSourceRead, AppDataSourceReadWrite } from '@orm/db';
+import { ItemChaptersFeedService } from './itemChaptersFeed';
+import { ItemEnclosureService } from './itemEnclosure';
+import { ItemContentLinkService } from './itemContentLink';
+import { ItemFundingService } from './itemFunding';
+import { ItemImageService } from './itemImage';
+import { ItemPersonService } from './itemPerson';
+import { ItemSocialInteractService } from './itemSocialInteract';
+import { ItemSoundbiteService } from './itemSoundbite';
+import { ItemTranscriptService } from './itemTranscript';
+import { ItemTxtService } from './itemTxt';
+import { ItemValueService } from './itemValue';
+import { ItemValueRecipientService } from './itemValueRecipient';
+import { ItemValueTimeSplitService } from './itemValueTimeSplit';
+import { ItemValueTimeSplitRecipientService } from './itemValueTimeSplitRecipient';
+import { ItemValueTimeSplitRemoteItemService } from './itemValueTimeSplitRemoteItem';
+import { ItemValueTimeSplit } from '@orm/entities/item/itemValueTimeSplit';
 
 type ItemDto = {
   title: string | null
@@ -16,6 +33,56 @@ type ItemGetByDto = {
   guid_enclosure_url: string | null
 }
 
+export const itemGetManyRelations = [
+  'item_about',
+  'item_about.item_itunes_episode_type',
+  'item_chat',
+  'item_description',
+  'item_enclosures',
+  'item_enclosures.item_enclosure_integrity',
+  'item_enclosures.item_enclosure_sources',
+  'item_images',
+  'item_persons',
+  'item_season',
+  'item_season.channel_season',
+  'live_item'
+];
+
+export const itemGetOneRelations: FindOptionsRelations<Item> = {
+  item_about: true,
+  item_chapters_feed: true,
+  item_chat: true,
+  item_content_links: true,
+  item_description: true,
+  item_enclosures: true,
+  item_fundings: true,
+  item_images: true,
+  item_license: true,
+  item_location: true,
+  item_persons: true,
+  item_season: true,
+  item_social_interacts: true,
+  item_soundbites: true,
+  item_transcripts: true,
+  item_txts: true,
+  item_values: true,
+  live_item: true
+};
+
+const getItemOneToOneRelations = (relations: FindOptionsRelations<Item>) => {
+  const oneToOneRelations: FindOptionsRelations<Item> = {
+    ...(relations.item_about ? { item_about: { item_itunes_episode_type: true } } : {}),
+    ...(relations.item_chat ? { item_chat: true } : {}),
+    ...(relations.item_description ? { item_description: true } : {}),
+    ...(relations.item_license ? { item_license: true } : {}),
+    ...(relations.item_location ? { item_location: true } : {}),
+    ...(relations.item_season ? { item_season: { channel_season: true } } : {}),
+    ...(relations.live_item ? { live_item: true } : {}),
+  };
+   
+  return oneToOneRelations;
+};
+
 export class ItemService {
   protected repositoryRead: Repository<Item>;
   protected repositoryReadWrite: Repository<Item>;
@@ -25,28 +92,150 @@ export class ItemService {
     this.repositoryReadWrite = AppDataSourceReadWrite.getRepository(Item);
   }
 
-  async get(id: number, config?: FindOneOptions<Item>): Promise<Item | null> {
+  async getItemWithRelations(
+    where: FindOptionsWhere<Item>,
+    relations: FindOptionsRelations<Item>
+  ): Promise<Item | null> {
+    const oneToOneRelations = getItemOneToOneRelations(relations);
+
+    let item = await this.repositoryRead.findOne({
+      where,
+      relations: oneToOneRelations
+    });
+
+    if (!item) {
+      return null;
+    }
+
+    if (relations.item_chapters_feed) {
+      const itemChaptersFeedService = new ItemChaptersFeedService();
+      const item_chapters_feed = await itemChaptersFeedService._get(item, {
+        relations: ['item_chapters', 'item_chapters_feed_log']
+      });
+      if (item_chapters_feed) item.item_chapters_feed = item_chapters_feed;
+    }
+
+    if (relations.item_content_links) {
+      const itemContentLinkService = new ItemContentLinkService();
+      const item_content_links = await itemContentLinkService._getAll(item);
+      if (item_content_links) item.item_content_links = item_content_links;
+    }
+
+    if (relations.item_enclosures) {
+      const itemEnclosureService = new ItemEnclosureService();
+      const item_enclosures = await itemEnclosureService._getAll(item, {
+        relations: ['item_enclosure_integrity', 'item_enclosure_sources']
+      });
+      if (item_enclosures) item.item_enclosures = item_enclosures;
+    }
+
+    if (relations.item_fundings) {
+      const itemFundingService = new ItemFundingService();
+      const item_fundings = await itemFundingService._getAll(item);
+      if (item_fundings) item.item_fundings = item_fundings;
+    }
+
+    if (relations.item_images) {
+      const itemImageService = new ItemImageService();
+      const item_images = await itemImageService._getAll(item);
+      if (item_images) item.item_images = item_images;
+    }
+
+    if (relations.item_persons) {
+      const itemPersonService = new ItemPersonService();
+      const item_persons = await itemPersonService._getAll(item);
+      if (item_persons) item.item_persons = item_persons;
+    }
+
+    if (relations.item_social_interacts) {
+      const itemSocialInteractService = new ItemSocialInteractService();
+      const item_social_interacts = await itemSocialInteractService._getAll(item);
+      if (item_social_interacts) item.item_social_interacts = item_social_interacts;
+    }
+
+    if (relations.item_soundbites) {
+      const itemSoundbiteService = new ItemSoundbiteService();
+      const item_soundbites = await itemSoundbiteService._getAll(item);
+      item.item_soundbites = item_soundbites;
+    }
+
+    if (relations.item_transcripts) {
+      const itemTranscriptService = new ItemTranscriptService();
+      const item_transcripts = await itemTranscriptService._getAll(item);
+      if (item_transcripts) item.item_transcripts = item_transcripts;
+    }
+
+    if (relations.item_txts) {
+      const itemTxtService = new ItemTxtService();
+      const item_txts = await itemTxtService._getAll(item);
+      if (item_txts) item.item_txts = item_txts;
+    }
+
+    if (relations.item_values) {
+      const itemValueService = new ItemValueService();
+      const item_values = await itemValueService._getAll(item);
+
+      for (const item_value of item_values) {
+        const itemValueRecipientsService = new ItemValueRecipientService();
+        const item_value_recipients = await itemValueRecipientsService._getAll(item_value);
+        if (item_value_recipients) {
+          item_value.item_value_recipients = item_value_recipients;
+        };
+
+        const itemValueTimeSplitService = new ItemValueTimeSplitService();
+        const item_value_time_splits = await itemValueTimeSplitService._getAll(item_value);
+
+        let final_item_value_time_splits: ItemValueTimeSplit[] = [];
+        for (const item_value_time_split of item_value_time_splits) {
+          const itemValueTimeSplitRecipientsService = new ItemValueTimeSplitRecipientService();
+          const item_value_time_split_recipients = await itemValueTimeSplitRecipientsService._getAll(item_value_time_split);
+          if (item_value_time_split_recipients) {
+            item_value_time_split.item_value_time_split_recipients = item_value_time_split_recipients;
+          }
+
+          const itemValueTimeSplitRemoteItemService = new ItemValueTimeSplitRemoteItemService();
+          const item_value_time_split_remote_items = await itemValueTimeSplitRemoteItemService._getAll(item_value_time_split);
+          if (item_value_time_split_remote_items?.[0]) {
+            item_value_time_split.item_value_time_split_remote_item = item_value_time_split_remote_items[0];
+          }
+          final_item_value_time_splits.push(item_value_time_split);
+        }
+
+        if (final_item_value_time_splits) {
+          item_value.item_value_time_splits = final_item_value_time_splits;
+        }
+      }
+
+      if (item_values) item.item_values = item_values;
+    }
+
+    return item;
+  }
+
+  async get(id: number, relations: FindOptionsRelations<Item> = {}): Promise<Item | null> {
     if (!id) {
       return null;
     }
-    return this.repositoryRead.findOne({ where: { id }, ...config });
+
+    return this.getItemWithRelations({ id }, relations);
   }
 
-  async getByIdText(id_text: string, config?: FindOneOptions<Item>): Promise<Item | null> {
+  async getByIdText(id_text: string, relations: FindOptionsRelations<Item> = {}): Promise<Item | null> {
     if (!id_text) {
       return null;
     }
-    return this.repositoryRead.findOne({ where: { id_text }, ...config });
+
+    return this.getItemWithRelations({ id_text }, relations);
   }
 
-  async getByIdOrIdText(idOrIdText: string, config?: FindOneOptions<Item>): Promise<Item | null> {
+  async getByIdOrIdText(idOrIdText: string, relations: FindOptionsRelations<Item> = {}): Promise<Item | null> {
     let item = null;
 
     if (isNaN(Number(idOrIdText))) {
-      item = await this.getByIdText(idOrIdText, config);
+      item = await this.getByIdText(idOrIdText, relations);
     } else {
       const id = parseInt(idOrIdText);
-      item = await this.get(id, config);
+      item = await this.get(id, relations);
     }
 
     return item;

@@ -23,5 +23,5 @@ export class ItemAbout {
 
   @ManyToOne(() => ItemItunesEpisodeType, itemItunesEpisodeType => itemItunesEpisodeType.id, { nullable: true })
   @JoinColumn({ name: 'item_itunes_episode_type_id' })
-  item_itunes_episode_type?: ItemItunesEpisodeTypeEnum | null;
+  item_itunes_episode_type?: ItemItunesEpisodeType | ItemItunesEpisodeTypeEnum | null;
 }

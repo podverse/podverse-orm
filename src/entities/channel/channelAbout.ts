@@ -23,7 +23,7 @@ export class ChannelAbout {
 
   @ManyToOne(() => ChannelItunesType, channelItunesType => channelItunesType.id, { nullable: true })
   @JoinColumn({ name: 'itunes_type_id' })
-  itunes_type!: ChannelItunesTypeItunesTypeEnum | null;
+  itunes_type!: ChannelItunesTypeItunesTypeEnum | ChannelItunesType | null;
 
   @Column({ type: 'varchar', nullable: true, length: DATABASE_CONSTANTS.varchar_short })
   language!: string | null;

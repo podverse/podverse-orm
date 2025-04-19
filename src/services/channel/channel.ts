@@ -1,9 +1,20 @@
 import { MediumEnum } from 'podverse-helpers';
-import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
+import { FindManyOptions, FindOneOptions, FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
 import { Channel } from '@orm/entities/channel/channel';
 import { Feed } from '@orm/entities/feed/feed';
 import { applyProperties } from '@orm/lib/applyProperties';
 import { AppDataSourceRead, AppDataSourceReadWrite } from '@orm/db';
+import { ChannelCategoryService } from './channelCategory';
+import { ChannelFundingService } from './channelFunding';
+import { ChannelImageService } from './channelImage';
+import { ChannelPersonService } from './channelPerson';
+import { ChannelRemoteItemService } from './channelRemoteItem';
+import { ChannelSeasonService } from './channelSeason';
+import { ChannelSocialInteractService } from './channelSocialInteract';
+import { ChannelTrailerService } from './channelTrailer';
+import { ChannelTxtService } from './channelTxt';
+import { ChannelValueService } from './channelValue';
+import { ChannelValueRecipientService } from './channelValueRecipient';
 
 type ChannelInitializeDto = {
   feed: Feed,
@@ -22,6 +33,54 @@ type ChannelDto = {
   marked_for_deletion?: boolean
 }
 
+export const channelGetManyRelations = [
+  'channel_about',
+  'channel_about.itunes_type',
+  'channel_chat',
+  'channel_description',
+  'channel_images',
+  'channel_internal_settings',
+  'channel_license',
+  'channel_location',
+  'channel_persons'
+];
+
+export const channelGetOneRelations: FindOptionsRelations<Channel> = {
+  channel_about: true,
+  channel_categories: true,
+  channel_chat: true,
+  channel_description: true,
+  channel_fundings: true,
+  channel_images: true,
+  channel_internal_settings: true,
+  channel_license: true,
+  channel_location: true,
+  channel_persons: true,
+  channel_podroll: true,
+  channel_publisher: true,
+  channel_remote_items: true,
+  channel_seasons: true,
+  channel_social_interacts: true,
+  channel_trailers: true,
+  channel_txts: true,
+  channel_values: true,
+};
+
+const getChannelOneToOneRelations = (relations: FindOptionsRelations<Channel>) => {
+  const oneToOneRelations: FindOptionsRelations<Channel> = {
+    ...(relations.channel_about ? { channel_about: { itunes_type: true } } : {}),
+    ...(relations.channel_chat ? { channel_chat: true } : {}),
+    ...(relations.channel_description ? { channel_description: true } : {}),
+    ...(relations.channel_internal_settings ? { channel_internal_settings: true } : {}),
+    ...(relations.channel_license ? { channel_license: true } : {}),
+    ...(relations.channel_location ? { channel_location: true } : {}),
+    ...(relations.channel_podroll ? { channel_podroll: { channel_podroll_remote_items: true } } : {}),
+    ...(relations.channel_publisher ? { channel_publisher: { channel_publisher_remote_items: true } } : {})
+  };
+   
+  return oneToOneRelations;
+};
+
 export class ChannelService {
   protected repositoryRead: Repository<Channel>;
   protected repositoryReadWrite: Repository<Channel>;
@@ -31,35 +90,124 @@ export class ChannelService {
     this.repositoryReadWrite = AppDataSourceReadWrite.getRepository(Channel);
   }
 
-  async get(id: number, config?: FindOneOptions<Channel>): Promise<Channel | null> {
-    if (!id) {
+  async getChannelWithRelations(
+    where: FindOptionsWhere<Channel>,
+    relations: FindOptionsRelations<Channel>
+  ): Promise<Channel | null> {
+    const oneToOneRelations = getChannelOneToOneRelations(relations);
+    
+    let channel = await this.repositoryRead.findOne({
+      where,
+      relations: oneToOneRelations
+    });
+
+    if (!channel) {
       return null;
     }
-    return this.repositoryRead.findOne({ where: { id }, ...config });
-  }
 
-  async getByIdText(id_text: string, config?: FindOneOptions<Channel>): Promise<Channel | null> {
-    if (!id_text) {
-      return null;
+    if (relations.channel_categories) {
+      const channelCategoryService = new ChannelCategoryService();
+      const channel_categories = await channelCategoryService._getAll(channel, {
+        relations: { category: true }
+      });
+      channel.channel_categories = channel_categories;
     }
-    return this.repositoryRead.findOne({ where: { id_text }, ...config });
-  }
 
-  async getByIdOrIdText(idOrIdText: string, config?: FindOneOptions<Channel>): Promise<Channel | null> {
-    let channel = null;
+    if (relations.channel_fundings) {
+      const channelFundingService = new ChannelFundingService();
+      const channel_fundings = await channelFundingService._getAll(channel);
+      channel.channel_fundings = channel_fundings;
+    }
 
-    if (isNaN(Number(idOrIdText))) {
-      channel = await this.getByIdText(idOrIdText, config);
-    } else {
-      const id = parseInt(idOrIdText);
-      channel = await this.get(id, config);
+    if (relations.channel_images) {
+      const channelImageService = new ChannelImageService();
+      const channel_images = await channelImageService._getAll(channel);
+      channel.channel_images = channel_images;
+    }
+
+    if (relations.channel_persons) {
+      const channelPersonService = new ChannelPersonService();
+      const channel_persons = await channelPersonService._getAll(channel);
+      channel.channel_persons = channel_persons;
+    }
+
+    if (relations.channel_remote_items) {
+      const channelRemoteItemService = new ChannelRemoteItemService();
+      const channel_remote_items = await channelRemoteItemService._getAll(channel);
+      channel.channel_remote_items = channel_remote_items;
+    }
+
+    if (relations.channel_seasons) {
+      const channelSeasonService = new ChannelSeasonService();
+      const channel_seasons = await channelSeasonService._getAll(channel);
+      channel.channel_seasons = channel_seasons;
+    }
+
+    if (relations.channel_social_interacts) {
+      const channelSocialInteractService = new ChannelSocialInteractService();
+      const channel_social_interacts = await channelSocialInteractService._getAll(channel);
+      channel.channel_social_interacts = channel_social_interacts;
+    }
+
+    if (relations.channel_trailers) {
+      const channelTrailerService = new ChannelTrailerService();
+      const channel_trailers = await channelTrailerService._getAll(channel);
+      channel.channel_trailers = channel_trailers;
+    }
+
+    if (relations.channel_txts) {
+      const channelTxtService = new ChannelTxtService();
+      const channel_txts = await channelTxtService._getAll(channel);
+      channel.channel_txts = channel_txts;
+    }
+
+    if (relations.channel_values) {
+      const channelValueService = new ChannelValueService();
+      const channel_values = await channelValueService._getAll(channel);
+
+      for (const channel_value of channel_values) {
+        const channelValueRecipientsService = new ChannelValueRecipientService();
+        const channel_value_recipients = await channelValueRecipientsService._getAll(channel_value);
+        if (channel_value_recipients) {
+          channel_value.channel_value_recipients = channel_value_recipients;
+        };
+      }
+
+      if (channel_values) channel.channel_values = channel_values;
     }
 
     return channel;
   }
 
-  async getByPodcastIndexId(podcast_index_id: number, config?: FindOneOptions<Channel>): Promise<Channel | null> {
-    return this.repositoryRead.findOne({ where: { podcast_index_id }, ...config });
+  async get(id: number, relations: FindOptionsRelations<Channel> = {}): Promise<Channel | null> {
+    if (!id) {
+      return null;
+    }
+    return this.getChannelWithRelations({ id }, relations);
+  }
+
+  async getByIdText(id_text: string, relations: FindOptionsRelations<Channel> = {}): Promise<Channel | null> {
+    if (!id_text) {
+      return null;
+    }
+    return this.getChannelWithRelations({ id_text }, relations);
+  }
+
+  async getByIdOrIdText(idOrIdText: string, relations: FindOptionsRelations<Channel> = {}): Promise<Channel | null> {
+    let channel = null;
+
+    if (isNaN(Number(idOrIdText))) {
+      channel = await this.getByIdText(idOrIdText, relations);
+    } else {
+      const id = parseInt(idOrIdText);
+      channel = await this.get(id, relations);
+    }
+
+    return channel;
+  }
+
+  async getByPodcastIndexId(podcast_index_id: number): Promise<Channel | null> {
+    return this.repositoryRead.findOne({ where: { podcast_index_id } });
   }
 
   async getMany(config: FindManyOptions<Channel>): Promise<Channel[]> {
