@@ -351,6 +351,34 @@ export class ItemService {
     return this.repositoryReadWrite.save(item);
   }
 
+  async updateFlagStatus(item: Item, item_flag_status_id: ItemFlagStatusStatusEnum): Promise<Item> {
+    const itemFlagStatusService = new ItemFlagStatusService();
+    const item_flag_status = await itemFlagStatusService.get(item_flag_status_id);
+  
+    if (!item_flag_status) {
+      throw new Error(`ItemService.updateFlagStatus: item status ${item_flag_status_id} not found`);
+    }
+  
+    item.item_flag_status = item_flag_status;
+  
+    return this.repositoryReadWrite.save(item);
+  }
+
+  async updateManyFlagStatus(items: Item[], item_flag_status_id: ItemFlagStatusStatusEnum): Promise<Item[]> {
+    const itemFlagStatusService = new ItemFlagStatusService();
+    const item_flag_status = await itemFlagStatusService.get(item_flag_status_id);
+  
+    if (!item_flag_status) {
+      throw new Error(`ItemService.updateManyFlagStatus: item status ${item_flag_status_id} not found`);
+    }
+  
+    for (const item of items) {
+      item.item_flag_status = item_flag_status;
+    }
+  
+    return this.repositoryReadWrite.save(items);
+  }
+
   async delete(id: number): Promise<void> {
     await this.repositoryReadWrite.delete(id);
   }
