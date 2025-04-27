@@ -20,6 +20,8 @@ import { ItemValueTimeSplitService } from './itemValueTimeSplit';
 import { ItemValueTimeSplitRecipientService } from './itemValueTimeSplitRecipient';
 import { ItemValueTimeSplitRemoteItemService } from './itemValueTimeSplitRemoteItem';
 import { ItemValueTimeSplit } from '@orm/entities/item/itemValueTimeSplit';
+import { ItemFlagStatusService } from './itemFlagStatus';
+import { ItemFlagStatusStatusEnum } from '@orm/entities/item/itemFlagStatus';
 
 type ItemDto = {
   title: string | null
@@ -321,19 +323,28 @@ export class ItemService {
     });
   }
 
-  async update(channel: Channel, dto: ItemDto): Promise<Item> {
+  async update(channel: Channel, item_flag_status_id: ItemFlagStatusStatusEnum, dto: ItemDto): Promise<Item> {
     let item = await this.getBy(channel, {
       guid_enclosure_url: dto.guid_enclosure_url,
       guid: dto.guid
     });
 
+    const itemFlagStatusService = new ItemFlagStatusService();
+    const item_flag_status = await itemFlagStatusService.get(item_flag_status_id);
+    if (!item_flag_status) {
+      throw new Error(`ItemService.update: item status ${item_flag_status_id} not found`);
+    }
+    
     if (!item) {
       item = new Item();
       item.guid = dto.guid;
+      item.item_flag_status = item_flag_status;
       item.guid_enclosure_url = dto.guid_enclosure_url;
       item.channel = channel;
       item = await this.repositoryReadWrite.save(item);
     }
+
+    item.item_flag_status = item_flag_status;
 
     item = applyProperties(item, dto);
 

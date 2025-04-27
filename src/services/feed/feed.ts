@@ -90,8 +90,10 @@ export class FeedService {
     feed.url = url;
 
     const feedFlagStatusService = new FeedFlagStatusService();
-    const feed_flag_status = await feedFlagStatusService.get(FeedFlagStatusStatusEnum.None);
-    if (feed_flag_status) {
+    const feed_flag_status = await feedFlagStatusService.get(FeedFlagStatusStatusEnum.Active);
+    if (!feed_flag_status) {
+      throw new Error(`FeedService.create: feed status ${FeedFlagStatusStatusEnum.Active} not found`);
+    } else {
       feed.feed_flag_status = feed_flag_status;
     }
 

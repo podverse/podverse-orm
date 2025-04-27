@@ -20,6 +20,7 @@ import { ItemSocialInteract } from '@orm/entities/item/itemSocialInteract';
 import { ItemSoundbite } from '@orm/entities/item/itemSoundbite';
 import { ItemTranscript } from '@orm/entities/item/itemTranscript';
 import { ItemTxt } from '@orm/entities/item/itemTxt';
+import { ItemFlagStatus } from './itemFlagStatus';
 const shortid = require('shortid');
 
 @Entity()
@@ -53,11 +54,9 @@ export class Item {
   @OneToOne(() => LiveItem, liveItem => liveItem.item, { nullable: true })
   live_item!: LiveItem | null;
 
-  @Column({ type: 'boolean', name: 'hidden', default: false })
-  hidden!: boolean;
-
-  @Column({ type: 'boolean', name: 'marked_for_deletion', default: false })
-  marked_for_deletion!: boolean;
+  @ManyToOne(() => ItemFlagStatus, item_flag_status => item_flag_status.id)
+  @JoinColumn({ name: 'item_flag_status_id' })
+  item_flag_status!: ItemFlagStatus;
 
   @OneToOne(() => ItemAbout, item_about => item_about.item)
   item_about!: ItemAbout;

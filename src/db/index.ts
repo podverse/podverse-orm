@@ -21,9 +21,6 @@ import { AccountResetPassword } from "@orm/entities/account/accountResetPassword
 import { AccountUpDevice } from "@orm/entities/account/accountUPDevice";
 import { AccountVerification } from "@orm/entities/account/accountVerification";
 import { Category } from "@orm/entities/category";
-import { Feed } from "@orm/entities/feed/feed";
-import { FeedFlagStatus } from "@orm/entities/feed/feedFlagStatus";
-import { FeedLog } from "@orm/entities/feed/feedLog";
 import { Channel } from "@orm/entities/channel/channel";
 import { ChannelAbout } from "@orm/entities/channel/channelAbout";
 import { ChannelCategory } from "@orm/entities/channel/channelCategory";
@@ -49,6 +46,9 @@ import { ChannelValue } from "@orm/entities/channel/channelValue";
 import { ChannelValueRecipient } from "@orm/entities/channel/channelValueRecipient";
 import { Clip } from "@orm/entities/clip";
 import { ClipArchived } from "@orm/entities/clipArchived";
+import { Feed } from "@orm/entities/feed/feed";
+import { FeedFlagStatus } from "@orm/entities/feed/feedFlagStatus";
+import { FeedLog } from "@orm/entities/feed/feedLog";
 import { Item } from "@orm/entities/item/item";
 import { ItemAbout } from "@orm/entities/item/itemAbout";
 import { ItemChapter } from "@orm/entities/item/itemChapter";
@@ -61,6 +61,7 @@ import { ItemDescription } from "@orm/entities/item/itemDescription";
 import { ItemEnclosure } from "@orm/entities/item/itemEnclosure";
 import { ItemEnclosureIntegrity } from "@orm/entities/item/itemEnclosureIntegrity";
 import { ItemEnclosureSource } from "@orm/entities/item/itemEnclosureSource";
+import { ItemFlagStatus } from "@orm/entities/item/itemFlagStatus";
 import { ItemFunding } from "@orm/entities/item/itemFunding";
 import { ItemImage } from "@orm/entities/item/itemImage";
 import { ItemItunesEpisodeType } from "@orm/entities/item/itemItunesEpisodeType";
@@ -168,6 +169,7 @@ const commonConfig: DataSourceOptions = {
     ItemEnclosure,
     ItemEnclosureIntegrity,
     ItemEnclosureSource,
+    ItemFlagStatus,
     ItemFunding,
     ItemImage,
     ItemItunesEpisodeType,

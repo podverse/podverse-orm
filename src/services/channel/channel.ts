@@ -29,8 +29,6 @@ type ChannelDto = {
   medium?: MediumEnum | null
   has_podcast_index_value?: boolean
   has_value_time_splits?: boolean
-  hidden?: boolean
-  marked_for_deletion?: boolean
 }
 
 export const channelGetManyRelations = [

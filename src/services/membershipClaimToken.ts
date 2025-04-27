@@ -5,7 +5,6 @@ import { MembershipClaimToken } from '@orm/entities/membershipClaimToken';
 import { AccountMembershipService } from '@orm/services/account/accountMembership';
 import { AccountService } from '@orm/services/account/account';
 import { AccountMembershipStatusService } from '@orm/services/account/accountMembershipStatus';
-import { Account } from '@orm/entities/account/account';
 
 export class MembershipClaimTokenService {
   protected repositoryRead: Repository<MembershipClaimToken>;

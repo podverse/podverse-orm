@@ -2,15 +2,16 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Feed } from './feed';
 
 export enum FeedFlagStatusStatusEnum {
-  None = 1,
-  Spam = 2,
-  Takedown = 3,
-  Other = 4,
-  AlwaysAllow = 5,
+  Active = 1,
+  AlwaysParse = 2,
+  Spam = 3,
+  PendingArchive = 4,
+  Archived = 5,
+  Takedown = 6
 };
 
 export const checkIfFeedFlagStatusShouldParse = (status: FeedFlagStatusStatusEnum) => {
-  if (status === FeedFlagStatusStatusEnum.None || status === FeedFlagStatusStatusEnum.AlwaysAllow) {
+  if (status === FeedFlagStatusStatusEnum.Active || status === FeedFlagStatusStatusEnum.AlwaysParse) {
     return true;
   }
   return false;
@@ -24,7 +25,7 @@ export class FeedFlagStatus {
   @Column({
     type: 'enum',
     enum: FeedFlagStatusStatusEnum,
-    default: FeedFlagStatusStatusEnum.None,
+    default: FeedFlagStatusStatusEnum.Active,
   })
   status!: FeedFlagStatusStatusEnum;
 

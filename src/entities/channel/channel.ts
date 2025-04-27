@@ -64,13 +64,7 @@ export class Channel {
 
   @Column({ type: 'boolean', default: false })
   has_value_time_splits!: boolean;
-
-  @Column({ type: 'boolean', default: false })
-  hidden!: boolean;
-
-  @Column({ type: 'boolean', default: false })
-  marked_for_deletion!: boolean;
-
+  
   @OneToOne(() => ChannelAbout, channel_about => channel_about.channel)
   channel_about!: ChannelAbout;
 
