@@ -243,8 +243,20 @@ export class ItemService {
     return item;
   }
 
-  async getMany(config: FindManyOptions<Item>): Promise<Item[]> {
-    return this.repositoryRead.find(config);
+  async getMany(config: FindManyOptions<Item>, itemType: 'normal' | 'live-item'): Promise<Item[]> {
+    return this.repositoryRead.find({
+      ...config,
+      where: {
+        channel: {
+          feed: {
+            feed_flag_status: In([1, 2])
+          }
+        },
+        live_item: {
+          id: itemType === 'live-item' ? Not(IsNull()) : IsNull()
+        }
+      }
+    });
   }
 
   async getBy(channel: Channel, dto: ItemGetByDto): Promise<Item | null> {
@@ -284,6 +296,9 @@ export class ItemService {
       where: {
         channel,
         guid: In(guids),
+        item_flag_status: {
+          id: ItemFlagStatusStatusEnum.Active
+        }
       },
       ...options,
     });
@@ -294,6 +309,9 @@ export class ItemService {
       where: {
         channel,
         guid_enclosure_url: In(guidEnclosureUrls),
+        item_flag_status: {
+          id: ItemFlagStatusStatusEnum.Active
+        }
       },
       ...options,
     });
@@ -305,6 +323,9 @@ export class ItemService {
         channel,
         live_item: {
           id: IsNull()
+        },
+        item_flag_status: {
+          id: ItemFlagStatusStatusEnum.Active
         }
       },
       ...options
@@ -317,6 +338,9 @@ export class ItemService {
         channel,
         live_item: {
           id: Not(IsNull())
+        },
+        item_flag_status: {
+          id: ItemFlagStatusStatusEnum.Active
         }
       },
       ...options

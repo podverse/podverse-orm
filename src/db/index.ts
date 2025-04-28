@@ -45,7 +45,6 @@ import { ChannelTxt } from "@orm/entities/channel/channelTxt";
 import { ChannelValue } from "@orm/entities/channel/channelValue";
 import { ChannelValueRecipient } from "@orm/entities/channel/channelValueRecipient";
 import { Clip } from "@orm/entities/clip";
-import { ClipArchived } from "@orm/entities/clipArchived";
 import { Feed } from "@orm/entities/feed/feed";
 import { FeedFlagStatus } from "@orm/entities/feed/feedFlagStatus";
 import { FeedLog } from "@orm/entities/feed/feedLog";
@@ -153,7 +152,6 @@ const commonConfig: DataSourceOptions = {
     ChannelValue,
     ChannelValueRecipient,
     Clip,
-    ClipArchived,
     Feed,
     FeedFlagStatus,
     FeedLog,

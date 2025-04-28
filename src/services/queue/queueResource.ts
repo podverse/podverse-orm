@@ -5,7 +5,6 @@ import { QueueResource } from '@orm/entities/queue/queueResource';
 import { BaseManyService } from '@orm/services/base/baseManyService';
 import { QueueService } from '@orm/services/queue/queue';
 import { ClipService } from '../clip';
-import { ClipArchivedService } from '../clipArchived';
 import { ItemService } from '../item/item';
 import { getMd5Hash } from 'podverse-helpers';
 import { ItemChapterService } from '../item/itemChapter';
@@ -16,7 +15,6 @@ const QUEUE_LIST_POSITION_INCREMENT = 0.00000001;
 export class QueueResourceService extends BaseManyService<QueueResource, 'queue'> {
   private queueService: QueueService;
   private clipService: ClipService;
-  private clipArchivedService: ClipArchivedService;
   private itemService: ItemService;
   private itemChapterService: ItemChapterService;
   private itemSoundbiteService: ItemSoundbiteService;
@@ -25,7 +23,6 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     super(QueueResource, 'queue', transactionalEntityManager);
     this.queueService = new QueueService(transactionalEntityManager);
     this.clipService = new ClipService(transactionalEntityManager);
-    this.clipArchivedService = new ClipArchivedService();
     this.itemService = new ItemService();
     this.itemChapterService = new ItemChapterService();
     this.itemSoundbiteService = new ItemSoundbiteService();
@@ -40,7 +37,7 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     const options = {
       where: { queue: { id: queue.id } },
       order: { list_position: 'ASC' as FindOptionsOrderValue },
-      relations: ['clip', 'clip_archived', 'item', 'item_chapter', 'item_soundbite']
+      relations: ['clip', 'item', 'item_chapter', 'item_soundbite']
     };
 
     return this.repositoryRead.find(options);
@@ -234,30 +231,6 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
 
   async removeClipFromQueue(queue_id_text: string, clip_id_text: string): Promise<void> {
     return this.removeResourceFromQueue(queue_id_text, clip_id_text, this.clipService, 'clip');
-  }
-
-  async addClipArchivedToQueueNext(queue_id_text: string, clip_archived_id_text: string): Promise<QueueResource> {
-    return this.addResourceToQueueNext(queue_id_text, clip_archived_id_text, this.clipArchivedService, 'clip_archived');
-  }
-
-  async addClipArchivedToQueueLast(queue_id_text: string, clip_archived_id_text: string): Promise<QueueResource> {
-    return this.addResourceToQueueLast(queue_id_text, clip_archived_id_text, this.clipArchivedService, 'clip_archived');
-  }
-
-  async addClipArchivedToQueueBetween(queue_id_text: string, clip_archived_id_text: string, position1: number, position2: number): Promise<QueueResource> {
-    return this.addResourceToQueueBetween(queue_id_text, clip_archived_id_text, this.clipArchivedService, 'clip_archived', position1, position2);
-  }
-
-  async addClipArchivedToNowPlaying(queue_id_text: string, clip_archived_id_text: string): Promise<QueueResource> {
-    return this.addResourceToNowPlaying(queue_id_text, clip_archived_id_text, this.clipArchivedService, 'clip_archived');
-  }
-
-  async addClipArchivedToHistory(queue_id_text: string, clip_archived_id_text: string): Promise<QueueResource> {
-    return this.addResourceToHistory(queue_id_text, clip_archived_id_text, this.clipArchivedService, 'clip_archived');
-  }
-
-  async removeClipArchivedFromQueue(queue_id_text: string, clip_archived_id_text: string): Promise<void> {
-    return this.removeResourceFromQueue(queue_id_text, clip_archived_id_text, this.clipArchivedService, 'clip_archived');
   }
 
   async addItemToQueueNext(queue_id_text: string, item_id_text: string): Promise<QueueResource> {
@@ -454,7 +427,6 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
   async getResourcesByParams(
     params: {
       clip_id?: number;
-      clip_archived_id?: number;
       item_id?: number;
       item_chapter_id?: number;
       item_soundbite_id?: number;
@@ -464,9 +436,6 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
 
     if (params.clip_id) {
       whereClause.clip = { id: params.clip_id };
-    }
-    if (params.clip_archived_id) {
-      whereClause.clip_archived = { id: params.clip_archived_id };
     }
     if (params.item_id) {
       whereClause.item = { id: params.item_id };
@@ -480,7 +449,7 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
 
     return this.repositoryRead.find({
       where: whereClause,
-      relations: ['clip', 'clip_archived', 'item', 'item_chapter', 'item_soundbite', 'queue']
+      relations: ['clip', 'item', 'item_chapter', 'item_soundbite', 'queue']
     });
   }
 }

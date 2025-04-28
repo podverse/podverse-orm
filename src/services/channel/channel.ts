@@ -1,5 +1,5 @@
 import { MediumEnum } from 'podverse-helpers';
-import { FindManyOptions, FindOneOptions, FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
+import { FindManyOptions, FindOptionsRelations, FindOptionsWhere, In, Repository } from 'typeorm';
 import { Channel } from '@orm/entities/channel/channel';
 import { Feed } from '@orm/entities/feed/feed';
 import { applyProperties } from '@orm/lib/applyProperties';
@@ -15,6 +15,7 @@ import { ChannelTrailerService } from './channelTrailer';
 import { ChannelTxtService } from './channelTxt';
 import { ChannelValueService } from './channelValue';
 import { ChannelValueRecipientService } from './channelValueRecipient';
+import { FeedFlagStatusStatusEnum } from '@orm/entities/feed/feedFlagStatus';
 
 type ChannelInitializeDto = {
   feed: Feed,
@@ -209,7 +210,14 @@ export class ChannelService {
   }
 
   async getMany(config: FindManyOptions<Channel>): Promise<Channel[]> {
-    return this.repositoryRead.find(config);
+    return this.repositoryRead.find({
+      where: {
+        feed: {
+          id: In([FeedFlagStatusStatusEnum.Active, FeedFlagStatusStatusEnum.AlwaysParse])
+        }
+      },
+      ...config
+    });
   }
 
   async getOrCreateByPodcastIndexId(dto: ChannelInitializeDto): Promise<Channel> {

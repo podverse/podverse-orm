@@ -93,7 +93,6 @@ export * from './entities/queue/queueResource';
 
 export * from './entities/category';
 export * from './entities/clip';
-export * from './entities/clipArchived';
 export * from './entities/medium';
 export * from './entities/membershipClaimToken';
 export * from './entities/sharableStatus';
@@ -141,7 +140,6 @@ export * from './services/channel/channelValue';
 export * from './services/channel/channelValueRecipient';
 
 export * from './services/clip';
-export * from './services/clipArchived';
 
 export * from './services/feed/feed';
 export * from './services/feed/feedFlagStatus';

@@ -6,7 +6,6 @@ import { PlaylistResource } from '@orm/entities/playlist/playlistResource';
 import { PlaylistService } from './playlist';
 import { BaseManyService } from '@orm/services/base/baseManyService';
 import { ClipService } from '../clip';
-import { ClipArchivedService } from '../clipArchived';
 import { ItemService } from '../item/item';
 import { ItemChapterService } from '../item/itemChapter';
 import { ItemSoundbiteService } from '../item/itemSoundbite';
@@ -16,7 +15,6 @@ const PLAYLIST_LIST_POSITION_INCREMENT = 0.00000001;
 export class PlaylistResourceService extends BaseManyService<PlaylistResource, 'playlist'> {
   private playlistService: PlaylistService;
   private clipService: ClipService;
-  private clipArchivedService: ClipArchivedService;
   private itemService: ItemService;
   private itemChapterService: ItemChapterService;
   private itemSoundbiteService: ItemSoundbiteService;
@@ -25,7 +23,6 @@ export class PlaylistResourceService extends BaseManyService<PlaylistResource, '
     super(PlaylistResource, 'playlist', transactionalEntityManager);
     this.playlistService = new PlaylistService(transactionalEntityManager);
     this.clipService = new ClipService(transactionalEntityManager);
-    this.clipArchivedService = new ClipArchivedService();
     this.itemService = new ItemService();
     this.itemChapterService = new ItemChapterService(transactionalEntityManager);
     this.itemSoundbiteService = new ItemSoundbiteService(transactionalEntityManager);
@@ -40,7 +37,7 @@ export class PlaylistResourceService extends BaseManyService<PlaylistResource, '
     const options = {
       where: { playlist: { id: playlist.id } },
       order: { list_position: 'ASC' as FindOptionsOrderValue },
-      relations: ['clip', 'clip_archived', 'item', 'item_chapter', 'item_soundbite']
+      relations: ['clip', 'item', 'item_chapter', 'item_soundbite']
     };
 
     return this.repositoryRead.find(options);
@@ -193,22 +190,6 @@ export class PlaylistResourceService extends BaseManyService<PlaylistResource, '
     return this.removeResourceFromPlaylist(playlist_id_text, clip_id_text, this.clipService, 'clip');
   }
 
-  async addClipArchivedToPlaylistFirst(playlist_id_text: string, clip_archived_id_text: string): Promise<PlaylistResource> {
-    return this.addResourceToPlaylistFirst(playlist_id_text, clip_archived_id_text, this.clipArchivedService, 'clip_archived');
-  }
-
-  async addClipArchivedToPlaylistLast(playlist_id_text: string, clip_archived_id_text: string): Promise<PlaylistResource> {
-    return this.addResourceToPlaylistLast(playlist_id_text, clip_archived_id_text, this.clipArchivedService, 'clip_archived');
-  }
-
-  async addClipArchivedToPlaylistBetween(playlist_id_text: string, clip_archived_id_text: string, position1: number, position2: number): Promise<PlaylistResource> {
-    return this.addResourceToPlaylistBetween(playlist_id_text, clip_archived_id_text, this.clipArchivedService, 'clip_archived', position1, position2);
-  }
-
-  async removeClipArchivedFromPlaylist(playlist_id_text: string, clip_archived_id_text: string): Promise<void> {
-    return this.removeResourceFromPlaylist(playlist_id_text, clip_archived_id_text, this.clipArchivedService, 'clip_archived');
-  }
-
   async addItemToPlaylistFirst(playlist_id_text: string, item_id_text: string): Promise<PlaylistResource> {
     return this.addResourceToPlaylistFirst(playlist_id_text, item_id_text, this.itemService, 'item');
   }
@@ -339,7 +320,6 @@ export class PlaylistResourceService extends BaseManyService<PlaylistResource, '
   async getResourcesByParams(
     params: {
       clip_id?: number;
-      clip_archived_id?: number;
       item_id?: number;
       item_chapter_id?: number;
       item_soundbite_id?: number;
@@ -349,9 +329,6 @@ export class PlaylistResourceService extends BaseManyService<PlaylistResource, '
 
     if (params.clip_id) {
       whereClause.clip = { id: params.clip_id };
-    }
-    if (params.clip_archived_id) {
-      whereClause.clip_archived = { id: params.clip_archived_id };
     }
     if (params.item_id) {
       whereClause.item = { id: params.item_id };
@@ -365,7 +342,7 @@ export class PlaylistResourceService extends BaseManyService<PlaylistResource, '
 
     return this.repositoryRead.find({
       where: whereClause,
-      relations: ['clip', 'clip_archived', 'item', 'item_chapter', 'item_soundbite', 'playlist']
+      relations: ['clip', 'item', 'item_chapter', 'item_soundbite', 'playlist']
     });
   }
 }
