@@ -10,13 +10,6 @@ export enum FeedFlagStatusStatusEnum {
   Takedown = 6
 };
 
-export const checkIfFeedFlagStatusShouldParse = (status: FeedFlagStatusStatusEnum) => {
-  if (status === FeedFlagStatusStatusEnum.Active || status === FeedFlagStatusStatusEnum.AlwaysParse) {
-    return true;
-  }
-  return false;
-};
-
 @Entity('feed_flag_status')
 export class FeedFlagStatus {
   @PrimaryGeneratedColumn()

@@ -14,7 +14,6 @@ type FeedCreateDto = {
 
 type FeedUpdateDto = {
   url?: string
-  feed_flag_status_id?: number
   is_parsing?: Date | null
   parsing_priority?: number
   last_parsed_file_hash?: string | null
@@ -121,6 +120,19 @@ export class FeedService {
 
     feed = applyProperties(feed, dto);
 
+    return this.repositoryReadWrite.save(feed);
+  }
+
+  async updateFlagStatus(feed: Feed, feed_flag_status_id: FeedFlagStatusStatusEnum): Promise<Feed> {
+    const feedFlagStatusService = new FeedFlagStatusService();
+    const feed_flag_status = await feedFlagStatusService.get(feed_flag_status_id);
+  
+    if (!feed_flag_status) {
+      throw new Error(`FeedService.updateFlagStatus: feed status ${feed_flag_status_id} not found`);
+    }
+  
+    feed.feed_flag_status = feed_flag_status;
+  
     return this.repositoryReadWrite.save(feed);
   }
 }
