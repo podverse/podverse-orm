@@ -20,6 +20,7 @@ import { ChannelTxt } from '@orm/entities/channel/channelTxt';
 import { ChannelValue } from '@orm/entities/channel/channelValue';
 import { Feed } from '@orm/entities/feed/feed'; 
 import { Medium } from '@orm/entities/medium';
+import { Item } from '../item/item';
 const shortid = require('shortid');
 
 @Entity('channel')
@@ -118,6 +119,9 @@ export class Channel {
 
   @OneToMany(() => ChannelValue, channel_value => channel_value.channel)
   channel_values!: ChannelValue[];
+
+  @OneToMany(() => Item, item => item.channel)
+  items!: Item[];
 
   @BeforeInsert()
   generateIdText() {

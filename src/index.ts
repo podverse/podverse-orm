@@ -117,6 +117,8 @@ export * from './services/account/accountProfile';
 export * from './services/account/accountResetPassword';
 export * from './services/account/accountVerification';
 
+export * from './services/archiver';
+
 export * from './services/channel/channel';
 export * from './services/channel/channelAbout';
 export * from './services/channel/channelChat';
