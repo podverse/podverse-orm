@@ -1,7 +1,5 @@
 .env
 
-yarn.lock
-
 .git
 
 **/dist
