@@ -213,7 +213,7 @@ export class ChannelService {
     return this.repositoryRead.find({
       where: {
         feed: {
-          id: In([FeedFlagStatusStatusEnum.Active, FeedFlagStatusStatusEnum.AlwaysParse])
+          feed_flag_status: In([FeedFlagStatusStatusEnum.Active, FeedFlagStatusStatusEnum.AlwaysParse])
         }
       },
       ...config
