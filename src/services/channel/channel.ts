@@ -205,8 +205,8 @@ export class ChannelService {
     return channel;
   }
 
-  async getByPodcastIndexId(podcast_index_id: number): Promise<Channel | null> {
-    return this.repositoryRead.findOne({ where: { podcast_index_id } });
+  async getByPodcastIndexId(podcast_index_id: number, relations: FindOptionsRelations<Channel> = {}): Promise<Channel | null> {
+    return this.repositoryRead.findOne({ where: { podcast_index_id }, relations });
   }
 
   async getMany(config: FindManyOptions<Channel>): Promise<Channel[]> {
@@ -244,4 +244,16 @@ export class ChannelService {
 
     return this.repositoryReadWrite.save(channel);
   }
+
+  async updatePodcastIndexId(id: number, podcast_index_id: number): Promise<Channel> {
+    let channel = await this.get(id);
+
+    if (!channel) {
+      channel = new Channel();
+    }
+
+    channel = applyProperties(channel, { podcast_index_id });
+
+    return this.repositoryReadWrite.save(channel);
+  } 
 }
