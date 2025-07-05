@@ -18,6 +18,9 @@ export class Clip {
   @JoinColumn({ name: 'account_id' })
   account!: Account;
 
+  @Column()
+  item_id!: string;
+
   @ManyToOne(() => Item, item => item.id, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'item_id' })
   item!: Item;
