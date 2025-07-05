@@ -113,8 +113,34 @@ export class ArchiverService {
     await this.processItems(items, archivedStatus);
   }
 
+  async getFeedsWithTakedownStatus(): Promise<Feed[]> {
+    return this.feedRepositoryRead.find({
+      where: {
+        feed_flag_status: {
+          id: FeedFlagStatusStatusEnum.Takedown,
+        },
+      },
+      relations: ['channel', 'channel.items', 'feed_flag_status'],
+    });
+  }
+
+  async removeAllItemsForTakedownFeeds(): Promise<void> {
+    const feeds = await this.getFeedsWithTakedownStatus();
+    for (const feed of feeds) {
+      const channel = feed.channel;
+      if (!channel || !channel.items || channel.items.length === 0) {
+        continue;
+      }
+      const itemIds = channel.items.map(item => item.id);
+      if (itemIds.length > 0) {
+        await this.itemRepositoryReadWrite.delete(itemIds);
+      }
+    }
+  }
+
   async archiveAll(): Promise<void> {
     await this.processPendingArchiveFeeds();
     await this.processPendingArchiveItems();
+    await this.removeAllItemsForTakedownFeeds();
   }
 }
