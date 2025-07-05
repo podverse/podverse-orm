@@ -143,6 +143,8 @@ export * from './services/channel/channelValueRecipient';
 
 export * from './services/clip';
 
+export * from './services/deduplicator';
+
 export * from './services/feed/feed';
 export * from './services/feed/feedFlagStatus';
 export * from './services/feed/feedLog';
