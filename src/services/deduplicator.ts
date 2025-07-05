@@ -12,26 +12,26 @@ export class DeduplicatorService {
     this.readWriteEntityManager = AppDataSourceReadWrite.manager;
   }
 
-  async mergeChannels(id_to_remove: number, duplicate_id_to_keep: number): Promise<void> {    
-    await this.updateAccountFollowingChannel(id_to_remove, duplicate_id_to_keep);
+  async mergeChannels(id_to_archive: number, duplicate_id_to_keep: number): Promise<void> {    
+    await this.updateAccountFollowingChannel(id_to_archive, duplicate_id_to_keep);
 
-    const { itemsToRemove, duplicateItemsToKeep } = await this.getItemsForBothChannels(id_to_remove, duplicate_id_to_keep);
+    const { itemsToArchive, duplicateItemsToKeep } = await this.getItemsForBothChannels(id_to_archive, duplicate_id_to_keep);
     const { guidMap, guidEnclosureUrlMap } = this.buildItemMaps(duplicateItemsToKeep);
 
-    for (const itemToRemove of itemsToRemove) {
-      const duplicateItemToKeep = this.findDuplicateItem(itemToRemove, guidMap, guidEnclosureUrlMap);
+    for (const itemToArchive of itemsToArchive) {
+      const duplicateItemToKeep = this.findDuplicateItem(itemToArchive, guidMap, guidEnclosureUrlMap);
       if (duplicateItemToKeep) {
-        await this.updateClipAndPlaylistResource(itemToRemove.id, duplicateItemToKeep.id);
+        await this.updateClipAndPlaylistResource(itemToArchive.id, duplicateItemToKeep.id);
       }
     }
   }
 
-  private async updateAccountFollowingChannel(id_to_remove: number, duplicate_id_to_keep: number): Promise<void> {
+  private async updateAccountFollowingChannel(id_to_archive: number, duplicate_id_to_keep: number): Promise<void> {
     await this.readWriteEntityManager
       .createQueryBuilder()
       .update(AccountFollowingChannel)
       .set({ channel_id: duplicate_id_to_keep })
-      .where("channel_id = :channel_to_remove", { channel_to_remove: id_to_remove })
+      .where("channel_id = :id_to_archive", { id_to_archive })
       .execute();
   }
 
@@ -46,32 +46,32 @@ export class DeduplicatorService {
   }
 
   private findDuplicateItem(
-    itemToRemove: Item,
+    itemToArchive: Item,
     guidMap: Map<string, Item>,
     guidEnclosureUrlMap: Map<string, Item>
   ): Item | undefined {
-    if (itemToRemove.guid && guidMap.has(itemToRemove.guid)) {
-      return guidMap.get(itemToRemove.guid);
+    if (itemToArchive.guid && guidMap.has(itemToArchive.guid)) {
+      return guidMap.get(itemToArchive.guid);
     }
-    if (itemToRemove.guid_enclosure_url && guidEnclosureUrlMap.has(itemToRemove.guid_enclosure_url)) {
-      return guidEnclosureUrlMap.get(itemToRemove.guid_enclosure_url);
+    if (itemToArchive.guid_enclosure_url && guidEnclosureUrlMap.has(itemToArchive.guid_enclosure_url)) {
+      return guidEnclosureUrlMap.get(itemToArchive.guid_enclosure_url);
     }
     return undefined;
   }
 
-  private async updateClipAndPlaylistResource(itemToRemoveId: number, duplicateItemToKeepId: number): Promise<void> {
+  private async updateClipAndPlaylistResource(itemToArchiveId: number, duplicateItemToKeepId: number): Promise<void> {
     await this.readWriteEntityManager
       .createQueryBuilder()
       .update(Clip)
       .set({ item_id: duplicateItemToKeepId })
-      .where("item_id = :itemToRemoveId", { itemToRemoveId })
+      .where("item_id = :itemToArchiveId", { itemToArchiveId })
       .execute();
 
     await this.readWriteEntityManager
       .createQueryBuilder()
       .update(PlaylistResource)
       .set({ item_id: duplicateItemToKeepId })
-      .where("item_id = :itemToRemoveId", { itemToRemoveId })
+      .where("item_id = :itemToArchiveId", { itemToArchiveId })
       .execute();
   }
 
@@ -82,9 +82,9 @@ export class DeduplicatorService {
     return items;
   }
 
-  async getItemsForBothChannels(id_to_remove: number, duplicate_id_to_keep: number): Promise<{ itemsToRemove: Item[], duplicateItemsToKeep: Item[] }> {
-    const itemsToRemove = await this.getChannelItems(id_to_remove);
+  async getItemsForBothChannels(id_to_archive: number, duplicate_id_to_keep: number): Promise<{ itemsToArchive: Item[], duplicateItemsToKeep: Item[] }> {
+    const itemsToArchive = await this.getChannelItems(id_to_archive);
     const duplicateItemsToKeep = await this.getChannelItems(duplicate_id_to_keep);
-    return { itemsToRemove, duplicateItemsToKeep };
+    return { itemsToArchive, duplicateItemsToKeep };
   }
 }
