@@ -50,13 +50,13 @@ export class ArchiverService {
 
   private async processItems(items: Item[], archivedStatus: ItemFlagStatus): Promise<void> {
     for (const item of items) {
-      const hasPlaylistResource = await this.playlistResourceRepository.findOne({
+      const hasPlaylistResource = !!(await this.playlistResourceRepository.findOne({
         where: { item: { id: item.id } },
-      });
+      }));
 
-      const hasClip = await this.clipRepository.findOne({
+      const hasClip = !!(await this.clipRepository.findOne({
         where: { item: { id: item.id } },
-      });
+      }));
 
       if (hasPlaylistResource || hasClip) {
         item.item_flag_status = archivedStatus;
@@ -90,14 +90,17 @@ export class ArchiverService {
         relations: ['item_flag_status']
       });
 
-      if (items.length === 0) {
-        await this.feedRepositoryReadWrite.delete(feed.id);
-      } else {
+      if (items.length > 0) {
         const activeOrPendingItems = items.filter(item =>
-          [ItemFlagStatusStatusEnum.Active, ItemFlagStatusStatusEnum.PendingArchive].includes(item.item_flag_status.id)
+          [ItemFlagStatusStatusEnum.Active, ItemFlagStatusStatusEnum.PendingArchive]
+            .includes(item.item_flag_status.id)
         );
         await this.processItems(activeOrPendingItems, archivedStatus);
+
       }
+      
+      feed.feed_flag_status = { ...feed.feed_flag_status, id: FeedFlagStatusStatusEnum.Archived };
+      await this.feedRepositoryReadWrite.save(feed);
     }
   }
 
