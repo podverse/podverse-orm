@@ -15,6 +15,10 @@ export class ArchiverService {
   private playlistResourceRepository = AppDataSourceRead.getRepository(PlaylistResource);
   private clipRepository = AppDataSourceRead.getRepository(Clip);
 
+  // TODO: check if archived items no longer have clip or playlist resource relationships
+  
+  // TODO: handle spam items
+
   async getItemsPendingArchive(): Promise<Item[]> {
     return this.itemRepositoryRead.find({
       where: [
