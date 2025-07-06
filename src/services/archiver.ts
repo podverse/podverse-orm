@@ -96,10 +96,10 @@ export class ArchiverService {
             .includes(item.item_flag_status.id)
         );
         await this.processItems(activeOrPendingItems, archivedStatus);
-
       }
       
       feed.feed_flag_status = { ...feed.feed_flag_status, id: FeedFlagStatusStatusEnum.Archived };
+      feed.last_parsed_file_hash = null;
       await this.feedRepositoryReadWrite.save(feed);
     }
   }
