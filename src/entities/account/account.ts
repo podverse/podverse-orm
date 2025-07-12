@@ -1,7 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, BeforeInsert, OneToOne, OneToMany } from 'typeorm';
 import { AccountCredentials } from '@orm/entities/account/accountCredentials';
 import { SharableStatus } from '@orm/entities/sharableStatus';
-import { AccountAdminRoles } from './accountAdminRoles';
 import { AccountAppStorePurchase } from './accountAppStorePurchase';
 import { AccountFCMDevice } from './accountFCMDevice';
 import { AccountFollowingAccount } from './accountFollowingAccount';
@@ -32,9 +31,6 @@ export class Account {
   @ManyToOne(() => SharableStatus, sharableStatus => sharableStatus.id)
   @JoinColumn({ name: 'sharable_status_id' })
   sharable_status!: SharableStatus;
-
-  @OneToOne(() => AccountAdminRoles, accountAdminRoles => accountAdminRoles.account)
-  account_admin_roles!: AccountAdminRoles;
 
   @OneToMany(() => AccountAppStorePurchase, accountAppStorePurchase => accountAppStorePurchase.account)
   account_app_store_purchases!: AccountAppStorePurchase[];

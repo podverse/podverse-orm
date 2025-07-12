@@ -2,7 +2,6 @@ import { DataSource, DataSourceOptions } from "typeorm";
 import { SnakeNamingStrategy } from "typeorm-naming-strategies";
 import { config } from "@orm/config";
 import { Account } from "@orm/entities/account/account";
-import { AccountAdminRoles } from "@orm/entities/account/accountAdminRoles";
 import { AccountAppStorePurchase } from "@orm/entities/account/accountAppStorePurchase";
 import { AccountCredentials } from "@orm/entities/account/accountCredentials";
 import { AccountEmailChangeVerification } from "@orm/entities/account/accountEmailChangeVerification";
@@ -109,7 +108,6 @@ const commonConfig: DataSourceOptions = {
   logging: false,
   entities: [
     Account,
-    AccountAdminRoles,
     AccountAppStorePurchase,
     AccountCredentials,
     AccountEmailChangeVerification,

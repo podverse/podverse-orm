@@ -5,7 +5,6 @@ export * from './config';
 export * from './db';
 
 export * from './entities/account/account';
-export * from './entities/account/accountAdminRoles';
 export * from './entities/account/accountAppStorePurchase';
 export * from './entities/account/accountCredentials';
 export * from './entities/account/accountEmailChangeVerification';
