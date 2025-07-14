@@ -4,7 +4,6 @@ import { AppDataSourceRead, AppDataSourceReadWrite } from '@orm/db';
 import { StatsTrackAccountGuid } from '@orm/entities/stats/statsTrackAccountGuid';
 import { AccountService } from '@orm/services/account/account';
 
-
 export class StatsTrackAccountGuidService {
   private repositoryRead: Repository<StatsTrackAccountGuid>;
   private repositoryReadWrite: Repository<StatsTrackAccountGuid>;

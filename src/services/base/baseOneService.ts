@@ -1,8 +1,8 @@
-import { logger } from "podverse-helpers";
 import { EntityManager, FindOneOptions, FindOptionsWhere, ObjectLiteral, Repository } from "typeorm";
 import { AppDataSourceRead, AppDataSourceReadWrite } from "@orm/db";
 import { applyProperties } from "@orm/lib/applyProperties";
 import { hasDifferentValues } from "@orm/lib/hasDifferentValues";
+import { loggerService } from "@orm/factories/loggerService";
 
 export class BaseOneService<T extends ObjectLiteral, K extends keyof T> {
   private parentEntityKey: K;
@@ -33,8 +33,8 @@ export class BaseOneService<T extends ObjectLiteral, K extends keyof T> {
     }
 
     entity = applyProperties(entity, dto);
-    logger.debug(`Updating entity ${JSON.stringify(entity)}`);
-    logger.debug(`With DTO ${JSON.stringify(dto)}`);
+    loggerService.debug(`Updating entity ${JSON.stringify(entity)}`);
+    loggerService.debug(`With DTO ${JSON.stringify(dto)}`);
 
     return (this.transactionalEntityManager as EntityManager
       ?? this.repositoryReadWrite).save(entity);
