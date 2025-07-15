@@ -3,7 +3,6 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, BeforeIn
 import { Account } from '@orm/entities/account/account';
 import { Item } from '@orm/entities/item/item';
 import { SharableStatus } from '@orm/entities/sharableStatus';
-import { AppDataSourceRead } from '@orm/db';
 const shortid = require('shortid');
 
 @Entity('clip')
