@@ -1,5 +1,10 @@
 import './module-alias-config';
 
+export type {
+  FindOptionsWhere,
+  FindOptionsOrder
+} from 'typeorm';
+
 export * from './config';
 
 export * from './db';
