@@ -35,6 +35,7 @@ type ChannelDto = {
 export const channelGetManyRelations = [
   'channel_about',
   'channel_about.itunes_type',
+  'channel_categories',
   'channel_chat',
   'channel_description',
   'channel_images',
