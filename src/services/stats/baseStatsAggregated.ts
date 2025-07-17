@@ -1,5 +1,6 @@
-import { Repository, ObjectLiteral, FindOptionsWhere } from 'typeorm';
+import { Repository, ObjectLiteral, FindOptionsWhere, EntityTarget } from 'typeorm';
 import { TIME_CONSTANTS } from 'podverse-helpers';
+import { AppDataSourceRead, AppDataSourceReadWrite } from '@orm/db';
 
 export type UpdateHistoricalOptions = {
   daily: boolean;
@@ -28,11 +29,14 @@ interface BaseAggregatedStats extends ObjectLiteral {
   all_time_count?: number;
 }
 
+
 export abstract class BaseStatsAggregatedService<T extends BaseAggregatedStats, ID> {
+  protected repositoryRead: Repository<T>;
   protected repositoryReadWrite: Repository<T>;
 
-  constructor(repository: Repository<T>) {
-    this.repositoryReadWrite = repository;
+  constructor(entity: EntityTarget<T>) {
+    this.repositoryRead = AppDataSourceRead.getRepository(entity);
+    this.repositoryReadWrite = AppDataSourceReadWrite.getRepository(entity);
   }
 
   protected abstract getIdFieldName(): string;
@@ -44,8 +48,8 @@ export abstract class BaseStatsAggregatedService<T extends BaseAggregatedStats, 
     const eventCountMonth = await statsTrackEventService._getCountWithinTimeFrame(entity_id, TIME_CONSTANTS.ONE_MONTH_IN_MINUTES);
 
     const idFieldName = this.getIdFieldName();
-    let aggregatedStats = await this.repositoryReadWrite.findOne({ where: { [idFieldName]: entity_id } as FindOptionsWhere<T> });
-    
+    let aggregatedStats = await this.repositoryRead.findOne({ where: { [idFieldName]: entity_id } as FindOptionsWhere<T> });
+
     if (!aggregatedStats) {
       aggregatedStats = this.repositoryReadWrite.create({ [idFieldName]: entity_id } as T);
     }
@@ -57,16 +61,16 @@ export abstract class BaseStatsAggregatedService<T extends BaseAggregatedStats, 
     if (updateAllTime) {
       aggregatedStats.all_time_count = (aggregatedStats.all_time_count ?? 0) + (aggregatedStats.day_current_count ?? 0);
     }
-    
+
     await this.repositoryReadWrite.save(aggregatedStats);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async _updateAggregatedStatsRolling(entity_id: ID, statsTrackEventService: any, updateHistoricalOptions: UpdateHistoricalOptions): Promise<void> {
     const eventCount = await statsTrackEventService._getCountWithinTimeFrame(entity_id, TIME_CONSTANTS.ONE_DAY_IN_MINUTES);
-    
+
     const idFieldName = this.getIdFieldName();
-    let aggregatedStats = await this.repositoryReadWrite.findOne({ where: { [idFieldName]: entity_id } as FindOptionsWhere<T> });
+    let aggregatedStats = await this.repositoryRead.findOne({ where: { [idFieldName]: entity_id } as FindOptionsWhere<T> });
 
     if (!aggregatedStats) {
       aggregatedStats = this.repositoryReadWrite.create({ [idFieldName]: entity_id } as T);
@@ -86,14 +90,14 @@ export abstract class BaseStatsAggregatedService<T extends BaseAggregatedStats, 
 
       aggregatedStats.all_time_count = (aggregatedStats.all_time_count ?? 0) + (aggregatedStats.day_current_count ?? 0);
     }
-    
+
     if (updateHistoricalOptions.weekly || updateHistoricalOptions.monthly) {
       aggregatedStats.week_4_count = aggregatedStats.week_3_count ?? 0;
       aggregatedStats.week_3_count = aggregatedStats.week_2_count ?? 0;
       aggregatedStats.week_2_count = aggregatedStats.week_1_count ?? 0;
       aggregatedStats.week_1_count = aggregatedStats.week_current_count ?? 0;
     }
-    
+
     if (updateHistoricalOptions.monthly) {
       aggregatedStats.month_1_count = aggregatedStats.month_current_count ?? 0;
     }
@@ -125,7 +129,7 @@ export abstract class BaseStatsAggregatedService<T extends BaseAggregatedStats, 
             + (aggregatedStats.week_2_count ?? 0)
             + (aggregatedStats.week_3_count ?? 0)
             + (aggregatedStats.week_4_count ?? 0));
-    
+
     await this.repositoryReadWrite.save(aggregatedStats);
   }
 }

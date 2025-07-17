@@ -1,4 +1,3 @@
-import { AppDataSourceReadWrite } from '@orm/db';
 import { StatsAggregatedPlaylist } from '@orm/entities/stats/statsAggregatedPlaylist';
 import { StatsTrackEventPlaylistService } from './statsTrackEventPlaylist';
 import { BaseStatsAggregatedService, UpdateHistoricalOptions } from './baseStatsAggregated';
@@ -7,7 +6,7 @@ export class StatsAggregatedPlaylistService extends BaseStatsAggregatedService<S
   private statsTrackEventPlaylistService: StatsTrackEventPlaylistService;
 
   constructor() {
-    super(AppDataSourceReadWrite.getRepository(StatsAggregatedPlaylist));
+    super(StatsAggregatedPlaylist);
     this.statsTrackEventPlaylistService = new StatsTrackEventPlaylistService();
   }
 

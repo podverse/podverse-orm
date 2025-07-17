@@ -1,4 +1,3 @@
-import { AppDataSourceReadWrite } from '@orm/db';
 import { StatsAggregatedClip } from '@orm/entities/stats/statsAggregatedClip';
 import { StatsTrackEventClipService } from './statsTrackEventClip';
 import { BaseStatsAggregatedService, UpdateHistoricalOptions } from './baseStatsAggregated';
@@ -7,10 +6,10 @@ export class StatsAggregatedClipService extends BaseStatsAggregatedService<Stats
   private statsTrackEventClipService: StatsTrackEventClipService;
 
   constructor() {
-    super(AppDataSourceReadWrite.getRepository(StatsAggregatedClip));
+    super(StatsAggregatedClip);
     this.statsTrackEventClipService = new StatsTrackEventClipService();
   }
-
+  
   protected getIdFieldName(): string {
     return 'clip_id';
   }

@@ -1,4 +1,3 @@
-import { AppDataSourceReadWrite } from '@orm/db';
 import { StatsAggregatedAccount } from '@orm/entities/stats/statsAggregatedAccount';
 import { StatsTrackEventAccountService } from './statsTrackEventAccount';
 import { BaseStatsAggregatedService, UpdateHistoricalOptions } from './baseStatsAggregated';
@@ -7,7 +6,7 @@ export class StatsAggregatedAccountService extends BaseStatsAggregatedService<St
   private statsTrackEventAccountService: StatsTrackEventAccountService;
 
   constructor() {
-    super(AppDataSourceReadWrite.getRepository(StatsAggregatedAccount));
+    super(StatsAggregatedAccount);
     this.statsTrackEventAccountService = new StatsTrackEventAccountService();
   }
 
