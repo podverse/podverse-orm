@@ -59,7 +59,7 @@ export class AccountService {
     return this.repositoryRead.find(config);
   }
 
-  async create(dto: CreateAccountDto) {
+  async create(dto: CreateAccountDto, qaVerified?: boolean) {
     if (!validateEmail(dto.email)) {
       throw new Error('Invalid email');
     }
@@ -73,16 +73,17 @@ export class AccountService {
     if (!sharableStatus) {
       throw new Error('SharableStatus not found');
     }
-
+    
     const accountCredentialsService = new AccountCredentialsService();
     const accountCredentials = await accountCredentialsService.getByEmail(dto.email);
+
     if (accountCredentials) {
       throw new Error(ERROR_MESSAGES.ACCOUNT.ALREADY_EXISTS);
     }
 
     const accountObj = this.repositoryReadWrite.create({
       sharable_status: sharableStatus,
-      verified: false
+      verified: qaVerified ?? false
     });
     
     const account = await this.repositoryReadWrite.save(accountObj);

@@ -1,6 +1,7 @@
 import './module-alias-config';
 
 export type {
+  FindManyOptions,
   FindOptionsWhere,
   FindOptionsOrder
 } from 'typeorm';
@@ -100,6 +101,18 @@ export * from './entities/clip';
 export * from './entities/medium';
 export * from './entities/membershipClaimToken';
 export * from './entities/sharableStatus';
+
+export * from './entities/stats/statsAggregatedAccount';
+export * from './entities/stats/statsAggregatedChannel';
+export * from './entities/stats/statsAggregatedClip';
+export * from './entities/stats/statsAggregatedItem';
+export * from './entities/stats/statsAggregatedPlaylist';
+export * from './entities/stats/statsTrackAccountGuid';
+export * from './entities/stats/statsTrackEventAccount';
+export * from './entities/stats/statsTrackEventChannel';
+export * from './entities/stats/statsTrackEventClip';
+export * from './entities/stats/statsTrackEventItem';
+export * from './entities/stats/statsTrackEventPlaylist';
 
 export * from './lib/typeORMTypes';
 

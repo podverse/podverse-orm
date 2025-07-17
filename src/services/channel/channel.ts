@@ -32,9 +32,8 @@ type ChannelDto = {
   has_value_time_splits?: boolean
 }
 
-export const channelGetManyRelations = [
+export const channelGetManyRelations: Array<keyof Channel> = [
   'channel_about',
-  'channel_about.itunes_type',
   'channel_categories',
   'channel_chat',
   'channel_description',
@@ -43,6 +42,29 @@ export const channelGetManyRelations = [
   'channel_license',
   'channel_location',
   'channel_persons'
+];
+
+export type SubChannelGetManyRelation =
+  | 'channel.channel_about'
+  | 'channel.channel_categories'
+  | 'channel.channel_chat'
+  | 'channel.channel_description'
+  | 'channel.channel_images'
+  | 'channel.channel_internal_settings'
+  | 'channel.channel_license'
+  | 'channel.channel_location'
+  | 'channel.channel_persons';
+
+export const subChannelGetManyRelations: SubChannelGetManyRelation[] = [
+  'channel.channel_about',
+  'channel.channel_categories',
+  'channel.channel_chat',
+  'channel.channel_description',
+  'channel.channel_images',
+  'channel.channel_internal_settings',
+  'channel.channel_license',
+  'channel.channel_location',
+  'channel.channel_persons'
 ];
 
 export const channelGetOneRelations: FindOptionsRelations<Channel> = {
