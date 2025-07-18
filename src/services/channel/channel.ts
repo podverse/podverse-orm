@@ -44,7 +44,8 @@ export const channelGetManyRelations: Array<keyof Channel> = [
   'channel_persons'
 ];
 
-export type SubChannelGetManyRelation =
+export type SubChannelGetManyRelations =
+  | 'channel'
   | 'channel.channel_about'
   | 'channel.channel_categories'
   | 'channel.channel_chat'
@@ -55,7 +56,8 @@ export type SubChannelGetManyRelation =
   | 'channel.channel_location'
   | 'channel.channel_persons';
 
-export const subChannelGetManyRelations: SubChannelGetManyRelation[] = [
+export const subChannelGetManyRelations: SubChannelGetManyRelations[] = [
+  'channel',
   'channel.channel_about',
   'channel.channel_categories',
   'channel.channel_chat',
