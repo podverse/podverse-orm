@@ -23,6 +23,15 @@ export class AccountFollowingChannelService extends BaseManyService<AccountFollo
     return this._getAll(account, config);
   }
 
+  async getFollowedChannelsWithCount(account_id: number, config?: FindManyOptions<AccountFollowingChannel>): Promise<{ count: number; results: AccountFollowingChannel[] }> {
+    const account = await this.accountService.get(account_id);
+    if (!account) {
+      throw new Error("Account not found.");
+    }
+
+    return this._getAllWithCount(account, config);
+  }
+
   async followChannel(account_id: number, channel_id_text: string): Promise<AccountFollowingChannel> {
     const account = await this.accountService.get(account_id);
     if (!account) {

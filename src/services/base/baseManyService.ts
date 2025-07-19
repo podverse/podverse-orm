@@ -24,6 +24,12 @@ export class BaseManyService<T extends ObjectLiteral, K extends keyof T> {
     return this.repositoryRead.find({ where, ...config });
   }
 
+  public async _getAllWithCount(parentEntity: T[K], config?: FindManyOptions<T>): Promise<{ count: number; results: T[] }> {
+    const where: FindOptionsWhere<T> = { [this.parentEntityKey]: parentEntity } as FindOptionsWhere<T>;
+    const [results, count] = await this.repositoryRead.findAndCount({ where, ...config });
+    return { count, results };
+  }
+
   public async _get(parentEntity: T[K], whereKeyValues: Record<string,unknown>, config?: FindOneOptions<T>): Promise<T | null> {
     const where: FindOptionsWhere<T> = {
       [this.parentEntityKey]: parentEntity,
