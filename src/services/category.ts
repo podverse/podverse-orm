@@ -29,7 +29,8 @@ export class CategoryService {
         id: category.id,
         parent_id: category?.parent_id?.id || null,
         display_name: category.display_name,
-        slug: category.slug
+        slug: category.slug,
+        mapping_key: category.mapping_key
       };
     });
 
@@ -47,13 +48,20 @@ export class CategoryService {
           if (!parentCategory.children) {
             parentCategory.children = [];
           }
-          parentCategory.children.push(category);
+          const copyCategory = { ...category };
+          delete copyCategory.parent_id;
+          parentCategory.children.push(copyCategory);
         }
+      } else {
+        delete category.parent_id;
       }
-      delete category.parent_id;
     });
 
-    allCategories = parsedCategories.filter(category => !category.parent_id);
+    const finalCategories = parsedCategories.filter(category => !category.parent_id);
+
+    console.log('Setting category cache with', finalCategories.length, 'categories');
+
+    allCategories = finalCategories;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
