@@ -59,8 +59,6 @@ export class CategoryService {
 
     const finalCategories = parsedCategories.filter(category => !category.parent_id);
 
-    console.log('Setting category cache with', finalCategories.length, 'categories');
-
     allCategories = finalCategories;
   }
 
