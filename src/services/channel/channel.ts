@@ -1,5 +1,5 @@
 import { MediumEnum } from 'podverse-helpers';
-import { FindManyOptions, FindOptionsRelations, FindOptionsWhere, In, Repository } from 'typeorm';
+import { FindManyOptions, FindOptionsRelations, FindOptionsWhere, In, Repository, Equal } from 'typeorm';
 import { Channel } from '@orm/entities/channel/channel';
 import { Feed } from '@orm/entities/feed/feed';
 import { applyProperties } from '@orm/lib/applyProperties';
@@ -105,6 +105,8 @@ const getChannelOneToOneRelations = (relations: FindOptionsRelations<Channel>) =
   return oneToOneRelations;
 };
 
+export type IChannelService = ChannelService;
+
 export class ChannelService {
   protected repositoryRead: Repository<Channel>;
   protected repositoryReadWrite: Repository<Channel>;
@@ -120,10 +122,12 @@ export class ChannelService {
   ): Promise<Channel | null> {
     const oneToOneRelations = getChannelOneToOneRelations(relations);
     
-    let channel = await this.repositoryRead.findOne({
+    let channels = await this.repositoryRead.find({
       where,
       relations: oneToOneRelations
     });
+
+    let channel = channels.length > 0 ? channels[0] : null;
 
     if (!channel) {
       return null;
@@ -230,12 +234,23 @@ export class ChannelService {
     return channel;
   }
 
-  async getByPodcastIndexId(podcast_index_id: number, relations: FindOptionsRelations<Channel> = {}): Promise<Channel | null> {
-    return this.repositoryRead.findOne({ where: { podcast_index_id }, relations });
+  async getByPodcastIndexId(podcast_index_id: number, relations: FindOptionsRelations<Channel> = {}) {
+    return this.repositoryRead.findOne({ where: { podcast_index_id }, relations }) as unknown as Promise<Channel | null>;
   }
 
   async getMany(config: FindManyOptions<Channel>): Promise<Channel[]> {
     return this.repositoryRead.find({
+      where: {
+        feed: {
+          feed_flag_status: In([FeedFlagStatusStatusEnum.Active, FeedFlagStatusStatusEnum.AlwaysParse])
+        }
+      },
+      ...config
+    });
+  }
+
+  async getManyCount(config: FindManyOptions<Channel>): Promise<number> {
+    return this.repositoryRead.count({
       where: {
         feed: {
           feed_flag_status: In([FeedFlagStatusStatusEnum.Active, FeedFlagStatusStatusEnum.AlwaysParse])

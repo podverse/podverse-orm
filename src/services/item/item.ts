@@ -35,56 +35,6 @@ type ItemGetByDto = {
   guid_enclosure_url: string | null
 }
 
-export const itemGetManyRelations = [
-  'item_about',
-  'item_about.item_itunes_episode_type',
-  'item_chat',
-  'item_description',
-  'item_enclosures',
-  'item_enclosures.item_enclosure_integrity',
-  'item_enclosures.item_enclosure_sources',
-  'item_images',
-  'item_persons',
-  'item_season',
-  'item_season.channel_season',
-  'live_item'
-];
-
-export const itemGetOneRelations: FindOptionsRelations<Item> = {
-  item_about: true,
-  item_chapters_feed: true,
-  item_chat: true,
-  item_content_links: true,
-  item_description: true,
-  item_enclosures: true,
-  item_fundings: true,
-  item_images: true,
-  item_license: true,
-  item_location: true,
-  item_persons: true,
-  item_season: true,
-  item_social_interacts: true,
-  item_soundbites: true,
-  item_transcripts: true,
-  item_txts: true,
-  item_values: true,
-  live_item: true
-};
-
-const getItemOneToOneRelations = (relations: FindOptionsRelations<Item>) => {
-  const oneToOneRelations: FindOptionsRelations<Item> = {
-    ...(relations.item_about ? { item_about: { item_itunes_episode_type: true } } : {}),
-    ...(relations.item_chat ? { item_chat: true } : {}),
-    ...(relations.item_description ? { item_description: true } : {}),
-    ...(relations.item_license ? { item_license: true } : {}),
-    ...(relations.item_location ? { item_location: true } : {}),
-    ...(relations.item_season ? { item_season: { channel_season: true } } : {}),
-    ...(relations.live_item ? { live_item: true } : {}),
-  };
-   
-  return oneToOneRelations;
-};
-
 export class ItemService {
   protected repositoryRead: Repository<Item>;
   protected repositoryReadWrite: Repository<Item>;
@@ -332,10 +282,40 @@ export class ItemService {
     });
   }
 
-  async getManyWithLiveItemByChannel(channel: Channel, options?: FindManyOptions<Item>): Promise<Item[]> {
+  async getManyByChannelWithLiveItem(channel: Channel, options?: FindManyOptions<Item>): Promise<Item[]> {
     return this.repositoryRead.find({
       where: {
         channel,
+        live_item: {
+          id: Not(IsNull())
+        },
+        item_flag_status: {
+          id: ItemFlagStatusStatusEnum.Active
+        }
+      },
+      ...options
+    });
+  }
+
+  async getManyByChannels(channels: Channel[], options?: FindManyOptions<Item>): Promise<Item[]> {
+    return this.repositoryRead.find({
+      where: {
+        channel: In(channels),
+        live_item: {
+          id: IsNull()
+        },
+        item_flag_status: {
+          id: ItemFlagStatusStatusEnum.Active
+        }
+      },
+      ...options
+    });
+  }
+
+  async getManyByChannelsWithLiveItem(channels: Channel[], options?: FindManyOptions<Item>): Promise<Item[]> {
+    return this.repositoryRead.find({
+      where: {
+        channel: In(channels),
         live_item: {
           id: Not(IsNull())
         },
@@ -413,3 +393,82 @@ export class ItemService {
     }
   }
 }
+
+export const itemGetManyRelations = [
+  'item_about',
+  'item_about.item_itunes_episode_type',
+  'item_chat',
+  'item_description',
+  'item_enclosures',
+  'item_enclosures.item_enclosure_integrity',
+  'item_enclosures.item_enclosure_sources',
+  'item_images',
+  'item_persons',
+  'item_season',
+  'item_season.channel_season',
+  'live_item'
+];
+
+export type SubItemGetManyRelations =
+  | 'item'
+  | 'item.item_about'
+  | 'item.item_chat'
+  | 'item.item_description'
+  | 'item.item_enclosures'
+  | 'item.item_enclosures.item_enclosure_integrity'
+  | 'item.item_enclosures.item_enclosure_sources'
+  | 'item.item_images'
+  | 'item.item_persons'
+  | 'item.item_season'
+  | 'item.item_season.channel_season'
+  | 'item.live_item';
+
+export const subItemGetManyRelations: SubItemGetManyRelations[] = [
+  'item',
+  'item.item_about',
+  'item.item_chat',
+  'item.item_description',
+  'item.item_enclosures',
+  'item.item_enclosures.item_enclosure_integrity',
+  'item.item_enclosures.item_enclosure_sources',
+  'item.item_images',
+  'item.item_persons',
+  'item.item_season',
+  'item.item_season.channel_season',
+  'item.live_item'
+];
+
+export const itemGetOneRelations: FindOptionsRelations<Item> = {
+  item_about: true,
+  item_chapters_feed: true,
+  item_chat: true,
+  item_content_links: true,
+  item_description: true,
+  item_enclosures: true,
+  item_fundings: true,
+  item_images: true,
+  item_license: true,
+  item_location: true,
+  item_persons: true,
+  item_season: true,
+  item_social_interacts: true,
+  item_soundbites: true,
+  item_transcripts: true,
+  item_txts: true,
+  item_values: true,
+  live_item: true
+};
+
+const getItemOneToOneRelations = (relations: FindOptionsRelations<Item>) => {
+  const oneToOneRelations: FindOptionsRelations<Item> = {
+    ...(relations.item_about ? { item_about: { item_itunes_episode_type: true } } : {}),
+    ...(relations.item_chat ? { item_chat: true } : {}),
+    ...(relations.item_description ? { item_description: true } : {}),
+    ...(relations.item_license ? { item_license: true } : {}),
+    ...(relations.item_location ? { item_location: true } : {}),
+    ...(relations.item_season ? { item_season: { channel_season: true } } : {}),
+    ...(relations.live_item ? { live_item: true } : {}),
+  };
+   
+  return oneToOneRelations;
+};
