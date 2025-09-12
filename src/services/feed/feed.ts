@@ -97,7 +97,7 @@ export class FeedService {
     }
 
     feed.is_parsing = null;
-    feed.parsing_priority = 1;
+    feed.parsing_priority = 0;
     feed.container_id = '';
 
     const newFeed = await this.repositoryReadWrite.save(feed);
