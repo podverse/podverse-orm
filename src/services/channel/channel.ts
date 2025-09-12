@@ -16,6 +16,7 @@ import { ChannelTxtService } from './channelTxt';
 import { ChannelValueService } from './channelValue';
 import { ChannelValueRecipientService } from './channelValueRecipient';
 import { FeedFlagStatusStatusEnum } from '@orm/entities/feed/feedFlagStatus';
+import { FeedService } from '../feed/feed';
 
 type ChannelInitializeDto = {
   feed: Feed,
@@ -88,6 +89,7 @@ export const channelGetOneRelations: FindOptionsRelations<Channel> = {
   channel_trailers: true,
   channel_txts: true,
   channel_values: true,
+  feed: true
 };
 
 const getChannelOneToOneRelations = (relations: FindOptionsRelations<Channel>) => {
@@ -110,10 +112,12 @@ export type IChannelService = ChannelService;
 export class ChannelService {
   protected repositoryRead: Repository<Channel>;
   protected repositoryReadWrite: Repository<Channel>;
+  protected feedRepositoryRead: Repository<Feed>;
 
   constructor() {
     this.repositoryRead = AppDataSourceRead.getRepository(Channel);
     this.repositoryReadWrite = AppDataSourceReadWrite.getRepository(Channel);
+    this.feedRepositoryRead = AppDataSourceRead.getRepository(Feed);
   }
 
   async getChannelWithRelations(
@@ -202,6 +206,16 @@ export class ChannelService {
       }
 
       if (channel_values) channel.channel_values = channel_values;
+    }
+
+    if (relations.feed) {
+      // can't use Feed service here because of circular dependency
+      const feed = await this.feedRepositoryRead.findOne({
+        where: { id: Equal(channel.feed_id) }
+      });
+      if (feed) {
+        channel.feed = feed;
+      }
     }
 
     return channel;
