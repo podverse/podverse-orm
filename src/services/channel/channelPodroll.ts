@@ -39,7 +39,9 @@ export class ChannelPodrollService extends BaseOneService<ChannelPodroll, 'chann
       }
     }
 
-    const podrollChannels = await channelService.getMany({}, {
+    const podrollChannels = await channelService.getMany({
+      relations: ['channel_images']
+    }, {
       podcast_guid: In(feed_guids)
     });
 
