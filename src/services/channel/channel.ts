@@ -16,7 +16,6 @@ import { ChannelTxtService } from './channelTxt';
 import { ChannelValueService } from './channelValue';
 import { ChannelValueRecipientService } from './channelValueRecipient';
 import { FeedFlagStatusStatusEnum } from '@orm/entities/feed/feedFlagStatus';
-import { FeedService } from '../feed/feed';
 
 type ChannelInitializeDto = {
   feed: Feed,
@@ -252,12 +251,13 @@ export class ChannelService {
     return this.repositoryRead.findOne({ where: { podcast_index_id }, relations }) as unknown as Promise<Channel | null>;
   }
 
-  async getMany(config: FindManyOptions<Channel>): Promise<Channel[]> {
+  async getMany(config: FindManyOptions<Channel>, channelWhere?: FindOptionsWhere<Channel>): Promise<Channel[]> {
     return this.repositoryRead.find({
       where: {
         feed: {
           feed_flag_status: In([FeedFlagStatusStatusEnum.Active, FeedFlagStatusStatusEnum.AlwaysParse])
-        }
+        },
+        ...(channelWhere ?? {})
       },
       ...config
     });

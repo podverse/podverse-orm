@@ -209,6 +209,25 @@ export class ItemService {
     });
   }
 
+  async getManyByPodcastGuidAndItemGuid(params: { podcast_guid: string, item_guid: string }[], options?: FindManyOptions<Item>): Promise<Item[]> {
+    if (!params.length) return [];
+
+    const where = params.map(param => ({
+      guid: param.item_guid,
+      channel: {
+        podcast_guid: param.podcast_guid
+      },
+      item_flag_status: {
+        id: ItemFlagStatusStatusEnum.Active
+      }
+    }));
+
+    return this.repositoryRead.find({
+      where,
+      ...options,
+    });
+  }
+
   async getBy(channel: Channel, dto: ItemGetByDto): Promise<Item | null> {
     let item = null;
 
