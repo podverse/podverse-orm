@@ -64,4 +64,28 @@ export class PlaylistService extends BaseManyService<Playlist, 'account'> {
   async getMany(options?: FindManyOptions<Playlist>): Promise<Playlist[]> {
     return this.repositoryRead.find(options);
   }
+
+  async getAllFavoritesPrivate(account_id: number) {
+    const options: FindManyOptions<Playlist> = {
+      select: {
+        id: true,
+        id_text: true,
+        medium: true,
+        playlist_resources: {
+          clip_id: true,
+          item_id: true,
+          item_chapter_id: true,
+          item_soundbite_id: true,
+          add_by_rss_hash_id: true
+        }
+      },
+      where: {
+        is_default_favorites: true,
+        account: { id: account_id }
+      },
+      relations: ['medium', 'playlist_resources']
+    };
+
+    return this.getMany(options);
+  }
 }
