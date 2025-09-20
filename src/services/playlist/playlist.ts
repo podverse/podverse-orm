@@ -64,13 +64,4 @@ export class PlaylistService extends BaseManyService<Playlist, 'account'> {
   async getMany(options?: FindManyOptions<Playlist>): Promise<Playlist[]> {
     return this.repositoryRead.find(options);
   }
-
-  async getManyByAccount(account_id: number): Promise<Playlist[]> {
-    const account = await this.accountService.get(account_id);
-    if (!account) {
-      throw new Error("Account not found.");
-    }
-
-    return this._getAll(account);
-  }
 }

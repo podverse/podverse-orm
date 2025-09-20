@@ -1,8 +1,9 @@
 import { DATABASE_CONSTANTS, MediumEnum, SharableStatusEnum } from 'podverse-helpers';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, BeforeInsert, Unique } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, BeforeInsert, Unique, OneToMany } from 'typeorm';
 import { Account } from '@orm/entities/account/account';
 import { SharableStatus } from '@orm/entities/sharableStatus';
 import { Medium } from '@orm/entities/medium';
+import { PlaylistResource } from './playlistResource';
 const shortid = require('shortid');
 
 @Entity()
@@ -37,6 +38,9 @@ export class Playlist {
   @ManyToOne(() => Medium, medium => medium.id)
   @JoinColumn({ name: 'medium_id' })
   medium!: MediumEnum;
+
+  @OneToMany(() => PlaylistResource, playlistResource => playlistResource.playlist)
+  playlist_resources!: PlaylistResource[];
 
   @BeforeInsert()
   generateIdText() {
