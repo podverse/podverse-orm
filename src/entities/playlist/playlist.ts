@@ -23,6 +23,13 @@ export class Playlist {
   @JoinColumn({ name: 'sharable_status_id' })
   sharable_status!: SharableStatusEnum;
 
+  /*
+    NOTE: this is not truly nullable, but we need this column to allow
+    nested where queries using the .find method of TypeORM.
+  */
+  @Column({ name: 'sharable_status_id', type: 'int', nullable: true })
+  sharable_status_id?: number | null;
+
   @Column({ type: 'varchar', nullable: true, length: DATABASE_CONSTANTS.varchar_normal })
   title?: string | null;
 
@@ -38,6 +45,13 @@ export class Playlist {
   @ManyToOne(() => Medium, medium => medium.id)
   @JoinColumn({ name: 'medium_id' })
   medium!: MediumEnum;
+
+  /*
+    NOTE: this is not truly nullable, but we need this column to allow
+    nested where queries using the .find method of TypeORM.
+  */
+  @Column({ name: 'medium_id', type: 'int', nullable: true })
+  medium_id?: number | null;
 
   @OneToMany(() => PlaylistResource, playlistResource => playlistResource.playlist)
   playlist_resources!: PlaylistResource[];

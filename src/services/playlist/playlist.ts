@@ -7,8 +7,8 @@ import { AccountService } from '@orm/services/account/account';
 export type PlaylistDto = {
   title?: string;
   description?: string;
-  medium: MediumEnum;
-  sharable_status: SharableStatusEnum;
+  medium_id: MediumEnum;
+  sharable_status_id: SharableStatusEnum;
   is_default_favorites: boolean;
 };
 
@@ -27,6 +27,7 @@ export class PlaylistService extends BaseManyService<Playlist, 'account'> {
     }
 
     const whereKeys = [] as (keyof Playlist)[];
+
     return this._update(account, whereKeys, dto);
   }
 

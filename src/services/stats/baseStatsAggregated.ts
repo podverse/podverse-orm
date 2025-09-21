@@ -29,6 +29,26 @@ interface BaseAggregatedStats extends ObjectLiteral {
   all_time_count?: number;
 }
 
+export const STATS_AGGREGATED_SELECT_ALL = {
+  id: true,
+  day_current_count: true,
+  day_1_count: true,
+  day_2_count: true,
+  day_3_count: true,
+  day_4_count: true,
+  day_5_count: true,
+  day_6_count: true,
+  day_7_count: true,
+  day_8_count: true,
+  week_current_count: true,
+  week_1_count: true,
+  week_2_count: true,
+  week_3_count: true,
+  week_4_count: true,
+  month_current_count: true,
+  month_1_count: true,
+  all_time_count: true
+};
 
 export abstract class BaseStatsAggregatedService<T extends BaseAggregatedStats, ID> {
   protected repositoryRead: Repository<T>;
