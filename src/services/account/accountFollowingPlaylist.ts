@@ -24,6 +24,26 @@ export class AccountFollowingPlaylistService extends BaseManyService<AccountFoll
     return this._getAll(account, config);
   }
 
+  async getFollowedPlaylistsPrivateWithCount(
+    account_id: number,
+    medium_id?: number,
+    config?: FindManyOptions<AccountFollowingPlaylist>):
+      Promise<[AccountFollowingPlaylist[], number]> {
+    return this.repositoryRead.findAndCount({
+      ...config,
+      where: {
+        ...config?.where,
+        account_id,
+        ...(medium_id ? { playlist: { medium_id } } : {})
+      },
+      relations: [
+        'playlist',
+        'playlist.account',
+        'playlist.account.account_profile'
+      ]
+    });
+  }
+
   async getFollowedPlaylistsPublic(account_id: number, config?: FindManyOptions<AccountFollowingPlaylist>): Promise<AccountFollowingPlaylist[]> {
     const account = await this.accountService.get(account_id);
     if (!account) {

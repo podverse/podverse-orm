@@ -101,25 +101,13 @@ export class StatsAggregatedPlaylistService extends BaseStatsAggregatedService<S
     });
   }
 
-  async getManyByPlaylists(playlist_id_texts: string[], config: FindManyOptions<StatsAggregatedPlaylist>): Promise<StatsAggregatedPlaylist[]> {
-    return this.repositoryRead.find({
+  async getManyPrivateByPlaylists(playlist_ids: number[], config: FindManyOptions<StatsAggregatedPlaylist>): Promise<[StatsAggregatedPlaylist[], number]> {
+    return this.repositoryRead.findAndCount({
       ...config,
       where: {
         ...config.where,
         playlist: {
-          id_text: In(playlist_id_texts)
-        }
-      }
-    });
-  }
-
-  async getManyByPlaylistsCount(playlist_id_texts: string[], config: FindManyOptions<StatsAggregatedPlaylist>): Promise<number> {
-    return this.repositoryRead.count({
-      ...config,
-      where: {
-        ...config.where,
-        playlist: {
-          id_text: In(playlist_id_texts)
+          id: In(playlist_ids)
         }
       }
     });
