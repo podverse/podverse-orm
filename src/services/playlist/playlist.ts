@@ -1,5 +1,5 @@
 import { MediumEnum, SharableStatusEnum } from 'podverse-helpers';
-import { EntityManager, FindManyOptions, FindOneOptions } from 'typeorm';
+import { EntityManager, FindManyOptions, FindOneOptions, Not } from 'typeorm';
 import { Playlist } from '@orm/entities/playlist/playlist';
 import { BaseManyService } from '@orm/services/base/baseManyService';
 import { AccountService } from '@orm/services/account/account';
@@ -71,18 +71,47 @@ export class PlaylistService extends BaseManyService<Playlist, 'account'> {
     });
   }
 
-  async getMany(options?: FindManyOptions<Playlist>): Promise<Playlist[]> {
-    return this.repositoryRead.find(options);
+  async getManyPublic(options?: FindManyOptions<Playlist>): Promise<Playlist[]> {
+    return this.repositoryRead.find({
+      where: {
+        ...options?.where,
+        sharable_status_id: SharableStatusEnum.Public
+      },
+      ...options
+    });
   }
 
-  async getManyPrivate(account_id: number, options?: FindManyOptions<Playlist>): Promise<Playlist[]> {
-    return this.repositoryRead.find({
+  async getManyPrivate(account_id: number, options?: FindManyOptions<Playlist>): Promise<[Playlist[], number] > {
+    return this.repositoryRead.findAndCount({
+      ...options,
       where: {
         ...options?.where,
         account: {
           id: account_id
         },
       },
+    });
+  }
+
+  async getOnePublic(playlist_id_text: string, options?: FindOneOptions<Playlist>): Promise<Playlist | null> {
+    return this.repositoryRead.findOne({
+      where: {
+        ...options?.where,
+        id_text: playlist_id_text,
+        sharable_status_id: Not(SharableStatusEnum.Private)
+      },
+      ...options
+    });
+  }
+
+  async getOnePrivate(account_id_text: string, playlist_id_text: string, options?: FindOneOptions<Playlist>): Promise<Playlist | null> {
+    return this.repositoryRead.findOne({
+      where: {
+        ...options?.where,
+        id_text: playlist_id_text,
+        account: { id_text: account_id_text }
+      },
+      relations: ['account'],
       ...options
     });
   }
@@ -108,6 +137,6 @@ export class PlaylistService extends BaseManyService<Playlist, 'account'> {
       relations: ['medium', 'playlist_resources']
     };
 
-    return this.getMany(options);
+    return this.repositoryRead.find(options);
   }
 }
