@@ -46,6 +46,15 @@ export class PlaylistService extends BaseManyService<Playlist, 'account'> {
     return this._update(account, whereKeys, dto, undefined, playlist);
   }
 
+  async updateLastUpdated(playlist_id_text: string): Promise<Playlist> {
+    const playlist = await this.repositoryRead.findOne({ where: { id_text: playlist_id_text } });
+    if (!playlist) {
+      throw new Error("Playlist not found.");
+    }
+    playlist.last_updated = new Date();
+    return this.repositoryReadWrite.save(playlist);
+  }
+
   async delete(account_id: number, playlist_id_text: string): Promise<void> {
     const account = await this.accountService.get(account_id);
     if (!account) {
@@ -64,6 +73,18 @@ export class PlaylistService extends BaseManyService<Playlist, 'account'> {
 
   async getMany(options?: FindManyOptions<Playlist>): Promise<Playlist[]> {
     return this.repositoryRead.find(options);
+  }
+
+  async getManyPrivate(account_id: number, options?: FindManyOptions<Playlist>): Promise<Playlist[]> {
+    return this.repositoryRead.find({
+      where: {
+        ...options?.where,
+        account: {
+          id: account_id
+        },
+      },
+      ...options
+    });
   }
 
   async getAllFavoritesPrivate(account_id: number) {

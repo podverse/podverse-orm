@@ -87,11 +87,15 @@ export class PlaylistResourceService extends BaseManyService<PlaylistResource, '
       list_position
     };
     
-    return this._update(
+    const results = await this._update(
       playlist,
       ['playlist', resourceKey],
       finalDto
     );
+
+    await this.playlistService.updateLastUpdated(playlist.id_text);
+
+    return results;
   }
 
   private async addResourceToPlaylistHelper(

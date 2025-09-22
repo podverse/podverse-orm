@@ -42,6 +42,9 @@ export class Playlist {
   @Column({ type: 'int', default: 0 })
   item_count!: number;
 
+  @Column({ type: 'timestamp' })
+  last_updated!: Date;
+
   @ManyToOne(() => Medium, medium => medium.id)
   @JoinColumn({ name: 'medium_id' })
   medium!: MediumEnum;
