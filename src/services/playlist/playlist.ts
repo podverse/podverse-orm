@@ -9,7 +9,7 @@ export type PlaylistDto = {
   description?: string;
   medium_id: MediumEnum;
   sharable_status_id: SharableStatusEnum;
-  is_default_favorites: boolean;
+  is_default_favorites?: boolean;
 };
 
 export class PlaylistService extends BaseManyService<Playlist, 'account'> {
