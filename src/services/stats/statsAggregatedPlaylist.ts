@@ -24,7 +24,10 @@ export class StatsAggregatedPlaylistService extends BaseStatsAggregatedService<S
     return this.repositoryRead.count(config);
   }
 
-  async getManyPublic(config: FindManyOptions<StatsAggregatedPlaylist>, medium_id?: MediumEnum): Promise<StatsAggregatedPlaylist[]> {
+  async getManyPublic(
+    config: FindManyOptions<StatsAggregatedPlaylist>,
+    medium_id?: MediumEnum
+  ): Promise<StatsAggregatedPlaylist[]> {
     return this.repositoryRead.find({
       ...config,
       select: {
@@ -47,6 +50,45 @@ export class StatsAggregatedPlaylistService extends BaseStatsAggregatedService<S
         playlist: {
           sharable_status_id: SharableStatusEnum.Public,
           ...(medium_id ? { medium_id } : {})
+        }
+      },
+      relations: [
+        'playlist',
+        'playlist.account',
+        'playlist.account.account_profile',
+        'playlist.sharable_status',
+        'playlist.medium'
+      ]
+    });
+  }
+
+  async getManyPrivate(
+    config: FindManyOptions<StatsAggregatedPlaylist>,
+    account_id: number,
+    medium_id?: MediumEnum,
+  ): Promise<[StatsAggregatedPlaylist[], number]> {
+    return this.repositoryRead.findAndCount({
+      ...config,
+      select: {
+        ...STATS_AGGREGATED_SELECT_ALL,
+        playlist: {
+          id_text: true,
+          title: true,
+          description: true,
+          is_default_favorites: true,
+          item_count: true,
+          account: {
+            id_text: true,
+            account_profile: {
+              display_name: true
+            }
+          }
+        }
+      },
+      where: {
+        playlist: {
+          ...(medium_id ? { medium_id } : {}),
+          ...(account_id ? { account: { id: account_id } } : {})
         }
       },
       relations: [
