@@ -12,7 +12,7 @@ export type ClipDto = {
   description?: string | null;
   account_id: number;
   item_id_text: string;
-  sharable_status: SharableStatusEnum;
+  sharable_status_id: SharableStatusEnum;
 };
 
 export class ClipService extends BaseManyService<Clip, 'account'> {
@@ -47,7 +47,7 @@ export class ClipService extends BaseManyService<Clip, 'account'> {
       description: dto.description || null,
       account,
       item,
-      sharable_status: dto.sharable_status
+      sharable_status: dto.sharable_status_id
     };
 
     const whereKeys = [] as (keyof Clip)[];
@@ -81,7 +81,7 @@ export class ClipService extends BaseManyService<Clip, 'account'> {
       description: dto.description || null,
       account,
       item,
-      sharable_status: dto.sharable_status
+      sharable_status: dto.sharable_status_id
     };
 
     const whereKeys = ['id_text'] as (keyof Clip)[];
