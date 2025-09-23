@@ -60,6 +60,9 @@ export class Channel {
   @JoinColumn({ name: 'medium_id' })
   medium!: MediumEnum | null;
 
+  @Column({ name: 'medium_id', type: 'int', nullable: true })
+  medium_id?: number | null;
+
   @Column({ type: 'boolean', default: false })
   has_podcast_index_value!: boolean;
 
