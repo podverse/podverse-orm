@@ -1,4 +1,3 @@
-import { SharableStatusEnum } from 'podverse-helpers';
 import { EntityManager, FindOneOptions, FindManyOptions } from 'typeorm';
 import { Clip } from '@orm/entities/clip';
 import { BaseManyService } from '@orm/services/base/baseManyService';
@@ -10,9 +9,8 @@ export type ClipDto = {
   end_time?: string | null;
   title?: string | null;
   description?: string | null;
-  account_id: number;
   item_id_text: string;
-  sharable_status_id: SharableStatusEnum;
+  sharable_status_id: number;
 };
 
 export class ClipService extends BaseManyService<Clip, 'account'> {
@@ -47,7 +45,7 @@ export class ClipService extends BaseManyService<Clip, 'account'> {
       description: dto.description || null,
       account,
       item,
-      sharable_status: dto.sharable_status_id
+      sharable_status_id: dto.sharable_status_id
     };
 
     const whereKeys = [] as (keyof Clip)[];
@@ -79,7 +77,6 @@ export class ClipService extends BaseManyService<Clip, 'account'> {
       end_time: dto.end_time || null,
       title: dto.title || null,
       description: dto.description || null,
-      account,
       item,
       sharable_status_id: dto.sharable_status_id
     };
