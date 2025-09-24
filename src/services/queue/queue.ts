@@ -26,15 +26,6 @@ export class QueueService extends BaseManyService<Queue, 'account'> {
     return this._update(account, whereKeys, dto);
   }
 
-  async delete(account_id: number, queue_id_text: string): Promise<void> {
-    const account = await this.accountService.get(account_id);
-    if (!account) {
-      throw new Error("Account not found.");
-    }
-
-    return this._delete(account, { id_text: queue_id_text });
-  }
-
   async getByIdText(queue_id_text: string, config?: FindOneOptions<Queue>): Promise<Queue | null> {
     return this.repositoryRead.findOne({
       where: {
