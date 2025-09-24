@@ -43,6 +43,15 @@ export class PlaylistResourceService extends BaseManyService<PlaylistResource, '
     return this.repositoryRead.find(options);
   }
 
+  async getAllByPlaylistIdTextCount(playlist_id_text: string): Promise<number> {
+    const playlist = await this.playlistService.getByIdText(playlist_id_text);
+    if (!playlist) {
+      throw new Error("Playlist not found.");
+    }
+
+    return this.repositoryRead.count({ where: { playlist: { id: playlist.id } }});
+  }
+
   async getFirstAndLastItemsByPlaylistIdText(playlist_id_text: string): Promise<{ firstItem: PlaylistResource | null, lastItem: PlaylistResource | null }> {
     const playlist = await this.playlistService.getByIdText(playlist_id_text);
     if (!playlist) {
@@ -93,7 +102,7 @@ export class PlaylistResourceService extends BaseManyService<PlaylistResource, '
       finalDto
     );
 
-    await this.playlistService.updateLastUpdated(playlist.id_text);
+    await this.playlistService.updateLastUpdatedAndItemCount(playlist.id_text);
 
     return results;
   }
@@ -263,11 +272,15 @@ export class PlaylistResourceService extends BaseManyService<PlaylistResource, '
       add_by_rss_hash_id
     };
 
-    return this._update(
+    const results = await this._update(
       playlist,
       ['playlist', 'add_by_rss_hash_id'],
       finalDto
     );
+
+    await this.playlistService.updateLastUpdatedAndItemCount(playlist.id_text);
+
+    return results;
   }
 
   private async addItemAddByRSSToPlaylistHelper(

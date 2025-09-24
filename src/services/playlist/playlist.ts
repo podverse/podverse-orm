@@ -3,6 +3,7 @@ import { EntityManager, FindManyOptions, FindOneOptions, Not } from 'typeorm';
 import { Playlist } from '@orm/entities/playlist/playlist';
 import { BaseManyService } from '@orm/services/base/baseManyService';
 import { AccountService } from '@orm/services/account/account';
+import { PlaylistResourceService } from './playlistResource';
 
 export type PlaylistDto = {
   title?: string;
@@ -46,11 +47,15 @@ export class PlaylistService extends BaseManyService<Playlist, 'account'> {
     return this._update(account, whereKeys, dto, undefined, playlist);
   }
 
-  async updateLastUpdated(playlist_id_text: string): Promise<Playlist> {
+  async updateLastUpdatedAndItemCount(playlist_id_text: string): Promise<Playlist> {
     const playlist = await this.repositoryRead.findOne({ where: { id_text: playlist_id_text } });
     if (!playlist) {
       throw new Error("Playlist not found.");
     }
+
+    const playlistResourceService = new PlaylistResourceService();
+    const itemCount = await playlistResourceService.getAllByPlaylistIdTextCount(playlist_id_text);
+    playlist.item_count = itemCount;
     playlist.last_updated = new Date();
     return this.repositoryReadWrite.save(playlist);
   }
