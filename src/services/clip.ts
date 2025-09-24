@@ -110,6 +110,10 @@ export class ClipService extends BaseManyService<Clip, 'account'> {
     return this.repositoryRead.find(options);
   }
 
+  async getManyAndCount(options?: FindManyOptions<Clip>): Promise<[Clip[], number]> {
+    return this.repositoryRead.findAndCount(options);
+  }
+
   async getManyByAccount(account_id: number): Promise<Clip[]> {
     const account = await this.accountService.get(account_id);
     if (!account) {

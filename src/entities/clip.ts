@@ -36,9 +36,19 @@ export class Clip {
   @Column({ type: 'varchar', nullable: true, length: DATABASE_CONSTANTS.varchar_long })
   description?: string | null;
 
+  @Column({ type: 'timestamp' })
+  created_at!: Date;
+
   @ManyToOne(() => SharableStatus, sharableStatus => sharableStatus.id)
   @JoinColumn({ name: 'sharable_status_id' })
   sharable_status!: SharableStatusEnum;
+
+  /*
+    NOTE: this is not truly nullable, but we need this column to allow
+    nested where queries using the .find method of TypeORM.
+  */
+  @Column({ name: 'sharable_status_id', type: 'int', nullable: true })
+  sharable_status_id?: number | null;
   
   @BeforeInsert()
   generateIdText() {
