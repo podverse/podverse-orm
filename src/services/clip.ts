@@ -81,7 +81,7 @@ export class ClipService extends BaseManyService<Clip, 'account'> {
       description: dto.description || null,
       account,
       item,
-      sharable_status: dto.sharable_status_id
+      sharable_status_id: dto.sharable_status_id
     };
 
     const whereKeys = ['id_text'] as (keyof Clip)[];
