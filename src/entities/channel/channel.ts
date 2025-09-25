@@ -56,12 +56,12 @@ export class Channel {
   @Column({ type: 'varchar', nullable: true, length: DATABASE_CONSTANTS.varchar_short })
   sortable_title!: string | null;
 
-  @ManyToOne(() => Medium, medium => medium.id, { nullable: true })
+  @ManyToOne(() => Medium, medium => medium.id, { nullable: false })
   @JoinColumn({ name: 'medium_id' })
-  medium!: MediumEnum | null;
+  medium!: MediumEnum;
 
-  @Column({ name: 'medium_id', type: 'int', nullable: true })
-  medium_id?: number | null;
+  @Column({ name: 'medium_id', type: 'int', nullable: false })
+  medium_id!: number;
 
   @Column({ type: 'boolean', default: false })
   has_podcast_index_value!: boolean;
