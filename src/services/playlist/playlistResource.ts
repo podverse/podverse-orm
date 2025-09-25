@@ -92,7 +92,7 @@ export class PlaylistResourceService extends BaseManyService<PlaylistResource, '
     const list_position = calculatePosition(firstItem as PlaylistResource, lastItem as PlaylistResource);
 
     const finalDto = {
-      [resourceKey]: resource,
+      [resourceKey]: resource.id,
       list_position
     };
     
@@ -188,67 +188,67 @@ export class PlaylistResourceService extends BaseManyService<PlaylistResource, '
   }
 
   async addClipToPlaylistFirst(playlist_id_text: string, clip_id_text: string): Promise<PlaylistResource> {
-    return this.addResourceToPlaylistFirst(playlist_id_text, clip_id_text, this.clipService, 'clip');
+    return this.addResourceToPlaylistFirst(playlist_id_text, clip_id_text, this.clipService, 'clip_id');
   }
 
   async addClipToPlaylistLast(playlist_id_text: string, clip_id_text: string): Promise<PlaylistResource> {
-    return this.addResourceToPlaylistLast(playlist_id_text, clip_id_text, this.clipService, 'clip');
+    return this.addResourceToPlaylistLast(playlist_id_text, clip_id_text, this.clipService, 'clip_id');
   }
 
   async addClipToPlaylistBetween(playlist_id_text: string, clip_id_text: string, position1: number, position2: number): Promise<PlaylistResource> {
-    return this.addResourceToPlaylistBetween(playlist_id_text, clip_id_text, this.clipService, 'clip', position1, position2);
+    return this.addResourceToPlaylistBetween(playlist_id_text, clip_id_text, this.clipService, 'clip_id', position1, position2);
   }
 
   async removeClipFromPlaylist(playlist_id_text: string, clip_id_text: string): Promise<void> {
-    return this.removeResourceFromPlaylist(playlist_id_text, clip_id_text, this.clipService, 'clip');
+    return this.removeResourceFromPlaylist(playlist_id_text, clip_id_text, this.clipService, 'clip_id');
   }
 
   async addItemToPlaylistFirst(playlist_id_text: string, item_id_text: string): Promise<PlaylistResource> {
-    return this.addResourceToPlaylistFirst(playlist_id_text, item_id_text, this.itemService, 'item');
+    return this.addResourceToPlaylistFirst(playlist_id_text, item_id_text, this.itemService, 'item_id');
   }
 
   async addItemToPlaylistLast(playlist_id_text: string, item_id_text: string): Promise<PlaylistResource> {
-    return this.addResourceToPlaylistLast(playlist_id_text, item_id_text, this.itemService, 'item');
+    return this.addResourceToPlaylistLast(playlist_id_text, item_id_text, this.itemService, 'item_id');
   }
 
   async addItemToPlaylistBetween(playlist_id_text: string, item_id_text: string, position1: number, position2: number): Promise<PlaylistResource> {
-    return this.addResourceToPlaylistBetween(playlist_id_text, item_id_text, this.itemService, 'item', position1, position2);
+    return this.addResourceToPlaylistBetween(playlist_id_text, item_id_text, this.itemService, 'item_id', position1, position2);
   }
 
   async removeItemFromPlaylist(playlist_id_text: string, item_id_text: string): Promise<void> {
-    return this.removeResourceFromPlaylist(playlist_id_text, item_id_text, this.itemService, 'item');
+    return this.removeResourceFromPlaylist(playlist_id_text, item_id_text, this.itemService, 'item_id');
   }
 
   async addItemChapterToPlaylistFirst(playlist_id_text: string, item_chapter_id_text: string): Promise<PlaylistResource> {
-    return this.addResourceToPlaylistFirst(playlist_id_text, item_chapter_id_text, this.itemChapterService, 'item_chapter');
+    return this.addResourceToPlaylistFirst(playlist_id_text, item_chapter_id_text, this.itemChapterService, 'item_chapter_id');
   }
 
   async addItemChapterToPlaylistLast(playlist_id_text: string, item_chapter_id_text: string): Promise<PlaylistResource> {
-    return this.addResourceToPlaylistLast(playlist_id_text, item_chapter_id_text, this.itemChapterService, 'item_chapter');
+    return this.addResourceToPlaylistLast(playlist_id_text, item_chapter_id_text, this.itemChapterService, 'item_chapter_id');
   }
 
   async addItemChapterToPlaylistBetween(playlist_id_text: string, item_chapter_id_text: string, position1: number, position2: number): Promise<PlaylistResource> {
-    return this.addResourceToPlaylistBetween(playlist_id_text, item_chapter_id_text, this.itemChapterService, 'item_chapter', position1, position2);
+    return this.addResourceToPlaylistBetween(playlist_id_text, item_chapter_id_text, this.itemChapterService, 'item_chapter_id', position1, position2);
   }
 
   async removeItemChapterFromPlaylist(playlist_id_text: string, item_chapter_id_text: string): Promise<void> {
-    return this.removeResourceFromPlaylist(playlist_id_text, item_chapter_id_text, this.itemChapterService, 'item_chapter');
+    return this.removeResourceFromPlaylist(playlist_id_text, item_chapter_id_text, this.itemChapterService, 'item_chapter_id');
   }
 
   async addItemSoundbiteToPlaylistFirst(playlist_id_text: string, item_soundbite_id_text: string): Promise<PlaylistResource> {
-    return this.addResourceToPlaylistFirst(playlist_id_text, item_soundbite_id_text, this.itemSoundbiteService, 'item_soundbite');
+    return this.addResourceToPlaylistFirst(playlist_id_text, item_soundbite_id_text, this.itemSoundbiteService, 'item_soundbite_id');
   }
 
   async addItemSoundbiteToPlaylistLast(playlist_id_text: string, item_soundbite_id_text: string): Promise<PlaylistResource> {
-    return this.addResourceToPlaylistLast(playlist_id_text, item_soundbite_id_text, this.itemSoundbiteService, 'item_soundbite');
+    return this.addResourceToPlaylistLast(playlist_id_text, item_soundbite_id_text, this.itemSoundbiteService, 'item_soundbite_id');
   }
 
   async addItemSoundbiteToPlaylistBetween(playlist_id_text: string, item_soundbite_id_text: string, position1: number, position2: number): Promise<PlaylistResource> {
-    return this.addResourceToPlaylistBetween(playlist_id_text, item_soundbite_id_text, this.itemSoundbiteService, 'item_soundbite', position1, position2);
+    return this.addResourceToPlaylistBetween(playlist_id_text, item_soundbite_id_text, this.itemSoundbiteService, 'item_soundbite_id', position1, position2);
   }
 
   async removeItemSoundbiteFromPlaylist(playlist_id_text: string, item_soundbite_id_text: string): Promise<void> {
-    return this.removeResourceFromPlaylist(playlist_id_text, item_soundbite_id_text, this.itemSoundbiteService, 'item_soundbite');
+    return this.removeResourceFromPlaylist(playlist_id_text, item_soundbite_id_text, this.itemSoundbiteService, 'item_soundbite_id');
   }
 
   private async addItemAddByRSSToPlaylist(
