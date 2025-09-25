@@ -12,6 +12,12 @@ import { ItemSoundbiteService } from '../item/itemSoundbite';
 
 const QUEUE_LIST_POSITION_INCREMENT = 0.00000001;
 
+type QueueParams = {
+  playback_position?: string;
+  media_file_duration?: string;
+  completed?: boolean;
+}
+
 export class QueueResourceService extends BaseManyService<QueueResource, 'queue'> {
   private queueService: QueueService;
   private clipService: ClipService;
@@ -173,7 +179,13 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     return this._update(queue, ['queue', resourceKey], finalDto);
   }
 
-  async addResourceToHistory(queue_id_text: string, resource_id_text: string, resourceService: any, resourceKey: keyof QueueResource): Promise<QueueResource> {
+  async addResourceToHistory(
+    queue_id_text: string,
+    resource_id_text: string,
+    resourceService: any,
+    resourceKey: keyof QueueResource,
+    params: QueueParams,
+  ): Promise<QueueResource> {
     const queue = await this.queueService.getByIdText(queue_id_text);
     if (!queue) {
       throw new Error("Queue not found.");
@@ -189,7 +201,8 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
 
     const finalDto = {
       [resourceKey]: resource,
-      list_position: newPosition.toString()
+      list_position: newPosition.toString(),
+      ...params
     };
 
     return this._update(queue, ['queue', resourceKey], finalDto);
@@ -225,8 +238,8 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     return this.addResourceToNowPlaying(queue_id_text, clip_id_text, this.clipService, 'clip');
   }
 
-  async addClipToHistory(queue_id_text: string, clip_id_text: string): Promise<QueueResource> {
-    return this.addResourceToHistory(queue_id_text, clip_id_text, this.clipService, 'clip');
+  async addClipToHistory(queue_id_text: string, clip_id_text: string, params: QueueParams): Promise<QueueResource> {
+    return this.addResourceToHistory(queue_id_text, clip_id_text, this.clipService, 'clip', params);
   }
 
   async removeClipFromQueue(queue_id_text: string, clip_id_text: string): Promise<void> {
@@ -249,8 +262,8 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     return this.addResourceToNowPlaying(queue_id_text, item_id_text, this.itemService, 'item');
   }
 
-  async addItemToHistory(queue_id_text: string, item_id_text: string): Promise<QueueResource> {
-    return this.addResourceToHistory(queue_id_text, item_id_text, this.itemService, 'item');
+  async addItemToHistory(queue_id_text: string, item_id_text: string, params: QueueParams): Promise<QueueResource> {
+    return this.addResourceToHistory(queue_id_text, item_id_text, this.itemService, 'item', params);
   }
 
   async removeItemFromQueue(queue_id_text: string, item_id_text: string): Promise<void> {
@@ -273,8 +286,8 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     return this.addResourceToNowPlaying(queue_id_text, item_chapter_id_text, this.itemChapterService, 'item_chapter');
   }
 
-  async addItemChapterToHistory(queue_id_text: string, item_chapter_id_text: string): Promise<QueueResource> {
-    return this.addResourceToHistory(queue_id_text, item_chapter_id_text, this.itemChapterService, 'item_chapter');
+  async addItemChapterToHistory(queue_id_text: string, item_chapter_id_text: string, params: QueueParams): Promise<QueueResource> {
+    return this.addResourceToHistory(queue_id_text, item_chapter_id_text, this.itemChapterService, 'item_chapter', params);
   }
 
   async removeItemChapterFromQueue(queue_id_text: string, item_chapter_id_text: string): Promise<void> {
@@ -297,8 +310,8 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     return this.addResourceToNowPlaying(queue_id_text, item_soundbite_id_text, this.itemSoundbiteService, 'item_soundbite');
   }
 
-  async addItemSoundbiteToHistory(queue_id_text: string, item_soundbite_id_text: string): Promise<QueueResource> {
-    return this.addResourceToHistory(queue_id_text, item_soundbite_id_text, this.itemSoundbiteService, 'item_soundbite');
+  async addItemSoundbiteToHistory(queue_id_text: string, item_soundbite_id_text: string, params: QueueParams): Promise<QueueResource> {
+    return this.addResourceToHistory(queue_id_text, item_soundbite_id_text, this.itemSoundbiteService, 'item_soundbite', params);
   }
 
   async removeItemSoundbiteFromQueue(queue_id_text: string, item_soundbite_id_text: string): Promise<void> {
