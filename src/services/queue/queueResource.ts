@@ -1,5 +1,6 @@
 // TODO: get rid of "any" in the file 
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { QueueExtraParams } from 'podverse-helpers';
 import { EntityManager, FindOptionsOrderValue, LessThan, MoreThan } from 'typeorm';
 import { QueueResource } from '@orm/entities/queue/queueResource';
 import { BaseManyService } from '@orm/services/base/baseManyService';
@@ -11,12 +12,6 @@ import { ItemChapterService } from '../item/itemChapter';
 import { ItemSoundbiteService } from '../item/itemSoundbite';
 
 const QUEUE_LIST_POSITION_INCREMENT = 0.00000001;
-
-type QueueParams = {
-  playback_position?: string;
-  media_file_duration?: string;
-  completed?: boolean;
-}
 
 export class QueueResourceService extends BaseManyService<QueueResource, 'queue'> {
   private queueService: QueueService;
@@ -160,7 +155,13 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     });
   }
 
-  async addResourceToNowPlaying(queue_id_text: string, resource_id_text: string, resourceService: any, resourceKey: keyof QueueResource): Promise<QueueResource> {
+  async addResourceToNowPlaying(
+    queue_id_text: string,
+    resource_id_text: string,
+    resourceService: any,
+    resourceKey: keyof QueueResource,
+    params: QueueExtraParams = {}
+  ): Promise<QueueResource> {
     const queue = await this.queueService.getByIdText(queue_id_text);
     if (!queue) {
       throw new Error("Queue not found.");
@@ -173,7 +174,8 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
 
     const finalDto = {
       [resourceKey]: resource,
-      list_position: '0'
+      list_position: '0',
+      ...params
     };
 
     return this._update(queue, ['queue', resourceKey], finalDto);
@@ -184,7 +186,7 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     resource_id_text: string,
     resourceService: any,
     resourceKey: keyof QueueResource,
-    params: QueueParams,
+    params: QueueExtraParams,
   ): Promise<QueueResource> {
     const queue = await this.queueService.getByIdText(queue_id_text);
     if (!queue) {
@@ -234,11 +236,11 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     return this.addResourceToQueueBetween(queue_id_text, clip_id_text, this.clipService, 'clip', position1, position2);
   }
 
-  async addClipToNowPlaying(queue_id_text: string, clip_id_text: string): Promise<QueueResource> {
-    return this.addResourceToNowPlaying(queue_id_text, clip_id_text, this.clipService, 'clip');
+  async addClipToNowPlaying(queue_id_text: string, clip_id_text: string, params: QueueExtraParams = {}): Promise<QueueResource> {
+    return this.addResourceToNowPlaying(queue_id_text, clip_id_text, this.clipService, 'clip', params);
   }
 
-  async addClipToHistory(queue_id_text: string, clip_id_text: string, params: QueueParams): Promise<QueueResource> {
+  async addClipToHistory(queue_id_text: string, clip_id_text: string, params: QueueExtraParams): Promise<QueueResource> {
     return this.addResourceToHistory(queue_id_text, clip_id_text, this.clipService, 'clip', params);
   }
 
@@ -258,11 +260,11 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     return this.addResourceToQueueBetween(queue_id_text, item_id_text, this.itemService, 'item', position1, position2);
   }
 
-  async addItemToNowPlaying(queue_id_text: string, item_id_text: string): Promise<QueueResource> {
-    return this.addResourceToNowPlaying(queue_id_text, item_id_text, this.itemService, 'item');
+  async addItemToNowPlaying(queue_id_text: string, item_id_text: string, params: QueueExtraParams = {}): Promise<QueueResource> {
+    return this.addResourceToNowPlaying(queue_id_text, item_id_text, this.itemService, 'item', params);
   }
 
-  async addItemToHistory(queue_id_text: string, item_id_text: string, params: QueueParams): Promise<QueueResource> {
+  async addItemToHistory(queue_id_text: string, item_id_text: string, params: QueueExtraParams): Promise<QueueResource> {
     return this.addResourceToHistory(queue_id_text, item_id_text, this.itemService, 'item', params);
   }
 
@@ -282,11 +284,11 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     return this.addResourceToQueueBetween(queue_id_text, item_chapter_id_text, this.itemChapterService, 'item_chapter', position1, position2);
   }
 
-  async addItemChapterToNowPlaying(queue_id_text: string, item_chapter_id_text: string): Promise<QueueResource> {
-    return this.addResourceToNowPlaying(queue_id_text, item_chapter_id_text, this.itemChapterService, 'item_chapter');
+  async addItemChapterToNowPlaying(queue_id_text: string, item_chapter_id_text: string, params: QueueExtraParams = {}): Promise<QueueResource> {
+    return this.addResourceToNowPlaying(queue_id_text, item_chapter_id_text, this.itemChapterService, 'item_chapter', params);
   }
 
-  async addItemChapterToHistory(queue_id_text: string, item_chapter_id_text: string, params: QueueParams): Promise<QueueResource> {
+  async addItemChapterToHistory(queue_id_text: string, item_chapter_id_text: string, params: QueueExtraParams): Promise<QueueResource> {
     return this.addResourceToHistory(queue_id_text, item_chapter_id_text, this.itemChapterService, 'item_chapter', params);
   }
 
@@ -306,11 +308,11 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     return this.addResourceToQueueBetween(queue_id_text, item_soundbite_id_text, this.itemSoundbiteService, 'item_soundbite', position1, position2);
   }
 
-  async addItemSoundbiteToNowPlaying(queue_id_text: string, item_soundbite_id_text: string): Promise<QueueResource> {
-    return this.addResourceToNowPlaying(queue_id_text, item_soundbite_id_text, this.itemSoundbiteService, 'item_soundbite');
+  async addItemSoundbiteToNowPlaying(queue_id_text: string, item_soundbite_id_text: string, params: QueueExtraParams = {}): Promise<QueueResource> {
+    return this.addResourceToNowPlaying(queue_id_text, item_soundbite_id_text, this.itemSoundbiteService, 'item_soundbite', params);
   }
 
-  async addItemSoundbiteToHistory(queue_id_text: string, item_soundbite_id_text: string, params: QueueParams): Promise<QueueResource> {
+  async addItemSoundbiteToHistory(queue_id_text: string, item_soundbite_id_text: string, params: QueueExtraParams): Promise<QueueResource> {
     return this.addResourceToHistory(queue_id_text, item_soundbite_id_text, this.itemSoundbiteService, 'item_soundbite', params);
   }
 
