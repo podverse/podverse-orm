@@ -1,11 +1,11 @@
-import { MediumEnum } from 'podverse-helpers';
+import { supportedMediums } from 'podverse-helpers';
 import { EntityManager, FindManyOptions, FindOneOptions } from 'typeorm';
 import { Queue } from '@orm/entities/queue/queue';
 import { BaseManyService } from '@orm/services/base/baseManyService';
 import { AccountService } from '@orm/services/account/account';
 
 export type QueueDto = {
-  medium: MediumEnum;
+  medium_id: number;
 };
 
 export class QueueService extends BaseManyService<Queue, 'account'> {
@@ -41,6 +41,25 @@ export class QueueService extends BaseManyService<Queue, 'account'> {
       throw new Error("Account not found.");
     }
 
-    return this._getAll(account, config);
+    let results = await this._getAll(account, config);
+
+    const existingMediums = new Set(results.map(q => Number(q.medium_id)));
+
+    const missingMediums: number[] = [];
+    for (const mediumKey of Object.keys(supportedMediums)) {
+      const medium_id = Number(mediumKey);
+      if (supportedMediums[medium_id] && !existingMediums.has(medium_id)) {
+        missingMediums.push(medium_id);
+      }
+    }
+
+    if (missingMediums.length > 0) {
+      for (const medium_id of missingMediums) {
+        await this.create(account_id, { medium_id });
+      }
+      results = await this._getAll(account, config);
+    }
+
+    return results;
   }
 }

@@ -20,6 +20,13 @@ export class Queue {
   @JoinColumn({ name: 'medium_id' })
   medium!: MediumEnum;
 
+  /*
+    NOTE: this is not truly nullable, but we need this column to allow
+    nested where queries using the .find method of TypeORM.
+  */
+  @Column({ name: 'medium_id', type: 'int', nullable: true })
+  medium_id?: number | null;
+
   @BeforeInsert()
   generateIdText() {
     this.id_text = shortid.generate();
