@@ -1,4 +1,4 @@
-import { supportedMediums } from 'podverse-helpers';
+import { supportedQueueMediums } from 'podverse-helpers';
 import { EntityManager, FindManyOptions, FindOneOptions } from 'typeorm';
 import { Queue } from '@orm/entities/queue/queue';
 import { BaseManyService } from '@orm/services/base/baseManyService';
@@ -46,9 +46,9 @@ export class QueueService extends BaseManyService<Queue, 'account'> {
     const existingMediums = new Set(results.map(q => Number(q.medium_id)));
 
     const missingMediums: number[] = [];
-    for (const mediumKey of Object.keys(supportedMediums)) {
+    for (const mediumKey of Object.keys(supportedQueueMediums)) {
       const medium_id = Number(mediumKey);
-      if (supportedMediums[medium_id] && !existingMediums.has(medium_id)) {
+      if (supportedQueueMediums[medium_id] && !existingMediums.has(medium_id)) {
         missingMediums.push(medium_id);
       }
     }
