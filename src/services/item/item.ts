@@ -458,13 +458,6 @@ export const subItemGetManyRelations: SubItemGetManyRelations[] = [
 ];
 
 export const itemGetOneRelations: FindOptionsRelations<Item> = {
-  channel: {
-    channel_about: true,
-    channel_fundings: true,
-    channel_images: true,
-    channel_values: true,
-    feed: true
-  },
   item_about: true,
   item_chapters_feed: true,
   item_chat: true,
@@ -487,7 +480,6 @@ export const itemGetOneRelations: FindOptionsRelations<Item> = {
 
 const getItemOneToOneRelations = (relations: FindOptionsRelations<Item>) => {
   const oneToOneRelations: FindOptionsRelations<Item> = {
-    ...(relations.channel ? { channel: relations.channel } : {}),
     ...(relations.item_about ? { item_about: { item_itunes_episode_type: true } } : {}),
     ...(relations.item_chat ? { item_chat: true } : {}),
     ...(relations.item_description ? { item_description: true } : {}),
@@ -496,5 +488,6 @@ const getItemOneToOneRelations = (relations: FindOptionsRelations<Item>) => {
     ...(relations.item_season ? { item_season: { channel_season: true } } : {}),
     ...(relations.live_item ? { live_item: true } : {}),
   };
+   
   return oneToOneRelations;
 };

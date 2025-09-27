@@ -35,6 +35,9 @@ export class Item {
   @Column({ type: 'varchar', name: 'slug', nullable: true, length: DATABASE_CONSTANTS.varchar_slug })
   slug?: string | null;
 
+  @Column()
+  channel_id!: string;
+
   @ManyToOne(() => Channel, channel => channel.id, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'channel_id' })
   channel!: Channel;
