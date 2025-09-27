@@ -12,6 +12,6 @@ export class ChannelDescription {
   @JoinColumn({ name: 'channel_id' })
   channel!: Channel;
 
-  @Column({ type: 'varchar', length: DATABASE_CONSTANTS.varchar_long })
+  @Column({ type: 'varchar', length: DATABASE_CONSTANTS.varchar_longer })
   value!: string;
 }

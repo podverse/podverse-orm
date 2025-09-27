@@ -27,7 +27,7 @@ type ChannelDto = {
   podcast_guid?: string | null
   title?: string | null
   sortable_title?: string | null
-  medium: MediumEnum
+  medium_id: MediumEnum
   has_podcast_index_value?: boolean
   has_value_time_splits?: boolean
 }
@@ -282,6 +282,7 @@ export class ChannelService {
       channel.feed_id = dto.feed.id;
       channel.podcast_index_id = dto.podcast_index_id;
       channel.medium_id = MediumEnum.Podcast; // default to podcast. This will be overridden after channel is parsed.
+      channel.medium = MediumEnum.Podcast; // default to podcast. This will be overridden after channel is parsed.
       channel = await this.repositoryReadWrite.save(channel);
     }
 

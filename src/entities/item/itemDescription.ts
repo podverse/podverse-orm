@@ -12,6 +12,6 @@ export class ItemDescription {
   @JoinColumn({ name: 'item_id' })
   item!: Item;
 
-  @Column({ type: 'varchar', length: DATABASE_CONSTANTS.varchar_long })
+  @Column({ type: 'varchar', length: DATABASE_CONSTANTS.varchar_longer })
   value!: string;
 }
