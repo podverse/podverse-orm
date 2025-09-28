@@ -16,6 +16,9 @@ export class ItemChapter {
   @JoinColumn({ name: 'item_chapters_feed_id' })
   item_chapters_feed!: ItemChaptersFeed;
 
+  @Column({ type: 'varchar', length: DATABASE_CONSTANTS.varchar_md5 })
+  data_hash!: string;
+
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   start_time!: string;
 

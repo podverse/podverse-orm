@@ -1,4 +1,4 @@
-import { FindManyOptions, FindOneOptions, EntityManager } from 'typeorm';
+import { FindManyOptions, FindOneOptions, EntityManager, In } from 'typeorm';
 import { ItemChapter } from '@orm/entities/item/itemChapter';
 import { ItemChaptersFeed } from '@orm/entities/item/itemChaptersFeed';
 import { BaseManyService } from '@orm/services/base/baseManyService';
@@ -9,6 +9,7 @@ export type ItemChapterDto = {
   title: string | null
   web_url: string | null
   table_of_contents: boolean
+  data_hash: string
 }
 
 export class ItemChapterService extends BaseManyService<ItemChapter, 'item_chapters_feed'> {
@@ -17,7 +18,17 @@ export class ItemChapterService extends BaseManyService<ItemChapter, 'item_chapt
   }
 
   async getAll(item_chapters_feed: ItemChaptersFeed, config?: FindManyOptions<ItemChapter>): Promise<ItemChapter[]> {
-    return super._getAll(item_chapters_feed, config);
+    const feed = { ...item_chapters_feed };
+    delete (feed as Partial<ItemChaptersFeed>).item_chapters;
+    delete (feed as Partial<ItemChaptersFeed>).item_chapters_feed_log;
+    return super._getAll(feed, config);
+  }
+
+  async getAllWithCount(item_chapters_feed: ItemChaptersFeed, config?: FindManyOptions<ItemChapter>): Promise<{ count: number; results: ItemChapter[] }> {
+    const feed = { ...item_chapters_feed };
+    delete (feed as Partial<ItemChaptersFeed>).item_chapters;
+    delete (feed as Partial<ItemChaptersFeed>).item_chapters_feed_log;
+    return super._getAllWithCount(feed, config);
   }
 
   async getByIdText(id_text: string, config?: FindOneOptions<ItemChapter>): Promise<ItemChapter | null> {
@@ -39,9 +50,19 @@ export class ItemChapterService extends BaseManyService<ItemChapter, 'item_chapt
     return super._updateMany(item_chapters_feed, whereKeys, dtos);
   }
 
+
   async deleteMany(ids: number[]): Promise<void> {
     if (ids.length) {
       await this.repositoryReadWrite.delete(ids);
     }
   }
+
+  async deleteManyByDataHash(item_chapters_feed: ItemChaptersFeed, dataHashes: string[]): Promise<void> {
+    if (!dataHashes.length) return;
+    await this.repositoryReadWrite.delete({
+      item_chapters_feed,
+      data_hash: In(dataHashes)
+    });
+  }
+
 }
