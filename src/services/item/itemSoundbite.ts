@@ -1,4 +1,4 @@
-import { EntityManager, FindOneOptions } from 'typeorm';
+import { EntityManager, FindManyOptions, FindOneOptions } from 'typeorm';
 import { Item } from '@orm/entities/item/item';
 import { ItemSoundbite } from '@orm/entities/item/itemSoundbite';
 import { BaseManyService } from '@orm/services/base/baseManyService';
@@ -14,13 +14,21 @@ export class ItemSoundbiteService extends BaseManyService<ItemSoundbite, 'item'>
     super(ItemSoundbite, 'item', transactionalEntityManager);
   }
 
-  async getByIdText(id_text: string, config?: FindOneOptions<ItemSoundbite>): Promise<ItemSoundbite | null> {
+  async getByIdText(item_soundbite_id_text: string, config?: FindOneOptions<ItemSoundbite>): Promise<ItemSoundbite | null> {
     const options: FindOneOptions<ItemSoundbite> = {
-      where: { id_text },
+      where: { id_text: item_soundbite_id_text },
       ...config
     };
 
     return this.repositoryRead.findOne(options);
+  }
+
+  async getMany(options?: FindManyOptions<ItemSoundbite>): Promise<ItemSoundbite[]> {
+    return this.repositoryRead.find(options);
+  }
+
+  async getManyAndCount(options?: FindManyOptions<ItemSoundbite>): Promise<[ItemSoundbite[], number]> {
+    return this.repositoryRead.findAndCount(options);
   }
 
   async update(item: Item, dto: ItemSoundbiteDto): Promise<ItemSoundbite> {
