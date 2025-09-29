@@ -62,7 +62,7 @@ export class ItemService {
     if (relations.item_chapters_feed) {
       const itemChaptersFeedService = new ItemChaptersFeedService();
       const item_chapters_feed = await itemChaptersFeedService._get(item, {
-        relations: ['item_chapters', 'item_chapters_feed_log']
+        relations: ['item_chapters_feed_log']
       });
       if (item_chapters_feed) item.item_chapters_feed = item_chapters_feed;
     }
