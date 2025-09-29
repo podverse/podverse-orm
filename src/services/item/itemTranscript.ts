@@ -1,4 +1,4 @@
-import { EntityManager } from 'typeorm';
+import { EntityManager, FindManyOptions } from 'typeorm';
 import { Item } from '@orm/entities/item/item';
 import { ItemTranscript } from '@orm/entities/item/itemTranscript';
 import { BaseManyService } from '@orm/services/base/baseManyService';
@@ -11,6 +11,10 @@ type ItemTranscriptDto = {
 export class ItemTranscriptService extends BaseManyService<ItemTranscript, 'item'> {
   constructor(transactionalEntityManager?: EntityManager) {
     super(ItemTranscript, 'item', transactionalEntityManager);
+  }
+
+  async getMany(options?: FindManyOptions<ItemTranscript>): Promise<ItemTranscript[]> {
+    return this.repositoryRead.find(options);
   }
 
   async update(item: Item, dto: ItemTranscriptDto): Promise<ItemTranscript> {
