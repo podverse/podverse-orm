@@ -1,7 +1,7 @@
 // TODO: get rid of "any" in the file 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { QueueExtraParams } from 'podverse-helpers';
-import { EntityManager, FindOptionsOrderValue, LessThan, MoreThan } from 'typeorm';
+import { EntityManager, Equal, FindOptionsOrderValue, LessThan, MoreThan } from 'typeorm';
 import { QueueResource } from '@orm/entities/queue/queueResource';
 import { BaseManyService } from '@orm/services/base/baseManyService';
 import { QueueService } from '@orm/services/queue/queue';
@@ -29,7 +29,7 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     this.itemSoundbiteService = new ItemSoundbiteService();
   }
 
-  async getAllByQueueId(queue_id_text: string): Promise<QueueResource[]> {
+  async getAllByQueueIdText(queue_id_text: string): Promise<QueueResource[]> {
     const queue = await this.queueService.getByIdText(queue_id_text);
     if (!queue) {
       throw new Error("Queue not found.");
@@ -37,6 +37,21 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
 
     const options = {
       where: { queue: { id: queue.id } },
+      order: { list_position: 'ASC' as FindOptionsOrderValue },
+      relations: ['clip', 'item', 'item_chapter', 'item_soundbite']
+    };
+
+    return this.repositoryRead.find(options);
+  }
+
+  async getAllNowPlayingOrUpcomingByQueueIdText(queue_id_text: string): Promise<QueueResource[]> {
+    const queue = await this.queueService.getByIdText(queue_id_text);
+    if (!queue) {
+      throw new Error("Queue not found.");
+    }
+
+    const options = {
+      where: { queue: { id: queue.id }, list_position: MoreThan(0) as any },
       order: { list_position: 'ASC' as FindOptionsOrderValue },
       relations: ['clip', 'item', 'item_chapter', 'item_soundbite']
     };
@@ -155,6 +170,36 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     });
   }
 
+  async moveQueueResourceToHistoryById(
+    queue_id_text: string,
+    queue_resource_id: number,
+    params: QueueExtraParams = {}
+  ): Promise<QueueResource> {
+    const queue = await this.queueService.getByIdText(queue_id_text);
+    if (!queue) {
+      throw new Error("Queue not found.");
+    }
+
+    const queueResource = await this.repositoryRead.findOne({
+      where: { queue, id: queue_resource_id }
+    });
+    if (!queueResource) {
+      throw new Error("QueueResource not found.");
+    }
+
+    const mostRecentHistoryItem = await this.getMostRecentHistoryItemByQueueIdText(queue_id_text);
+    const newPosition = mostRecentHistoryItem
+      ? parseFloat(mostRecentHistoryItem.list_position) + QUEUE_LIST_POSITION_INCREMENT
+      : -1;
+    
+    const finalDto = {
+      ...params,
+      list_position: newPosition.toString()
+    };
+
+    return this._update(queue, ['queue', 'id'], { ...queueResource, ...finalDto });
+  }
+
   async addResourceToNowPlaying(
     queue_id_text: string,
     resource_id_text: string,
@@ -165,6 +210,14 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     const queue = await this.queueService.getByIdText(queue_id_text);
     if (!queue) {
       throw new Error("Queue not found.");
+    }
+
+    const existingNowPlaying = await this.repositoryRead.findOne({
+      where: { queue, list_position: Equal(0) } as any
+    });
+
+    if (existingNowPlaying) {
+      await this.moveQueueResourceToHistoryById(queue_id_text, existingNowPlaying.id);
     }
 
     const resource = await resourceService.getByIdText(resource_id_text);
