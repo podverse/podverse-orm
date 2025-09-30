@@ -27,6 +27,9 @@ export class Queue {
   @Column({ name: 'medium_id', type: 'int', nullable: true })
   medium_id?: number | null;
 
+  @Column({ type: 'boolean', default: false })
+  is_active_queue!: boolean;
+
   @BeforeInsert()
   generateIdText() {
     this.id_text = shortid.generate();
