@@ -1,7 +1,7 @@
 // TODO: get rid of "any" in the file 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { QueueExtraParams } from 'podverse-helpers';
-import { EntityManager, Equal, FindOptionsOrderValue, LessThan, MoreThan } from 'typeorm';
+import { EntityManager, Equal, FindOptionsOrderValue, LessThan, MoreThan, MoreThanOrEqual } from 'typeorm';
 import { QueueResource } from '@orm/entities/queue/queueResource';
 import { BaseManyService } from '@orm/services/base/baseManyService';
 import { QueueService } from '@orm/services/queue/queue';
@@ -51,7 +51,7 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     }
 
     const options = {
-      where: { queue: { id: queue.id }, list_position: MoreThan(0) as any },
+      where: { queue: { id: queue.id }, list_position: MoreThanOrEqual(0) as any },
       order: { list_position: 'ASC' as FindOptionsOrderValue },
       relations: ['clip', 'item', 'item_chapter', 'item_soundbite']
     };
