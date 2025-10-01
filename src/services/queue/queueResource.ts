@@ -123,12 +123,14 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     const { firstQueued, lastQueued } = await this.getFirstAndLastQueuedItemsByQueueIdText(queue_id_text);
     const list_position = calculatePosition(firstQueued, lastQueued);
 
+    const resourceKeyId = `${resourceKey}_id` as any;
+
     const finalDto = {
-      [resourceKey]: resource,
+      [resourceKeyId]: resource.id,
       list_position
     };
 
-    return this._update(queue, ['queue', resourceKey], finalDto);
+    return this._update(queue, [resourceKeyId], finalDto);
   }
 
   private async addResourceToQueueHelper(
