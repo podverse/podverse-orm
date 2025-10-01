@@ -13,6 +13,13 @@ import { ItemSoundbiteService } from '../item/itemSoundbite';
 
 const QUEUE_LIST_POSITION_INCREMENT = 0.00000001;
 
+const fullRelations = [
+  'clip', 'clip.item', 'clip.item.item_about', 'clip.item.item_enclosures', 'clip.item.item_enclosures.item_enclosure_sources', 'clip.item.item_images', 'clip.item.channel', 'clip.item.channel.channel_images',
+  'item', 'item.item_about', 'item.item_enclosures', 'item.item_enclosures.item_enclosure_sources', 'item.item_images', 'item.channel', 'item.channel.channel_images',
+  'item_chapter', 'item_chapter.item_chapters_feed', 'item_chapter.item_chapters_feed.item', 'item_chapter.item_chapters_feed.item.item_about', 'item_chapter.item_chapters_feed.item.item_enclosures', 'item_chapter.item_chapters_feed.item.item_enclosures.item_enclosure_sources', 'item_chapter.item_chapters_feed.item.item_images', 'item_chapter.item_chapters_feed.item.channel', 'item_chapter.item_chapters_feed.item.channel.channel_images',
+  'item_soundbite', 'item_soundbite.item', 'item_soundbite.item.item_about', 'item_soundbite.item.item_enclosures', 'item_soundbite.item.item_enclosures.item_enclosure_sources', 'item_soundbite.item.item_images', 'item_soundbite.item.channel', 'item_soundbite.item.channel.channel_images'
+];
+
 export class QueueResourceService extends BaseManyService<QueueResource, 'queue'> {
   private queueService: QueueService;
   private clipService: ClipService;
@@ -38,7 +45,7 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     const options = {
       where: { queue: { id: queue.id } },
       order: { list_position: 'ASC' as FindOptionsOrderValue },
-      relations: ['clip', 'item', 'item_chapter', 'item_soundbite']
+      relations: fullRelations
     };
 
     return this.repositoryRead.find(options);
@@ -53,7 +60,7 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     const options = {
       where: { queue: { id: queue.id }, list_position: MoreThanOrEqual(0) as any },
       order: { list_position: 'ASC' as FindOptionsOrderValue },
-      relations: ['clip', 'item', 'item_chapter', 'item_soundbite']
+      relations: fullRelations
     };
 
     return this.repositoryRead.find(options);
@@ -492,34 +499,5 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     }
 
     return this._delete(queue, { add_by_rss_hash_id });
-  }
-
-  async getResourcesByParams(
-    params: {
-      clip_id?: number;
-      item_id?: number;
-      item_chapter_id?: number;
-      item_soundbite_id?: number;
-    }
-  ): Promise<QueueResource[]> {
-    const whereClause: any = {};
-
-    if (params.clip_id) {
-      whereClause.clip = { id: params.clip_id };
-    }
-    if (params.item_id) {
-      whereClause.item = { id: params.item_id };
-    }
-    if (params.item_chapter_id) {
-      whereClause.item_chapter = { id: params.item_chapter_id };
-    }
-    if (params.item_soundbite_id) {
-      whereClause.item_soundbite = { id: params.item_soundbite_id };
-    }
-
-    return this.repositoryRead.find({
-      where: whereClause,
-      relations: ['clip', 'item', 'item_chapter', 'item_soundbite', 'queue']
-    });
   }
 }
