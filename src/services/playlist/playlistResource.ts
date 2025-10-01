@@ -334,32 +334,4 @@ export class PlaylistResourceService extends BaseManyService<PlaylistResource, '
     return this._delete(playlist, { add_by_rss_hash_id });
   }
 
-  async getResourcesByParams(
-    params: {
-      clip_id?: number;
-      item_id?: number;
-      item_chapter_id?: number;
-      item_soundbite_id?: number;
-    }
-  ): Promise<PlaylistResource[]> {
-    const whereClause: any = {};
-
-    if (params.clip_id) {
-      whereClause.clip = { id: params.clip_id };
-    }
-    if (params.item_id) {
-      whereClause.item = { id: params.item_id };
-    }
-    if (params.item_chapter_id) {
-      whereClause.item_chapter = { id: params.item_chapter_id };
-    }
-    if (params.item_soundbite_id) {
-      whereClause.item_soundbite = { id: params.item_soundbite_id };
-    }
-
-    return this.repositoryRead.find({
-      where: whereClause,
-      relations: ['clip', 'item', 'item_chapter', 'item_soundbite', 'playlist']
-    });
-  }
 }
