@@ -130,7 +130,6 @@ export class PlaylistService extends BaseManyService<Playlist, 'account'> {
         playlist_resources: {
           clip_id: true,
           item_id: true,
-          item_chapter_id: true,
           item_soundbite_id: true,
           add_by_rss_hash_id: true
         }

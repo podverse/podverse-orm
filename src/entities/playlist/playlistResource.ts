@@ -2,7 +2,6 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Unique }
 import { Playlist } from '@orm/entities/playlist/playlist';
 import { Clip } from '../clip';
 import { Item } from '../item/item';
-import { ItemChapter } from '../item/itemChapter';
 import { ItemSoundbite } from '../item/itemSoundbite';
 
 @Entity()
@@ -31,13 +30,6 @@ export class PlaylistResource {
   @ManyToOne(() => Item, item => item.id, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'item_id' })
   item!: Item;
-
-  @Column()
-  item_chapter_id!: number;
-
-  @ManyToOne(() => ItemChapter, itemChapter => itemChapter.id, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'item_chapter_id' })
-  item_chapter!: ItemChapter;
 
   @Column()
   item_soundbite_id!: number;

@@ -2,7 +2,6 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 't
 import { Queue } from '@orm/entities/queue/queue';
 import { Clip } from '../clip';
 import { Item } from '../item/item';
-import { ItemChapter } from '../item/itemChapter';
 import { ItemSoundbite } from '../item/itemSoundbite';
 
 @Entity()
@@ -39,13 +38,6 @@ export class QueueResource {
   @ManyToOne(() => Item, item => item.id, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'item_id' })
   item!: Item;
-  
-  @Column()
-  item_chapter_id!: string;
-  
-  @ManyToOne(() => ItemChapter, itemChapter => itemChapter.id, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'item_chapter_id' })
-  item_chapter!: ItemChapter;
   
   @Column()
   item_soundbite_id!: string;

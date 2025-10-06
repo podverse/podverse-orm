@@ -16,7 +16,6 @@ const QUEUE_LIST_POSITION_INCREMENT = 0.00000001;
 const fullRelations = [
   'clip', 'clip.item', 'clip.item.item_about', 'clip.item.item_enclosures', 'clip.item.item_enclosures.item_enclosure_sources', 'clip.item.item_images', 'clip.item.channel', 'clip.item.channel.channel_images',
   'item', 'item.item_about', 'item.item_enclosures', 'item.item_enclosures.item_enclosure_sources', 'item.item_images', 'item.channel', 'item.channel.channel_images',
-  'item_chapter', 'item_chapter.item_chapters_feed', 'item_chapter.item_chapters_feed.item', 'item_chapter.item_chapters_feed.item.item_about', 'item_chapter.item_chapters_feed.item.item_enclosures', 'item_chapter.item_chapters_feed.item.item_enclosures.item_enclosure_sources', 'item_chapter.item_chapters_feed.item.item_images', 'item_chapter.item_chapters_feed.item.channel', 'item_chapter.item_chapters_feed.item.channel.channel_images',
   'item_soundbite', 'item_soundbite.item', 'item_soundbite.item.item_about', 'item_soundbite.item.item_enclosures', 'item_soundbite.item.item_enclosures.item_enclosure_sources', 'item_soundbite.item.item_images', 'item_soundbite.item.channel', 'item_soundbite.item.channel.channel_images'
 ];
 
@@ -332,30 +331,6 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
 
   async removeItemFromQueue(queue_id_text: string, item_id_text: string): Promise<void> {
     return this.removeResourceFromQueue(queue_id_text, item_id_text, this.itemService, 'item');
-  }
-
-  async addItemChapterToQueueNext(queue_id_text: string, item_chapter_id_text: string): Promise<QueueResource> {
-    return this.addResourceToQueueNext(queue_id_text, item_chapter_id_text, this.itemChapterService, 'item_chapter');
-  }
-
-  async addItemChapterToQueueLast(queue_id_text: string, item_chapter_id_text: string): Promise<QueueResource> {
-    return this.addResourceToQueueLast(queue_id_text, item_chapter_id_text, this.itemChapterService, 'item_chapter');
-  }
-
-  async addItemChapterToQueueBetween(queue_id_text: string, item_chapter_id_text: string, position1: number, position2: number): Promise<QueueResource> {
-    return this.addResourceToQueueBetween(queue_id_text, item_chapter_id_text, this.itemChapterService, 'item_chapter', position1, position2);
-  }
-
-  async addItemChapterToNowPlaying(queue_id_text: string, item_chapter_id_text: string, params: QueueExtraParams = {}): Promise<QueueResource> {
-    return this.addResourceToNowPlaying(queue_id_text, item_chapter_id_text, this.itemChapterService, 'item_chapter', params);
-  }
-
-  async addItemChapterToHistory(queue_id_text: string, item_chapter_id_text: string, params: QueueExtraParams): Promise<QueueResource> {
-    return this.addResourceToHistory(queue_id_text, item_chapter_id_text, this.itemChapterService, 'item_chapter', params);
-  }
-
-  async removeItemChapterFromQueue(queue_id_text: string, item_chapter_id_text: string): Promise<void> {
-    return this.removeResourceFromQueue(queue_id_text, item_chapter_id_text, this.itemChapterService, 'item_chapter');
   }
 
   async addItemSoundbiteToQueueNext(queue_id_text: string, item_soundbite_id_text: string): Promise<QueueResource> {

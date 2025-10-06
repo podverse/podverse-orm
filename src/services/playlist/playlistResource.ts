@@ -37,7 +37,7 @@ export class PlaylistResourceService extends BaseManyService<PlaylistResource, '
     const options = {
       where: { playlist: { id: playlist.id } },
       order: { list_position: 'ASC' as FindOptionsOrderValue },
-      relations: ['clip', 'item', 'item_chapter', 'item_soundbite']
+      relations: ['clip', 'item', 'item_soundbite']
     };
 
     return this.repositoryRead.find(options);
@@ -217,22 +217,6 @@ export class PlaylistResourceService extends BaseManyService<PlaylistResource, '
 
   async removeItemFromPlaylist(playlist_id_text: string, item_id_text: string): Promise<void> {
     return this.removeResourceFromPlaylist(playlist_id_text, item_id_text, this.itemService, 'item_id');
-  }
-
-  async addItemChapterToPlaylistFirst(playlist_id_text: string, item_chapter_id_text: string): Promise<PlaylistResource> {
-    return this.addResourceToPlaylistFirst(playlist_id_text, item_chapter_id_text, this.itemChapterService, 'item_chapter_id');
-  }
-
-  async addItemChapterToPlaylistLast(playlist_id_text: string, item_chapter_id_text: string): Promise<PlaylistResource> {
-    return this.addResourceToPlaylistLast(playlist_id_text, item_chapter_id_text, this.itemChapterService, 'item_chapter_id');
-  }
-
-  async addItemChapterToPlaylistBetween(playlist_id_text: string, item_chapter_id_text: string, position1: number, position2: number): Promise<PlaylistResource> {
-    return this.addResourceToPlaylistBetween(playlist_id_text, item_chapter_id_text, this.itemChapterService, 'item_chapter_id', position1, position2);
-  }
-
-  async removeItemChapterFromPlaylist(playlist_id_text: string, item_chapter_id_text: string): Promise<void> {
-    return this.removeResourceFromPlaylist(playlist_id_text, item_chapter_id_text, this.itemChapterService, 'item_chapter_id');
   }
 
   async addItemSoundbiteToPlaylistFirst(playlist_id_text: string, item_soundbite_id_text: string): Promise<PlaylistResource> {
