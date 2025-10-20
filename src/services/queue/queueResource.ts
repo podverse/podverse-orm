@@ -50,7 +50,7 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     return this.repositoryRead.find(options);
   }
 
-  async getAllNowPlayingOrUpcomingByQueueIdText(queue_id_text: string): Promise<QueueResource[]> {
+  async getNowPlayingByQueueIdText(queue_id_text: string): Promise<QueueResource | null> {
     const queue = await this.queueService.getByIdText(queue_id_text);
     if (!queue) {
       throw new Error("Queue not found.");
@@ -58,6 +58,34 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
 
     const options = {
       where: { queue: { id: queue.id }, list_position: MoreThanOrEqual(0) as any },
+      order: { list_position: 'ASC' as FindOptionsOrderValue },
+      relations: fullRelations
+    };
+
+    const rows = await this.repositoryRead.find(options);
+
+    if (!rows || rows.length === 0) {
+      return null;
+    }
+
+    const firstRow = rows[0];
+    if (parseFloat(firstRow.list_position) === 0) {
+      return firstRow;
+    } else {
+      firstRow.list_position = '0';
+      await this.repositoryReadWrite.save(firstRow);
+      return firstRow;
+    }
+  }
+
+  async getAllUpcomingByQueueIdText(queue_id_text: string): Promise<QueueResource[]> {
+    const queue = await this.queueService.getByIdText(queue_id_text);
+    if (!queue) {
+      throw new Error("Queue not found.");
+    }
+
+    const options = {
+      where: { queue: { id: queue.id }, list_position: MoreThan(0) as any },
       order: { list_position: 'ASC' as FindOptionsOrderValue },
       relations: fullRelations
     };
