@@ -248,19 +248,19 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
       throw new Error("Queue not found.");
     }
 
-    const existingNowPlaying = await this.repositoryRead.findOne({
-      where: { queue, list_position: Equal(0) } as any
-    });
-
-    if (existingNowPlaying) {
-      await this.moveQueueResourceToHistoryById(queue_id_text, existingNowPlaying.id);
-    }
-
     const resource = await resourceService.getByIdText(resource_id_text);
     if (!resource) {
       throw new Error(`${resourceKey} not found.`);
     }
 
+    const existingNowPlaying = await this.repositoryRead.findOne({
+      where: { queue, list_position: Equal(0) } as any
+    });
+
+    if (existingNowPlaying && resource.id !== existingNowPlaying.id) {
+      await this.moveQueueResourceToHistoryById(queue_id_text, existingNowPlaying.id);
+    }
+    
     const finalDto = {
       [resourceKey]: resource,
       list_position: '0',
