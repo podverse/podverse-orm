@@ -1,14 +1,12 @@
 // TODO: get rid of "any" in the file 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { QueueExtraParams } from 'podverse-helpers';
-import { EntityManager, Equal, FindOptionsOrderValue, LessThan, MoreThan, MoreThanOrEqual } from 'typeorm';
+import { getMd5Hash, QueueExtraParams } from 'podverse-helpers';
+import { Between, EntityManager, Equal, FindOptionsOrderValue, LessThan, MoreThan, MoreThanOrEqual } from 'typeorm';
 import { QueueResource } from '@orm/entities/queue/queueResource';
 import { BaseManyService } from '@orm/services/base/baseManyService';
 import { QueueService } from '@orm/services/queue/queue';
 import { ClipService } from '../clip';
 import { ItemService } from '../item/item';
-import { getMd5Hash } from 'podverse-helpers';
-import { ItemChapterService } from '../item/itemChapter';
 import { ItemSoundbiteService } from '../item/itemSoundbite';
 
 const QUEUE_LIST_POSITION_INCREMENT = 0.00000001;
@@ -23,7 +21,6 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
   private queueService: QueueService;
   private clipService: ClipService;
   private itemService: ItemService;
-  private itemChapterService: ItemChapterService;
   private itemSoundbiteService: ItemSoundbiteService;
 
   constructor(transactionalEntityManager?: EntityManager) {
@@ -31,7 +28,6 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     this.queueService = new QueueService(transactionalEntityManager);
     this.clipService = new ClipService(transactionalEntityManager);
     this.itemService = new ItemService();
-    this.itemChapterService = new ItemChapterService();
     this.itemSoundbiteService = new ItemSoundbiteService();
   }
 
@@ -253,9 +249,14 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
       throw new Error(`${resourceKey} not found.`);
     }
 
+    const epsilon = 1e-21;
     const existingNowPlaying = await this.repositoryRead.findOne({
-      where: { queue, list_position: Equal(0) } as any
-    });
+      where: { queue, list_position: Between(-epsilon, epsilon) as any }
+    }) as any;
+    
+    if (existingNowPlaying && existingNowPlaying[`${resourceKey}_id`] === resource.id) {
+      return existingNowPlaying;
+    }
 
     if (existingNowPlaying && resource.id !== existingNowPlaying.id) {
       await this.moveQueueResourceToHistoryById(queue_id_text, existingNowPlaying.id);
