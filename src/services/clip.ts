@@ -119,4 +119,18 @@ export class ClipService extends BaseManyService<Clip, 'account'> {
 
     return this._getAll(account);
   }
+
+  async getRandomClip(medium_id: number): Promise<Clip | null> {
+    let query = this.repositoryRead.createQueryBuilder('clip')
+      .innerJoin('clip.item', 'item')
+      .innerJoin('item.channel', 'channel');
+
+    const clips = await query
+      .where('channel.medium_id = :medium_id', { medium_id })
+      .orderBy('RANDOM()')
+      .limit(1)
+      .getMany();
+
+    return clips[0] || null;
+  }
 }

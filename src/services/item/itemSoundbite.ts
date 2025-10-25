@@ -23,6 +23,21 @@ export class ItemSoundbiteService extends BaseManyService<ItemSoundbite, 'item'>
     return this.repositoryRead.findOne(options);
   }
 
+  async getRandomItemSoundbite(medium_id?: number): Promise<ItemSoundbite | null> {
+    let query = this.repositoryRead
+      .createQueryBuilder('itemSoundbite')
+      .innerJoin('itemSoundbite.item', 'item')
+      .innerJoin('item.channel', 'channel');
+
+    const soundbites = await query
+      .where('channel.medium_id = :medium_id', { medium_id })
+      .orderBy('RANDOM()')
+      .limit(1)
+      .getMany();
+
+    return soundbites[0] || null;
+  }
+
   async getMany(options?: FindManyOptions<ItemSoundbite>): Promise<ItemSoundbite[]> {
     return this.repositoryRead.find(options);
   }

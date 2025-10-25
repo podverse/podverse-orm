@@ -1,7 +1,7 @@
 // TODO: get rid of "any" in the file 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { getMd5Hash, QueueExtraParams } from 'podverse-helpers';
-import { Between, EntityManager, Equal, FindOptionsOrderValue, LessThan, MoreThan, MoreThanOrEqual } from 'typeorm';
+import { Between, EntityManager, FindManyOptions, FindOptionsOrderValue, LessThan, MoreThan, MoreThanOrEqual } from 'typeorm';
 import { QueueResource } from '@orm/entities/queue/queueResource';
 import { BaseManyService } from '@orm/services/base/baseManyService';
 import { QueueService } from '@orm/services/queue/queue';
@@ -87,6 +87,23 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     };
 
     return this.repositoryRead.find(options);
+  }
+
+  async getHistoryResourcesByQueueIdText(
+    queue_id_text: string,
+    options?: FindManyOptions<QueueResource>
+  ): Promise<[QueueResource[], number]> {
+    const queue = await this.queueService.getByIdText(queue_id_text);
+    if (!queue) {
+      throw new Error("Queue not found.");
+    }
+
+    return this.repositoryRead.findAndCount({
+      where: { queue: { id: queue.id }, list_position: LessThan(0) as any },
+      order: { list_position: 'DESC' as FindOptionsOrderValue },
+      relations: fullRelations,
+      ...options
+    });
   }
 
   async getItemsByQueueIdTextAndPosition(queue_id_text: string, position: string): Promise<QueueResource[]> {

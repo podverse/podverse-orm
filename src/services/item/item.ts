@@ -193,6 +193,19 @@ export class ItemService {
     return item;
   }
 
+  async getRandomItem(medium_id: number): Promise<Item | null> {
+    let query = this.repositoryRead.createQueryBuilder('item')
+      .innerJoin('item.channel', 'channel');
+
+    const items = await query
+      .where('channel.medium_id = :medium_id', { medium_id })
+      .orderBy('RANDOM()')
+      .limit(1)
+      .getMany();
+
+    return items[0] || null;
+  }
+
   async getMany(config: FindManyOptions<Item>, itemType: 'normal' | 'live-item'): Promise<Item[]> {
     return this.repositoryRead.find({
       ...config,
