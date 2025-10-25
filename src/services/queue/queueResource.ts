@@ -31,19 +31,28 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     this.itemSoundbiteService = new ItemSoundbiteService();
   }
 
-  async getAllByQueueIdText(queue_id_text: string): Promise<QueueResource[]> {
-    const queue = await this.queueService.getByIdText(queue_id_text);
-    if (!queue) {
-      throw new Error("Queue not found.");
+  async getAllByAccountAbridged(account_id: number): Promise<any[]> {
+    const queues = await this.queueService.getAllPrivate(account_id);
+    if (!queues.length) {
+      throw new Error("No queues found for account.");
     }
+    const queueIds = queues.map(q => q.id);
 
-    const options = {
-      where: { queue: { id: queue.id } },
-      order: { list_position: 'ASC' as FindOptionsOrderValue },
-      relations: fullRelations
-    };
-
-    return this.repositoryRead.find(options);
+    return this.repositoryRead
+      .createQueryBuilder("qr")
+      .select([
+        "qr.id AS i",
+        "qr.playback_position AS p",
+        "qr.media_file_duration AS d",
+        "qr.completed AS z",
+        "qr.clip_id AS c",
+        "qr.item_id AS t",
+        "qr.item_soundbite_id AS s",
+        "qr.add_by_rss_hash_id AS a"
+      ])
+      .where("qr.queue_id IN (:...queueIds)", { queueIds })
+      .orderBy("qr.list_position", "ASC")
+      .getRawMany();
   }
 
   async getNowPlayingByQueueIdText(queue_id_text: string): Promise<QueueResource | null> {
