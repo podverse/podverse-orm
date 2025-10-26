@@ -280,7 +280,11 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
       where: { queue, list_position: Between(-epsilon, epsilon) as any }
     }) as any;
     
-    if (existingNowPlaying && existingNowPlaying[`${resourceKey}_id`] === resource.id) {
+    if (
+      existingNowPlaying
+      && existingNowPlaying[`${resourceKey}_id`] === resource.id
+      && existingNowPlaying.list_position === params.playback_position
+    ) {
       return existingNowPlaying;
     }
 
