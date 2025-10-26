@@ -25,6 +25,9 @@ export class ItemChapterService extends BaseManyService<ItemChapter, 'item_chapt
   }
 
   async getAllWithCount(item_chapters_feed: ItemChaptersFeed, config?: FindManyOptions<ItemChapter>): Promise<{ count: number; results: ItemChapter[] }> {
+    if (!item_chapters_feed) {
+      return { count: 0, results: [] };
+    }
     const feed = { ...item_chapters_feed };
     delete (feed as Partial<ItemChaptersFeed>).item_chapters;
     delete (feed as Partial<ItemChaptersFeed>).item_chapters_feed_log;
