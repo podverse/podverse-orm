@@ -294,7 +294,7 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     let queueResource = await manager.findOne(QueueResource, {
       where: { queue: { id: queue.id }, [`${resourceKey}_id`]: resource.id }
     });
-    
+
     if (!queueResource) {
       queueResource = manager.create(QueueResource, {
         queue,
@@ -350,26 +350,46 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     resourceKey: keyof QueueResource,
     params: QueueExtraParams,
   ): Promise<QueueResource> {
-    const queue = await this.queueService.getByIdText(queue_id_text);
-    if (!queue) {
-      throw new Error("Queue not found.");
-    }
+    const lock = this.getQueueLock(queue_id_text);
+    return lock.runExclusive(async () => {
+      return await this.repositoryReadWrite.manager.transaction(async (manager) => {
+        const queue = await manager.findOne('Queue', { where: { id_text: queue_id_text } }) as any;
+        if (!queue) throw new Error("Queue not found.");
 
-    const resource = await resourceService.getByIdText(resource_id_text);
-    if (!resource) {
-      throw new Error(`${resourceKey} not found.`);
-    }
+        const resource = await resourceService.getByIdText(resource_id_text);
+        if (!resource) throw new Error(`${resourceKey} not found.`);
 
-    const mostRecentHistoryItem = await this.getMostRecentHistoryItemByQueueIdText(queue_id_text);
-    const newPosition = mostRecentHistoryItem ? parseFloat(mostRecentHistoryItem.list_position) + QUEUE_LIST_POSITION_INCREMENT : -1;
+        const mostRecentHistoryItem = await manager.findOne(QueueResource, {
+          where: { queue: { id: queue.id }, list_position: LessThan(0) as any },
+          order: { list_position: 'DESC' }
+        });
 
-    const finalDto = {
-      [resourceKey]: resource,
-      list_position: newPosition.toString(),
-      ...params
-    };
+        const newPosition = mostRecentHistoryItem
+          ? parseFloat(mostRecentHistoryItem.list_position) + QUEUE_LIST_POSITION_INCREMENT
+          : -1;
 
-    return this._update(queue, ['queue', resourceKey], finalDto);
+        let queueResource = await manager.findOne(QueueResource, {
+          where: { queue: { id: queue.id }, [`${resourceKey}_id`]: resource.id }
+        });
+
+        if (!queueResource) {
+          queueResource = manager.create(QueueResource, {
+            queue,
+            [`${resourceKey}`]: resource,
+            list_position: newPosition.toString(),
+            ...params
+          });
+        } else {
+          Object.assign(queueResource, {
+            [`${resourceKey}`]: resource,
+            list_position: newPosition.toString(),
+            ...params
+          });
+        }
+
+        return await manager.save(queueResource);
+      });
+    });
   }
 
   async removeResourceFromQueue(queue_id_text: string, resource_id_text: string, resourceService: any, resourceKey: keyof QueueResource): Promise<void> {
