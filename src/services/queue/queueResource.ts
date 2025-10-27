@@ -1,5 +1,6 @@
 // TODO: get rid of "any" in the file 
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Mutex } from 'async-mutex';
 import { getMd5Hash, QueueExtraParams } from 'podverse-helpers';
 import { Between, EntityManager, FindManyOptions, FindOptionsOrderValue, LessThan, MoreThan, MoreThanOrEqual } from 'typeorm';
 import { QueueResource } from '@orm/entities/queue/queueResource';
@@ -22,6 +23,15 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
   private clipService: ClipService;
   private itemService: ItemService;
   private itemSoundbiteService: ItemSoundbiteService;
+
+  private static queueLocks: Map<string, Mutex> = new Map();
+
+  private getQueueLock(queue_id_text: string): Mutex {
+    if (!QueueResourceService.queueLocks.has(queue_id_text)) {
+      QueueResourceService.queueLocks.set(queue_id_text, new Mutex());
+    }
+    return QueueResourceService.queueLocks.get(queue_id_text)!;
+  }
 
   constructor(transactionalEntityManager?: EntityManager) {
     super(QueueResource, 'queue', transactionalEntityManager);
@@ -228,36 +238,6 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     });
   }
 
-  async moveQueueResourceToHistoryById(
-    queue_id_text: string,
-    queue_resource_id: number,
-    params: QueueExtraParams = {}
-  ): Promise<QueueResource> {
-    const queue = await this.queueService.getByIdText(queue_id_text);
-    if (!queue) {
-      throw new Error("Queue not found.");
-    }
-
-    const queueResource = await this.repositoryRead.findOne({
-      where: { queue, id: queue_resource_id }
-    });
-    if (!queueResource) {
-      throw new Error("QueueResource not found.");
-    }
-
-    const mostRecentHistoryItem = await this.getMostRecentHistoryItemByQueueIdText(queue_id_text);
-    const newPosition = mostRecentHistoryItem
-      ? parseFloat(mostRecentHistoryItem.list_position) + QUEUE_LIST_POSITION_INCREMENT
-      : -1;
-    
-    const finalDto = {
-      ...params,
-      list_position: newPosition.toString()
-    };
-
-    return this._update(queue, ['queue', 'id'], { ...queueResource, ...finalDto });
-  }
-
   async addResourceToNowPlaying(
     queue_id_text: string,
     resource_id_text: string,
@@ -265,40 +245,102 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     resourceKey: keyof QueueResource,
     params: QueueExtraParams = {}
   ): Promise<QueueResource> {
-    const queue = await this.queueService.getByIdText(queue_id_text);
-    if (!queue) {
-      throw new Error("Queue not found.");
-    }
+    const lock = this.getQueueLock(queue_id_text);
+    return lock.runExclusive(async () => {
+      return await this.repositoryReadWrite.manager.transaction(async (manager) => {
+        return this._addResourceToNowPlayingTransactional(
+          manager,
+          queue_id_text,
+          resource_id_text,
+          resourceService,
+          resourceKey,
+          params
+        );
+      });
+    });
+  }
+
+  private async _addResourceToNowPlayingTransactional(
+    manager: EntityManager,
+    queue_id_text: string,
+    resource_id_text: string,
+    resourceService: any,
+    resourceKey: keyof QueueResource,
+    params: QueueExtraParams = {}
+  ): Promise<QueueResource> {
+    const queue = await manager.findOne('Queue', { where: { id_text: queue_id_text } }) as any;
+    if (!queue) throw new Error("Queue not found.");
 
     const resource = await resourceService.getByIdText(resource_id_text);
-    if (!resource) {
-      throw new Error(`${resourceKey} not found.`);
-    }
+    if (!resource) throw new Error(`${resourceKey} not found.`);
 
     const epsilon = 1e-21;
-    const existingNowPlaying = await this.repositoryRead.findOne({
-      where: { queue, list_position: Between(-epsilon, epsilon) as any }
+    const existingNowPlaying = await manager.findOne(QueueResource, {
+      where: { queue: { id: queue.id }, list_position: Between(-epsilon, epsilon) as any }
     }) as any;
-    
+
     if (
-      existingNowPlaying
-      && existingNowPlaying[`${resourceKey}_id`] === resource.id
-      && existingNowPlaying.list_position === params.playback_position
+      existingNowPlaying &&
+      existingNowPlaying[`${resourceKey}_id`] === resource.id &&
+      existingNowPlaying.list_position === params.playback_position
     ) {
       return existingNowPlaying;
     }
 
     if (existingNowPlaying && resource.id !== existingNowPlaying.id) {
-      await this.moveQueueResourceToHistoryById(queue_id_text, existingNowPlaying.id);
+      await this.moveQueueResourceToHistoryByIdTransactional(manager, queue_id_text, existingNowPlaying.id);
     }
-    
-    const finalDto = {
-      [resourceKey]: resource,
-      list_position: '0',
-      ...params
-    };
 
-    return this._update(queue, ['queue', resourceKey], finalDto);
+    let queueResource = await manager.findOne(QueueResource, {
+      where: { queue: { id: queue.id }, [`${resourceKey}_id`]: resource.id }
+    });
+    
+    if (!queueResource) {
+      queueResource = manager.create(QueueResource, {
+        queue,
+        [`${resourceKey}`]: resource,
+        list_position: '0',
+        ...params
+      });
+    } else {
+      Object.assign(queueResource, {
+        [`${resourceKey}`]: resource,
+        list_position: '0',
+        ...params
+      });
+    }
+
+    return await manager.save(queueResource);
+  }
+
+  private async moveQueueResourceToHistoryByIdTransactional(
+    manager: EntityManager,
+    queue_id_text: string,
+    queue_resource_id: number,
+    params: QueueExtraParams = {}
+  ): Promise<QueueResource> {
+    const queue = await manager.findOne('Queue', { where: { id_text: queue_id_text } });
+    if (!queue) throw new Error("Queue not found.");
+
+    const queueResource = await manager.findOne(QueueResource, {
+      where: { queue: { id: queue.id }, id: queue_resource_id }
+    });
+    if (!queueResource) throw new Error("QueueResource not found.");
+
+    const mostRecentHistoryItem = await manager.findOne(QueueResource, {
+      where: { queue: { id: queue.id }, list_position: LessThan(0) as any },
+      order: { list_position: 'DESC' }
+    });
+    const newPosition = mostRecentHistoryItem
+      ? parseFloat(mostRecentHistoryItem.list_position) + QUEUE_LIST_POSITION_INCREMENT
+      : -1;
+
+    Object.assign(queueResource, {
+      ...params,
+      list_position: newPosition.toString()
+    });
+
+    return await manager.save(queueResource);
   }
 
   async addResourceToHistory(
