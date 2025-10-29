@@ -319,7 +319,7 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     queue_resource_id: number,
     params: QueueExtraParams = {}
   ): Promise<QueueResource> {
-    const queue = await manager.findOne('Queue', { where: { id_text: queue_id_text } });
+    const queue = await manager.findOne('Queue', { where: { id_text: queue_id_text } }) as any;
     if (!queue) throw new Error("Queue not found.");
 
     const queueResource = await manager.findOne(QueueResource, {
