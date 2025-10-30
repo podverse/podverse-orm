@@ -7,7 +7,6 @@ import { PlaylistService } from './playlist';
 import { BaseManyService } from '@orm/services/base/baseManyService';
 import { ClipService } from '../clip';
 import { ItemService } from '../item/item';
-import { ItemChapterService } from '../item/itemChapter';
 import { ItemSoundbiteService } from '../item/itemSoundbite';
 
 const PLAYLIST_LIST_POSITION_INCREMENT = 0.00000001;
@@ -16,7 +15,6 @@ export class PlaylistResourceService extends BaseManyService<PlaylistResource, '
   private playlistService: PlaylistService;
   private clipService: ClipService;
   private itemService: ItemService;
-  private itemChapterService: ItemChapterService;
   private itemSoundbiteService: ItemSoundbiteService;
 
   constructor(transactionalEntityManager?: EntityManager) {
@@ -24,7 +22,6 @@ export class PlaylistResourceService extends BaseManyService<PlaylistResource, '
     this.playlistService = new PlaylistService(transactionalEntityManager);
     this.clipService = new ClipService(transactionalEntityManager);
     this.itemService = new ItemService();
-    this.itemChapterService = new ItemChapterService(transactionalEntityManager);
     this.itemSoundbiteService = new ItemSoundbiteService(transactionalEntityManager);
   }
 
