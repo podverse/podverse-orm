@@ -12,7 +12,7 @@ import { ItemSoundbiteService } from '../item/itemSoundbite';
 
 const QUEUE_LIST_POSITION_INCREMENT = 0.00000001;
 
-const fullRelations = [
+export const listResourceRelations = [
   'clip', 'clip.item', 'clip.item.item_about', 'clip.item.item_enclosures', 'clip.item.item_enclosures.item_enclosure_sources', 'clip.item.item_images', 'clip.item.channel', 'clip.item.channel.channel_images',
   'item', 'item.item_about', 'item.item_enclosures', 'item.item_enclosures.item_enclosure_sources', 'item.item_images', 'item.channel', 'item.channel.channel_images',
   'item_soundbite', 'item_soundbite.item', 'item_soundbite.item.item_about', 'item_soundbite.item.item_enclosures', 'item_soundbite.item.item_enclosures.item_enclosure_sources', 'item_soundbite.item.item_images', 'item_soundbite.item.channel', 'item_soundbite.item.channel.channel_images'
@@ -74,7 +74,7 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     const options = {
       where: { queue: { id: queue.id }, list_position: MoreThanOrEqual(0) as any },
       order: { list_position: 'ASC' as FindOptionsOrderValue },
-      relations: fullRelations
+      relations: listResourceRelations
     };
 
     const rows = await this.repositoryRead.find(options);
@@ -102,7 +102,7 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     const options = {
       where: { queue: { id: queue.id }, list_position: MoreThan(0) as any },
       order: { list_position: 'ASC' as FindOptionsOrderValue },
-      relations: fullRelations
+      relations: listResourceRelations
     };
 
     return this.repositoryRead.find(options);
@@ -120,7 +120,7 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     return this.repositoryRead.findAndCount({
       where: { queue: { id: queue.id }, list_position: LessThan(0) as any },
       order: { list_position: 'DESC' as FindOptionsOrderValue },
-      relations: fullRelations,
+      relations: listResourceRelations,
       ...options
     });
   }

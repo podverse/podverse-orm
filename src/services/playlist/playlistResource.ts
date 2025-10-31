@@ -1,13 +1,14 @@
 // TODO: get rid of "any" in the file 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { getMd5Hash } from 'podverse-helpers';
-import { EntityManager, FindOptionsOrderValue } from 'typeorm';
+import { EntityManager, FindManyOptions, FindOptionsOrderValue } from 'typeorm';
 import { PlaylistResource } from '@orm/entities/playlist/playlistResource';
 import { PlaylistService } from './playlist';
 import { BaseManyService } from '@orm/services/base/baseManyService';
 import { ClipService } from '../clip';
 import { ItemService } from '../item/item';
 import { ItemSoundbiteService } from '../item/itemSoundbite';
+import { listResourceRelations } from '../queue/queueResource';
 
 const PLAYLIST_LIST_POSITION_INCREMENT = 0.00000001;
 
@@ -25,6 +26,28 @@ export class PlaylistResourceService extends BaseManyService<PlaylistResource, '
     this.itemSoundbiteService = new ItemSoundbiteService(transactionalEntityManager);
   }
 
+  async getManyByPlaylistIdText(
+    playlist_id_text: string,
+    options: Partial<FindManyOptions<PlaylistResource>> = {}
+  ): Promise<PlaylistResource[]> {
+    const playlist = await this.playlistService.getByIdText(playlist_id_text);
+    if (!playlist) {
+      throw new Error("Playlist not found.");
+    }
+
+    const defaultOptions: FindManyOptions<PlaylistResource> = {
+      where: { playlist: { id: playlist.id } },
+      order: { list_position: 'ASC' as FindOptionsOrderValue },
+      relations: listResourceRelations
+    };
+
+    return this.repositoryRead.find({
+      ...defaultOptions,
+      ...options,
+      where: { ...defaultOptions.where, ...(options.where || {}) }
+    });
+  }
+
   async getAllByPlaylistIdText(playlist_id_text: string): Promise<PlaylistResource[]> {
     const playlist = await this.playlistService.getByIdText(playlist_id_text);
     if (!playlist) {
@@ -34,7 +57,7 @@ export class PlaylistResourceService extends BaseManyService<PlaylistResource, '
     const options = {
       where: { playlist: { id: playlist.id } },
       order: { list_position: 'ASC' as FindOptionsOrderValue },
-      relations: ['clip', 'item', 'item_soundbite']
+      relations: listResourceRelations
     };
 
     return this.repositoryRead.find(options);
