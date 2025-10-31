@@ -204,7 +204,11 @@ export class PlaylistResourceService extends BaseManyService<PlaylistResource, '
       throw new Error(`${resourceKey} not found.`);
     }
 
-    return this._delete(playlist, { [`${resourceKey}_id`]: resource.id });
+    const results = await this._delete(playlist, { [resourceKey]: resource.id });
+
+    await this.playlistService.updateLastUpdatedAndItemCount(playlist.id_text);
+
+    return results;
   }
 
   async addClipToPlaylistFirst(playlist_id_text: string, clip_id_text: string): Promise<PlaylistResource> {
@@ -335,7 +339,11 @@ export class PlaylistResourceService extends BaseManyService<PlaylistResource, '
       throw new Error("Playlist not found.");
     }
 
-    return this._delete(playlist, { add_by_rss_hash_id });
+    const results = await this._delete(playlist, { add_by_rss_hash_id });
+
+    await this.playlistService.updateLastUpdatedAndItemCount(playlist.id_text);
+
+    return results;
   }
 
 }
