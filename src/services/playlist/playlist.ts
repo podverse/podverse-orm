@@ -103,8 +103,9 @@ export class PlaylistService extends BaseManyService<Playlist, 'account'> {
       where: {
         ...options?.where,
         id_text: playlist_id_text,
-        sharable_status_id: Not(SharableStatusEnum.Private)
+        sharable_status_id: Not(SharableStatusEnum.Private),
       },
+      relations: ['account', 'account.account_profile'],
       ...options
     });
   }
@@ -116,7 +117,7 @@ export class PlaylistService extends BaseManyService<Playlist, 'account'> {
         id_text: playlist_id_text,
         account: { id_text: account_id_text }
       },
-      relations: ['account'],
+      relations: ['account', 'account.account_profile'],
       ...options
     });
   }
