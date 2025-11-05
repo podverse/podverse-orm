@@ -1,5 +1,5 @@
 import { FindManyOptions, FindOptionsRelations, FindOptionsWhere,
-  In, IsNull, Not, Repository } from 'typeorm';
+  In, IsNull, Not, Repository, MoreThan, LessThan } from 'typeorm';
 import { Channel } from '@orm/entities/channel/channel';
 import { Item } from '@orm/entities/item/item';
 import { applyProperties } from '@orm/lib/applyProperties';
@@ -34,6 +34,13 @@ type ItemGetByDto = {
   guid: string | null
   guid_enclosure_url: string | null
 }
+
+const itemQueueListRelations = [
+  'item_about',
+  'item_enclosures', 'item_enclosures.item_enclosure_sources',
+  'item_images',
+  'channel', 'channel.channel_images'
+];
 
 export class ItemService {
   protected repositoryRead: Repository<Item>;
@@ -311,6 +318,48 @@ export class ItemService {
         }
       },
       ...options
+    });
+  }
+
+  async getManyForQueueByPubDate(
+    item_id_text: string,
+    order: 'forward' | 'backward'
+  ): Promise<Item[]> {
+    const item = await this.repositoryRead.findOne({
+      where: { id_text: item_id_text },
+      relations: { channel: true }
+    });
+
+    if (!item || !item.channel || !item.pub_date) {
+      return [];
+    }
+
+    const pubDateOperator =
+      order === 'forward'
+        ? MoreThan(item.pub_date)
+        : LessThan(item.pub_date);
+
+    const pubDateSort =
+      order === 'forward'
+        ? 'ASC'
+        : 'DESC';
+    
+    return this.repositoryRead.find({
+      where: {
+        channel: item.channel,
+        live_item: {
+          id: IsNull()
+        },
+        item_flag_status: {
+          id: ItemFlagStatusStatusEnum.Active
+        },
+        pub_date: pubDateOperator
+      },
+      order: {
+        pub_date: pubDateSort
+      },
+      take: 20,
+      relations: itemQueueListRelations
     });
   }
 
