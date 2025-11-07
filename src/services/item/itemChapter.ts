@@ -37,10 +37,31 @@ export class ItemChapterService extends BaseManyService<ItemChapter, 'item_chapt
   async getByIdText(id_text: string, config?: FindOneOptions<ItemChapter>): Promise<ItemChapter | null> {
     const options: FindOneOptions<ItemChapter> = {
       where: { id_text },
+      relations: ['item_chapters_feed'],
       ...config
     };
 
-    return this.repositoryRead.findOne(options);
+    const chapter = await this.repositoryRead.findOne(options);
+
+    if (!chapter || !chapter.item_chapters_feed) {
+      return chapter;
+    }
+
+    const allChapters = await this.getAll(chapter.item_chapters_feed, {
+      order: { start_time: 'ASC' }
+    });
+
+    const currentStart = parseFloat(chapter.start_time);
+    const nextChapter = allChapters.find(
+      ch => parseFloat(ch.start_time) > currentStart
+    );
+
+    if (nextChapter) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return { ...chapter, end_time: nextChapter.start_time } as any;
+    }
+    
+    return chapter;
   }
 
   async update(item_chapters_feed: ItemChaptersFeed, dto: ItemChapterDto): Promise<ItemChapter> {    
