@@ -487,7 +487,8 @@ export const itemGetManyRelations = [
   'item_persons',
   'item_season',
   'item_season.channel_season',
-  'live_item'
+  'live_item',
+  'live_item.live_item_status'
 ];
 
 export type SubItemGetManyRelations =
