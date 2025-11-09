@@ -16,7 +16,7 @@ export class ItemEnclosure {
   @Column({ type: 'varchar', length: DATABASE_CONSTANTS.varchar_short })
   type!: string;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'bigint', nullable: true })
   length?: number | null;
 
   @Column({ type: 'int', nullable: true })
