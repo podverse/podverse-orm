@@ -21,7 +21,7 @@ import { ItemSoundbite } from '@orm/entities/item/itemSoundbite';
 import { ItemTranscript } from '@orm/entities/item/itemTranscript';
 import { ItemTxt } from '@orm/entities/item/itemTxt';
 import { ItemFlagStatus } from './itemFlagStatus';
-const shortid = require('shortid');
+import { generateRandomIdText } from '@orm/lib/nanoid';
 
 @Entity()
 @Index('item_slug', ['slug'], { unique: true, where: 'slug IS NOT NULL' })
@@ -117,7 +117,7 @@ export class Item {
   
   @BeforeInsert()
   generateIdText() {
-    this.id_text = shortid.generate();
+    this.id_text = generateRandomIdText();
   }
 
   @BeforeInsert()

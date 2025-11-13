@@ -4,7 +4,7 @@ import { Account } from '@orm/entities/account/account';
 import { SharableStatus } from '@orm/entities/sharableStatus';
 import { Medium } from '@orm/entities/medium';
 import { PlaylistResource } from './playlistResource';
-const shortid = require('shortid');
+import { generateRandomIdText } from '@orm/lib/nanoid';
 
 @Entity()
 @Unique(['account', 'medium', 'is_default_favorites'])
@@ -61,6 +61,6 @@ export class Playlist {
 
   @BeforeInsert()
   generateIdText() {
-    this.id_text = shortid.generate();
+    this.id_text = generateRandomIdText();
   }
 }

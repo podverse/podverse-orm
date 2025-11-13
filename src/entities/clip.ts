@@ -3,7 +3,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, BeforeIn
 import { Account } from '@orm/entities/account/account';
 import { Item } from '@orm/entities/item/item';
 import { SharableStatus } from '@orm/entities/sharableStatus';
-const shortid = require('shortid');
+import { generateRandomIdText } from '@orm/lib/nanoid';
 
 @Entity('clip')
 export class Clip {
@@ -52,6 +52,6 @@ export class Clip {
   
   @BeforeInsert()
   generateIdText() {
-    this.id_text = shortid.generate();
+    this.id_text = generateRandomIdText();
   }
 }

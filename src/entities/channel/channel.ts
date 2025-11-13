@@ -21,7 +21,7 @@ import { ChannelValue } from '@orm/entities/channel/channelValue';
 import { Feed } from '@orm/entities/feed/feed'; 
 import { Medium } from '@orm/entities/medium';
 import { Item } from '../item/item';
-const shortid = require('shortid');
+import { generateRandomIdText } from '@orm/lib/nanoid';
 
 @Entity('channel')
 @Unique(['podcast_guid'])
@@ -128,7 +128,7 @@ export class Channel {
 
   @BeforeInsert()
   generateIdText() {
-    this.id_text = shortid.generate();
+    this.id_text = generateRandomIdText();
   }
 
   @BeforeInsert()

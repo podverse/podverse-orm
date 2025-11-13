@@ -2,7 +2,7 @@ import { MediumEnum } from 'podverse-helpers';
 import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, BeforeInsert, Column } from 'typeorm';
 import { Account } from '@orm/entities/account/account';
 import { Medium } from '@orm/entities/medium';
-const shortid = require('shortid');
+import { generateRandomIdText } from '@orm/lib/nanoid';
 
 @Entity()
 export class Queue {
@@ -32,6 +32,6 @@ export class Queue {
 
   @BeforeInsert()
   generateIdText() {
-    this.id_text = shortid.generate();
+    this.id_text = generateRandomIdText();
   }
 }

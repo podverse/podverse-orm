@@ -15,7 +15,7 @@ import { AccountProfile } from './accountProfile';
 import { AccountResetPassword } from './accountResetPassword';
 import { AccountUpDevice } from './accountUPDevice';
 import { AccountVerification } from './accountVerification';
-const shortid = require('shortid');
+import { generateRandomIdText } from '@orm/lib/nanoid';
 
 @Entity()
 export class Account {
@@ -79,6 +79,6 @@ export class Account {
 
   @BeforeInsert()
   generateIdText() {
-    this.id_text = shortid.generate();
+    this.id_text = generateRandomIdText();
   }
 }

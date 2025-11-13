@@ -1,8 +1,7 @@
 import { DATABASE_CONSTANTS } from 'podverse-helpers';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, BeforeInsert } from 'typeorm';
 import { ItemChaptersFeed } from './itemChaptersFeed';
-
-const shortid = require('shortid');
+import { generateRandomIdText } from '@orm/lib/nanoid';
 
 @Entity()
 export class ItemChapter {
@@ -39,6 +38,6 @@ export class ItemChapter {
 
   @BeforeInsert()
   setIdText() {
-    this.id_text = shortid.generate();
+    this.id_text = generateRandomIdText();
   }
 }

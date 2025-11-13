@@ -1,7 +1,7 @@
 import { DATABASE_CONSTANTS } from 'podverse-helpers';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, BeforeInsert } from 'typeorm';
 import { Item } from '@orm/entities/item/item';
-const shortid = require('shortid');
+import { generateRandomIdText } from '@orm/lib/nanoid';
 
 @Entity()
 export class ItemSoundbite {
@@ -26,6 +26,6 @@ export class ItemSoundbite {
 
   @BeforeInsert()
   generateIdText() {
-    this.id_text = shortid.generate();
+    this.id_text = generateRandomIdText();
   }
 }
