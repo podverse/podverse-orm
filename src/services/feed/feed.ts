@@ -1,3 +1,4 @@
+import { In } from 'typeorm';
 import { AppDataSourceRead, AppDataSourceReadWrite } from '@orm/db';
 import { Feed } from '@orm/entities/feed/feed';
 import { FeedFlagStatusStatusEnum } from '@orm/entities/feed/feedFlagStatus';
@@ -48,6 +49,32 @@ export class FeedService {
     });
   }
 
+  async getByUrl(url: string): Promise<Feed | null> {
+    const base = url.replace(/^https?:\/\//i, '');
+    const httpsUrl = `https://${base}`;
+    const httpUrl = `http://${base}`;
+
+    const httpsFeed = await this.repositoryRead.findOne({
+      where: {
+        url: httpsUrl,
+        feed_flag_status: In([FeedFlagStatusStatusEnum.Active, FeedFlagStatusStatusEnum.AlwaysParse])
+      },
+      relations: ['channel', 'feed_flag_status', 'feed_log'],
+    });
+    if (httpsFeed) return httpsFeed;
+
+    const httpFeed = await this.repositoryRead.findOne({
+      where: {
+        url: httpUrl,
+        feed_flag_status: In([FeedFlagStatusStatusEnum.Active, FeedFlagStatusStatusEnum.AlwaysParse])
+      },
+      relations: ['channel', 'feed_flag_status', 'feed_log'],
+    });
+    if (httpFeed) return httpFeed;
+
+    return null;
+  }
+
   async getByUrlAndPodcastIndexId({ url, podcast_index_id }: { url: string, podcast_index_id: number }): Promise<Feed | null> {
     return this.repositoryRead.findOne({
       where: {
@@ -65,7 +92,8 @@ export class FeedService {
       where: {
         channel: {
           podcast_index_id
-        }
+        },
+        feed_flag_status: In([FeedFlagStatusStatusEnum.Active, FeedFlagStatusStatusEnum.AlwaysParse])
       },
       relations: ['channel', 'feed_flag_status', 'feed_log'],
     });
