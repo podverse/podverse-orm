@@ -32,7 +32,7 @@ type ChannelDto = {
   has_value_time_splits?: boolean
 }
 
-export const channelGetManyRelations: Array<keyof Channel> = [
+export const channelGetManyRelations = [
   'channel_about',
   'channel_categories',
   'channel_chat',
