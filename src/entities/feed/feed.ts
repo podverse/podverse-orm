@@ -12,6 +12,9 @@ export class Feed {
   @Column({ type: 'varchar', unique: true, length: DATABASE_CONSTANTS.varchar_url })
   url!: string;
 
+  @Column({ type: 'int', unique: true })
+  podcast_index_id!: number;
+
   @ManyToOne(() => FeedFlagStatus, feed_flag_status => feed_flag_status.id)
   @JoinColumn({ name: 'feed_flag_status_id' })
   feed_flag_status!: FeedFlagStatus;

@@ -17,11 +17,6 @@ import { ChannelValueService } from './channelValue';
 import { ChannelValueRecipientService } from './channelValueRecipient';
 import { FeedFlagStatusStatusEnum } from '@orm/entities/feed/feedFlagStatus';
 
-type ChannelInitializeDto = {
-  feed: Feed,
-  podcast_index_id: number
-}
-
 type ChannelDto = {
   slug?: string | null
   podcast_guid?: string | null
@@ -248,7 +243,10 @@ export class ChannelService {
   }
 
   async getByPodcastIndexId(podcast_index_id: number, relations: FindOptionsRelations<Channel> = {}) {
-    return this.repositoryRead.findOne({ where: { podcast_index_id }, relations }) as unknown as Promise<Channel | null>;
+    return this.repositoryRead.findOne({
+      where: { feed: { podcast_index_id } },
+      relations
+    }) as unknown as Promise<Channel | null>;
   }
 
   async getMany(config: FindManyOptions<Channel>, channelWhere?: FindOptionsWhere<Channel>): Promise<Channel[]> {
@@ -274,13 +272,14 @@ export class ChannelService {
     });
   }
 
-  async getOrCreateByPodcastIndexId(dto: ChannelInitializeDto): Promise<Channel> {
-    let channel = await this.getByPodcastIndexId(dto.podcast_index_id);
+  async getOrCreateByFeed(feed: Feed): Promise<Channel> {
+    let channel = await this.repositoryRead.findOne({
+      where: { feed_id: feed.id }
+    });
 
     if (!channel) {
       channel = new Channel();
-      channel.feed_id = dto.feed.id;
-      channel.podcast_index_id = dto.podcast_index_id;
+      channel.feed_id = feed.id;
       channel.medium_id = MediumEnum.Podcast; // default to podcast. This will be overridden after channel is parsed.
       channel.medium = MediumEnum.Podcast; // default to podcast. This will be overridden after channel is parsed.
       channel = await this.repositoryReadWrite.save(channel);
@@ -300,16 +299,4 @@ export class ChannelService {
 
     return this.repositoryReadWrite.save(channel);
   }
-
-  async updatePodcastIndexId(id: number, podcast_index_id: number): Promise<Channel> {
-    let channel = await this.get(id);
-
-    if (!channel) {
-      channel = new Channel();
-    }
-
-    channel = applyProperties(channel, { podcast_index_id });
-
-    return this.repositoryReadWrite.save(channel);
-  } 
 }

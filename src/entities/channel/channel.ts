@@ -44,9 +44,6 @@ export class Channel {
   @Column({ type: 'int', nullable: false })
   feed_id!: number;
 
-  @Column({ type: 'int', unique: true })
-  podcast_index_id!: number;
-
   @Column({ type: 'uuid', nullable: true })
   podcast_guid!: string | null;
 

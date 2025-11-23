@@ -1,12 +1,8 @@
-import { In } from 'typeorm';
 import { AppDataSourceRead, AppDataSourceReadWrite } from '@orm/db';
 import { Feed } from '@orm/entities/feed/feed';
 import { FeedFlagStatusStatusEnum } from '@orm/entities/feed/feedFlagStatus';
-import { ChannelService } from '@orm/services/channel/channel';
 import { FeedFlagStatusService } from './feedFlagStatus';
 import { applyProperties } from '@orm/lib/applyProperties';
-
-const channelService = new ChannelService();
 
 type FeedCreateDto = {
   url: string,
@@ -49,15 +45,14 @@ export class FeedService {
     });
   }
 
-  async getByUrl(url: string): Promise<Feed | null> {
+  async getByUrl({ url }: { url: string }): Promise<Feed | null> {
     const base = url.replace(/^https?:\/\//i, '');
     const httpsUrl = `https://${base}`;
     const httpUrl = `http://${base}`;
 
     const httpsFeed = await this.repositoryRead.findOne({
       where: {
-        url: httpsUrl,
-        feed_flag_status: In([FeedFlagStatusStatusEnum.Active, FeedFlagStatusStatusEnum.AlwaysParse])
+        url: httpsUrl
       },
       relations: ['channel', 'feed_flag_status', 'feed_log'],
     });
@@ -65,8 +60,7 @@ export class FeedService {
 
     const httpFeed = await this.repositoryRead.findOne({
       where: {
-        url: httpUrl,
-        feed_flag_status: In([FeedFlagStatusStatusEnum.Active, FeedFlagStatusStatusEnum.AlwaysParse])
+        url: httpUrl
       },
       relations: ['channel', 'feed_flag_status', 'feed_log'],
     });
@@ -75,13 +69,12 @@ export class FeedService {
     return null;
   }
 
-  async getByUrlAndPodcastIndexId({ url, podcast_index_id }: { url: string, podcast_index_id: number }): Promise<Feed | null> {
+  async getByUrlAndPodcastIndexId({ url, podcast_index_id }: {
+    url: string, podcast_index_id: number }): Promise<Feed | null> {
     return this.repositoryRead.findOne({
       where: {
         url,
-        channel: {
-          podcast_index_id
-        }
+        podcast_index_id
       },
       relations: ['channel', 'feed_flag_status', 'feed_log'],
     });
@@ -90,10 +83,7 @@ export class FeedService {
   async getByPodcastIndexId({ podcast_index_id }: { podcast_index_id: number }): Promise<Feed | null> {
     return this.repositoryRead.findOne({
       where: {
-        channel: {
-          podcast_index_id
-        },
-        feed_flag_status: In([FeedFlagStatusStatusEnum.Active, FeedFlagStatusStatusEnum.AlwaysParse])
+        podcast_index_id
       },
       relations: ['channel', 'feed_flag_status', 'feed_log'],
     });
@@ -115,6 +105,7 @@ export class FeedService {
   async create({ url, podcast_index_id }: FeedCreateDto): Promise<Feed> {
     const feed = new Feed();
     feed.url = url;
+    feed.podcast_index_id = podcast_index_id;
 
     const feedFlagStatusService = new FeedFlagStatusService();
     const feed_flag_status = await feedFlagStatusService.get(FeedFlagStatusStatusEnum.Active);
@@ -128,15 +119,7 @@ export class FeedService {
     feed.parsing_priority = 0;
     feed.container_id = '';
 
-    const newFeed = await this.repositoryReadWrite.save(feed);
-
-    const channel = await channelService.getOrCreateByPodcastIndexId({
-      feed: newFeed,
-      podcast_index_id
-    });
-    
-    newFeed.channel = channel;
-    return this.repositoryReadWrite.save(newFeed);
+    return this.repositoryReadWrite.save(feed);
   }
 
   async update(id: number, dto: FeedUpdateDto): Promise<Feed> {
