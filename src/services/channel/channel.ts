@@ -279,6 +279,7 @@ export class ChannelService {
 
     if (!channel) {
       channel = new Channel();
+      channel.feed = feed;
       channel.feed_id = feed.id;
       channel.medium_id = MediumEnum.Podcast; // default to podcast. This will be overridden after channel is parsed.
       channel.medium = MediumEnum.Podcast; // default to podcast. This will be overridden after channel is parsed.
