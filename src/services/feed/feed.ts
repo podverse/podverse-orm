@@ -80,7 +80,7 @@ export class FeedService {
     });
   }
   
-  async getByPodcastIndexId({ podcast_index_id }: { podcast_index_id: number }): Promise<Feed | null> {
+  async getByPodcastIndexId(podcast_index_id: number): Promise<Feed | null> {
     return this.repositoryRead.findOne({
       where: {
         podcast_index_id
