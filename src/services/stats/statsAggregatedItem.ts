@@ -1,3 +1,4 @@
+import { MediumEnum } from 'podverse-helpers';
 import { StatsAggregatedItem } from '@orm/entities/stats/statsAggregatedItem';
 import { StatsTrackEventItemService } from './statsTrackEventItem';
 import { BaseStatsAggregatedService, UpdateHistoricalOptions } from './baseStatsAggregated';
@@ -16,22 +17,35 @@ export class StatsAggregatedItemService extends BaseStatsAggregatedService<Stats
     return 'item_id';
   }
 
-  async getMany(config: FindManyOptions<StatsAggregatedItem>): Promise<StatsAggregatedItem[]> {
+  async getMany(
+    config: FindManyOptions<StatsAggregatedItem>,
+    medium_id: MediumEnum | null
+  ): Promise<StatsAggregatedItem[]> {
     return this.repositoryRead.find({
       where: {
         item: {
-          ...getActiveFeedWhere()
+          ...getActiveFeedWhere({
+            channel_ids: null,
+            medium_id
+          })
         }
       },
       ...config
     });
   }
 
-  async getManyByChannels(channel_ids: number[], config: FindManyOptions<StatsAggregatedItem>): Promise<StatsAggregatedItem[]> {
+  async getManyByChannels(
+    channel_ids: number[],
+    medium_id: MediumEnum | null,
+    config: FindManyOptions<StatsAggregatedItem>
+  ): Promise<StatsAggregatedItem[]> {
     return this.repositoryRead.find({
       where: {
         item: {
-          ...getActiveFeedWhere(channel_ids)
+          ...getActiveFeedWhere({
+            channel_ids,
+            medium_id
+          })
         }
       },
       ...config

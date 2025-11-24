@@ -249,12 +249,17 @@ export class ChannelService {
     }) as unknown as Promise<Channel | null>;
   }
 
-  async getMany(config: FindManyOptions<Channel>, channelWhere?: FindOptionsWhere<Channel>): Promise<Channel[]> {
+  async getMany(
+    config: FindManyOptions<Channel>,
+    medium_id: MediumEnum | null,
+    channelWhere?: FindOptionsWhere<Channel>
+  ): Promise<Channel[]> {
     return this.repositoryRead.find({
       where: {
         feed: {
           feed_flag_status: In([FeedFlagStatusStatusEnum.Active, FeedFlagStatusStatusEnum.AlwaysParse])
         },
+        ...(medium_id ? { medium_id: Equal(medium_id) } : {}),
         ...(channelWhere ?? {})
       },
       ...config

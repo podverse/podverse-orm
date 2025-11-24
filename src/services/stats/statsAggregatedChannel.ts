@@ -1,3 +1,4 @@
+import { MediumEnum } from 'podverse-helpers';
 import { FindManyOptions } from 'typeorm';
 import { StatsAggregatedChannel } from '@orm/entities/stats/statsAggregatedChannel';
 import { StatsTrackEventChannelService } from './statsTrackEventChannel';
@@ -20,32 +21,46 @@ export class StatsAggregatedChannelService extends BaseStatsAggregatedService<St
     return { ...(feedWhere || {}), ...(configWhere || {}) };
   }
 
-  async getMany(config: FindManyOptions<StatsAggregatedChannel>): Promise<StatsAggregatedChannel[]> {
-    const feedWhere = getActiveFeedWhere();
+  async getMany(
+    config: FindManyOptions<StatsAggregatedChannel>,
+    medium_id: MediumEnum | null
+  ): Promise<StatsAggregatedChannel[]> {
+    const feedWhere = getActiveFeedWhere({ channel_ids: null, medium_id });
     return this.repositoryRead.find({
       ...config,
       where: this.mergeWhere(feedWhere, config.where)
     });
   }
 
-  async getManyCount(config: FindManyOptions<StatsAggregatedChannel>): Promise<number> {
-    const feedWhere = getActiveFeedWhere();
+  async getManyCount(
+    config: FindManyOptions<StatsAggregatedChannel>,
+    medium_id: MediumEnum | null
+  ): Promise<number> {
+    const feedWhere = getActiveFeedWhere({ channel_ids: null, medium_id });
     return this.repositoryRead.count({
       ...config,
       where: this.mergeWhere(feedWhere, config.where)
     });
   }
 
-  async getManyByChannels(channel_ids: number[], config: FindManyOptions<StatsAggregatedChannel>): Promise<StatsAggregatedChannel[]> {
-    const feedWhere = getActiveFeedWhere(channel_ids);
+  async getManyByChannels(
+    channel_ids: number[],
+    medium_id: MediumEnum | null,
+    config: FindManyOptions<StatsAggregatedChannel>,
+  ): Promise<StatsAggregatedChannel[]> {
+    const feedWhere = getActiveFeedWhere({ channel_ids, medium_id });
     return this.repositoryRead.find({
       ...config,
       where: this.mergeWhere(feedWhere, config.where)
     });
   }
 
-  async getManyByChannelsCount(channel_ids: number[], config: FindManyOptions<StatsAggregatedChannel>): Promise<number> {
-    const feedWhere = getActiveFeedWhere(channel_ids);
+  async getManyByChannelsCount(
+    channel_ids: number[],
+    medium_id: MediumEnum | null,
+    config: FindManyOptions<StatsAggregatedChannel>
+  ): Promise<number> {
+    const feedWhere = getActiveFeedWhere({ channel_ids, medium_id });
     return this.repositoryRead.count({
       ...config,
       where: this.mergeWhere(feedWhere, config.where)
