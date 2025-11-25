@@ -252,7 +252,7 @@ export class ChannelService {
   async getMany(
     config: FindManyOptions<Channel>,
     medium_id: MediumEnum | null,
-    channelWhere?: FindOptionsWhere<Channel>
+    category_id: number | null
   ): Promise<Channel[]> {
     return this.repositoryRead.find({
       where: {
@@ -260,7 +260,7 @@ export class ChannelService {
           feed_flag_status: In([FeedFlagStatusStatusEnum.Active, FeedFlagStatusStatusEnum.AlwaysParse])
         },
         ...(medium_id ? { medium_id: Equal(medium_id) } : {}),
-        ...(channelWhere ?? {})
+        ...(category_id ? { channel_categories: { category_id: Equal(category_id) } } : {})
       },
       ...config
     });
@@ -272,6 +272,18 @@ export class ChannelService {
         feed: {
           feed_flag_status: In([FeedFlagStatusStatusEnum.Active, FeedFlagStatusStatusEnum.AlwaysParse])
         }
+      },
+      ...config
+    });
+  }
+
+  async getAllByPodcastGuids(
+    config: FindManyOptions<Channel>,
+    podcast_guids: string[]
+  ): Promise<Channel[]> {
+    return this.repositoryRead.find({
+      where: {
+        podcast_guid: In(podcast_guids)
       },
       ...config
     });

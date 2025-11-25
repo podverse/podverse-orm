@@ -1,4 +1,4 @@
-import { EntityManager, In } from 'typeorm';
+import { EntityManager } from 'typeorm';
 import { Channel } from '@orm/entities/channel/channel';
 import { ChannelPodroll } from '@orm/entities/channel/channelPodroll';
 import { BaseOneService } from '@orm/services/base/baseOneService';
@@ -39,14 +39,14 @@ export class ChannelPodrollService extends BaseOneService<ChannelPodroll, 'chann
       }
     }
 
-    const medium = null;
-    const podrollChannels = await channelService.getMany({
-      relations: ['channel_images']
-    },
-    medium,
-    {
-      podcast_guid: In(feed_guids)
-    });
+    const podrollChannels = await channelService.getAllByPodcastGuids(
+      {
+        relations: [
+          'channel_images'
+        ]
+      },
+      feed_guids
+    );
 
     return podrollChannels;
   }
