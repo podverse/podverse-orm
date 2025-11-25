@@ -1,5 +1,7 @@
+import { MediumEnum } from 'podverse-helpers';
 import { FindManyOptions, FindOptionsRelations, FindOptionsWhere,
-  In, IsNull, Not, Repository, MoreThan, LessThan } from 'typeorm';
+  In, IsNull, Not, Repository, MoreThan, LessThan, 
+  Equal} from 'typeorm';
 import { Channel } from '@orm/entities/channel/channel';
 import { Item } from '@orm/entities/item/item';
 import { applyProperties } from '@orm/lib/applyProperties';
@@ -213,14 +215,24 @@ export class ItemService {
     return items[0] || null;
   }
 
-  async getMany(config: FindManyOptions<Item>, itemType: 'normal' | 'live-item'): Promise<Item[]> {
+  async getMany(
+    config: FindManyOptions<Item>,
+    medium_id: MediumEnum | null,
+    category_id: number | null,
+    itemType: 'normal' | 'live-item'
+  ): Promise<Item[]> {
     return this.repositoryRead.find({
       ...config,
       where: {
         channel: {
           feed: {
             feed_flag_status: In([1, 2])
-          }
+          },
+          ...(medium_id ? { medium_id: Equal(medium_id) } : {}),
+          ...(category_id ? { channel_categories: { category_id: Equal(category_id) } } : {})
+        },
+        item_flag_status: {
+          id: ItemFlagStatusStatusEnum.Active
         },
         live_item: {
           id: itemType === 'live-item' ? Not(IsNull()) : IsNull()

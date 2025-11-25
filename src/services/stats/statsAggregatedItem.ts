@@ -2,7 +2,7 @@ import { MediumEnum } from 'podverse-helpers';
 import { StatsAggregatedItem } from '@orm/entities/stats/statsAggregatedItem';
 import { StatsTrackEventItemService } from './statsTrackEventItem';
 import { BaseStatsAggregatedService, UpdateHistoricalOptions } from './baseStatsAggregated';
-import { FindManyOptions } from 'typeorm';
+import { FindManyOptions, IsNull, Not } from 'typeorm';
 import { getActiveFeedWhere } from '@orm/lib/feedFlagHelpers';
 
 export class StatsAggregatedItemService extends BaseStatsAggregatedService<StatsAggregatedItem, number> {
@@ -20,7 +20,8 @@ export class StatsAggregatedItemService extends BaseStatsAggregatedService<Stats
   async getMany(
     config: FindManyOptions<StatsAggregatedItem>,
     medium_id: MediumEnum | null,
-    category_id: number | null
+    category_id: number | null,
+    itemType: 'normal' | 'live-item'
   ): Promise<StatsAggregatedItem[]> {
     return this.repositoryRead.find({
       where: {
@@ -29,7 +30,10 @@ export class StatsAggregatedItemService extends BaseStatsAggregatedService<Stats
             channel_ids: null,
             medium_id,
             category_id
-          })
+          }),
+          live_item: {
+            id: itemType === 'live-item' ? Not(IsNull()) : IsNull()
+          }
         }
       },
       ...config
@@ -37,9 +41,10 @@ export class StatsAggregatedItemService extends BaseStatsAggregatedService<Stats
   }
 
   async getManyByChannels(
+    config: FindManyOptions<StatsAggregatedItem>,
     channel_ids: number[],
     medium_id: MediumEnum | null,
-    config: FindManyOptions<StatsAggregatedItem>
+    itemType: 'normal' | 'live-item'
   ): Promise<StatsAggregatedItem[]> {
     return this.repositoryRead.find({
       where: {
@@ -48,7 +53,10 @@ export class StatsAggregatedItemService extends BaseStatsAggregatedService<Stats
             channel_ids,
             medium_id,
             category_id: null
-          })
+          }),
+          live_item: {
+            id: itemType === 'live-item' ? Not(IsNull()) : IsNull()
+          }
         }
       },
       ...config
