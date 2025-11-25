@@ -19,14 +19,16 @@ export class StatsAggregatedItemService extends BaseStatsAggregatedService<Stats
 
   async getMany(
     config: FindManyOptions<StatsAggregatedItem>,
-    medium_id: MediumEnum | null
+    medium_id: MediumEnum | null,
+    category_id: number | null
   ): Promise<StatsAggregatedItem[]> {
     return this.repositoryRead.find({
       where: {
         item: {
           ...getActiveFeedWhere({
             channel_ids: null,
-            medium_id
+            medium_id,
+            category_id
           })
         }
       },
@@ -44,7 +46,8 @@ export class StatsAggregatedItemService extends BaseStatsAggregatedService<Stats
         item: {
           ...getActiveFeedWhere({
             channel_ids,
-            medium_id
+            medium_id,
+            category_id: null
           })
         }
       },

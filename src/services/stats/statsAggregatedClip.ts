@@ -27,7 +27,8 @@ export class StatsAggregatedClipService extends BaseStatsAggregatedService<Stats
           item: {
             ...getActiveFeedWhere({
               channel_ids: null,
-              medium_id
+              medium_id,
+              category_id: null
             })
           }
         }
@@ -47,7 +48,8 @@ export class StatsAggregatedClipService extends BaseStatsAggregatedService<Stats
           item: {
             ...getActiveFeedWhere({
               channel_ids: null,
-              medium_id
+              medium_id,
+              category_id: null
             })
           }
         }

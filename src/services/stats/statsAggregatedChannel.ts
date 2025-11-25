@@ -23,9 +23,14 @@ export class StatsAggregatedChannelService extends BaseStatsAggregatedService<St
 
   async getMany(
     config: FindManyOptions<StatsAggregatedChannel>,
-    medium_id: MediumEnum | null
+    medium_id: MediumEnum | null,
+    category_id: number | null
   ): Promise<StatsAggregatedChannel[]> {
-    const feedWhere = getActiveFeedWhere({ channel_ids: null, medium_id });
+    const feedWhere = getActiveFeedWhere({
+      channel_ids: null,
+      medium_id,
+      category_id
+    });
     return this.repositoryRead.find({
       ...config,
       where: this.mergeWhere(feedWhere, config.where)
@@ -36,7 +41,11 @@ export class StatsAggregatedChannelService extends BaseStatsAggregatedService<St
     config: FindManyOptions<StatsAggregatedChannel>,
     medium_id: MediumEnum | null
   ): Promise<number> {
-    const feedWhere = getActiveFeedWhere({ channel_ids: null, medium_id });
+    const feedWhere = getActiveFeedWhere({
+      channel_ids: null,
+      medium_id,
+      category_id: null
+    });
     return this.repositoryRead.count({
       ...config,
       where: this.mergeWhere(feedWhere, config.where)
@@ -48,7 +57,11 @@ export class StatsAggregatedChannelService extends BaseStatsAggregatedService<St
     medium_id: MediumEnum | null,
     config: FindManyOptions<StatsAggregatedChannel>,
   ): Promise<StatsAggregatedChannel[]> {
-    const feedWhere = getActiveFeedWhere({ channel_ids, medium_id });
+    const feedWhere = getActiveFeedWhere({
+      channel_ids,
+      medium_id,
+      category_id: null
+    });
     return this.repositoryRead.find({
       ...config,
       where: this.mergeWhere(feedWhere, config.where)
@@ -60,7 +73,11 @@ export class StatsAggregatedChannelService extends BaseStatsAggregatedService<St
     medium_id: MediumEnum | null,
     config: FindManyOptions<StatsAggregatedChannel>
   ): Promise<number> {
-    const feedWhere = getActiveFeedWhere({ channel_ids, medium_id });
+    const feedWhere = getActiveFeedWhere({
+      channel_ids,
+      medium_id,
+      category_id: null
+    });
     return this.repositoryRead.count({
       ...config,
       where: this.mergeWhere(feedWhere, config.where)
