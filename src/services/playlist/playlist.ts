@@ -1,5 +1,5 @@
 import { MediumEnum, SharableStatusEnum } from 'podverse-helpers';
-import { EntityManager, FindManyOptions, FindOneOptions, Not } from 'typeorm';
+import { EntityManager, Equal, FindManyOptions, FindOneOptions, Not } from 'typeorm';
 import { Playlist } from '@orm/entities/playlist/playlist';
 import { BaseManyService } from '@orm/services/base/baseManyService';
 import { AccountService } from '@orm/services/account/account';
@@ -86,7 +86,11 @@ export class PlaylistService extends BaseManyService<Playlist, 'account'> {
     });
   }
 
-  async getManyPrivate(account_id: number, options?: FindManyOptions<Playlist>): Promise<[Playlist[], number] > {
+  async getManyPrivate(
+    account_id: number,
+    medium_id: MediumEnum | null,
+    options?: FindManyOptions<Playlist>
+  ): Promise<[Playlist[], number] > {
     return this.repositoryRead.findAndCount({
       ...options,
       where: {
@@ -94,6 +98,7 @@ export class PlaylistService extends BaseManyService<Playlist, 'account'> {
         account: {
           id: account_id
         },
+        ...(medium_id ? { medium_id: Equal(medium_id) } : {}),
       },
     });
   }
