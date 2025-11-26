@@ -1,5 +1,5 @@
 import { MediumEnum, SharableStatusEnum } from 'podverse-helpers';
-import { FindManyOptions, In } from 'typeorm';
+import { Equal, FindManyOptions, In } from 'typeorm';
 import { StatsAggregatedPlaylist } from '@orm/entities/stats/statsAggregatedPlaylist';
 import { StatsTrackEventPlaylistService } from './statsTrackEventPlaylist';
 import { BaseStatsAggregatedService, STATS_AGGREGATED_SELECT_ALL, UpdateHistoricalOptions } from './baseStatsAggregated';
@@ -26,7 +26,7 @@ export class StatsAggregatedPlaylistService extends BaseStatsAggregatedService<S
 
   async getManyPublic(
     config: FindManyOptions<StatsAggregatedPlaylist>,
-    medium_id?: MediumEnum
+    medium_id: MediumEnum | null
   ): Promise<StatsAggregatedPlaylist[]> {
     return this.repositoryRead.find({
       ...config,
@@ -49,7 +49,7 @@ export class StatsAggregatedPlaylistService extends BaseStatsAggregatedService<S
       where: {
         playlist: {
           sharable_status_id: SharableStatusEnum.Public,
-          ...(medium_id ? { medium_id } : {})
+          ...(medium_id ? { medium_id: Equal(medium_id) } : {})
         }
       },
       relations: [
@@ -65,7 +65,7 @@ export class StatsAggregatedPlaylistService extends BaseStatsAggregatedService<S
   async getManyPrivate(
     config: FindManyOptions<StatsAggregatedPlaylist>,
     account_id: number,
-    medium_id?: MediumEnum,
+    medium_id: MediumEnum | null,
   ): Promise<[StatsAggregatedPlaylist[], number]> {
     return this.repositoryRead.findAndCount({
       ...config,
@@ -87,8 +87,8 @@ export class StatsAggregatedPlaylistService extends BaseStatsAggregatedService<S
       },
       where: {
         playlist: {
-          ...(medium_id ? { medium_id } : {}),
-          ...(account_id ? { account: { id: account_id } } : {})
+          ...(medium_id ? { medium_id: Equal(medium_id) } : {}),
+          ...(account_id ? { account: { id: Equal(account_id) } } : {})
         }
       },
       relations: [
