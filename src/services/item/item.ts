@@ -487,7 +487,22 @@ export class ItemService {
   }
 }
 
-export const itemGetManyRelations = [
+export type ItemGetManyRelations =
+  | 'item_about'
+  | 'item_about.item_itunes_episode_type'
+  | 'item_chat'
+  | 'item_description'
+  | 'item_enclosures'
+  | 'item_enclosures.item_enclosure_integrity'
+  | 'item_enclosures.item_enclosure_sources'
+  | 'item_images'
+  | 'item_persons'
+  | 'item_season'
+  | 'item_season.channel_season'
+  | 'live_item'
+  | 'live_item.live_item_status';
+
+export const itemGetManyRelations: ItemGetManyRelations[] = [
   'item_about',
   'item_about.item_itunes_episode_type',
   'item_chat',
@@ -501,6 +516,17 @@ export const itemGetManyRelations = [
   'item_season.channel_season',
   'live_item',
   'live_item.live_item_status'
+];
+
+export type ItemGetManyRelationsWithChannel =
+  | ItemGetManyRelations
+  | 'channel'
+  | 'channel.channel_images';
+
+export const itemGetManyRelationsWithChannel: ItemGetManyRelationsWithChannel[] = [
+  ...itemGetManyRelations,
+  'channel',
+  'channel.channel_images'
 ];
 
 export type SubItemGetManyRelations =
