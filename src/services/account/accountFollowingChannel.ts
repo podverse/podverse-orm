@@ -45,16 +45,17 @@ export class AccountFollowingChannelService extends BaseManyService<AccountFollo
       throw new Error("Account not found.");
     }
 
+    const where: FindManyOptions<AccountFollowingChannel>['where'] = {
+      account_id: Equal(account.id),
+    };
+
+    if (medium_id) {
+      where['channel'] = { medium_id: Equal(medium_id) };
+    }
+
     const finalConfig = {
       ...config,
-      ...(medium_id ? {
-        where: {
-          ...config?.where,
-          channel: {
-            medium_id: Equal(medium_id)
-          }
-        }
-      } : {})
+      where
     };
 
     return this._getAllWithCount(account, finalConfig);
