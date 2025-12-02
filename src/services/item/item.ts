@@ -518,17 +518,6 @@ export const itemGetManyRelations: ItemGetManyRelations[] = [
   'live_item.live_item_status'
 ];
 
-export type ItemGetManyRelationsWithChannel =
-  | ItemGetManyRelations
-  | 'channel'
-  | 'channel.channel_images';
-
-export const itemGetManyRelationsWithChannel: ItemGetManyRelationsWithChannel[] = [
-  ...itemGetManyRelations,
-  'channel',
-  'channel.channel_images'
-];
-
 export type SubItemGetManyRelations =
   | 'item'
   | 'item.item_about'
@@ -556,6 +545,28 @@ export const subItemGetManyRelations: SubItemGetManyRelations[] = [
   'item.item_season',
   'item.item_season.channel_season',
   'item.live_item'
+];
+
+export type ItemGetManyRelationsWithChannel =
+  | ItemGetManyRelations
+  | 'channel'
+  | 'channel.channel_images';
+
+export const itemGetManyRelationsWithChannel: ItemGetManyRelationsWithChannel[] = [
+  ...itemGetManyRelations,
+  'channel',
+  'channel.channel_images'
+];
+
+export type SubItemGetManyRelationsWithChannel =
+  | SubItemGetManyRelations
+  | 'item.channel'
+  | 'item.channel.channel_images';
+
+export const subItemGetManyRelationsWithChannel: SubItemGetManyRelationsWithChannel[] = [
+  ...subItemGetManyRelations,
+  'item.channel',
+  'item.channel.channel_images'
 ];
 
 export const itemGetOneRelations: FindOptionsRelations<Item> = {
