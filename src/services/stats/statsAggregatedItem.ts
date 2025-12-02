@@ -40,18 +40,17 @@ export class StatsAggregatedItemService extends BaseStatsAggregatedService<Stats
     });
   }
 
-  async getManyByChannels(
+  async getManyByChannelsAndCount(
     config: FindManyOptions<StatsAggregatedItem>,
     channel_ids: number[],
-    medium_id: MediumEnum | null,
     itemType: 'normal' | 'live-item'
-  ): Promise<StatsAggregatedItem[]> {
-    return this.repositoryRead.find({
+  ): Promise<[StatsAggregatedItem[], number]> {
+    return this.repositoryRead.findAndCount({
       where: {
         item: {
           ...getActiveFeedWhere({
             channel_ids,
-            medium_id,
+            medium_id: null,
             category_id: null
           }),
           live_item: {

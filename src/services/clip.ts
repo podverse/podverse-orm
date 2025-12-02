@@ -1,8 +1,10 @@
-import { EntityManager, FindOneOptions, FindManyOptions } from 'typeorm';
+import { EntityManager, FindOneOptions, FindManyOptions, In, Equal } from 'typeorm';
 import { Clip } from '@orm/entities/clip';
 import { BaseManyService } from '@orm/services/base/baseManyService';
 import { AccountService } from '@orm/services/account/account';
 import { ItemService } from './item/item';
+import { MediumEnum, SharableStatusEnum } from 'podverse-helpers';
+import { FeedFlagStatusStatusEnum } from '../';
 
 export type ClipDto = {
   start_time: string;
@@ -103,12 +105,66 @@ export class ClipService extends BaseManyService<Clip, 'account'> {
     return this.repositoryRead.findOne(options);
   }
 
-  async getMany(options?: FindManyOptions<Clip>): Promise<Clip[]> {
-    return this.repositoryRead.find(options);
+  async getManyPublic(
+    medium_id: MediumEnum | null,
+    category_id: number | null,
+    config: FindManyOptions<Clip>
+  ): Promise<Clip[]> {
+    return this.repositoryRead.find({
+      where: {
+        sharable_status_id: SharableStatusEnum.Public,
+        item: {
+          channel: {
+            feed: {
+              feed_flag_status: In([FeedFlagStatusStatusEnum.Active, FeedFlagStatusStatusEnum.AlwaysParse])
+            },
+            ...(medium_id ? { medium_id: Equal(medium_id) } : {}),
+            ...(category_id ? { channel_categories: { category_id: Equal(category_id) } } : {})
+          }
+        },
+      },
+      ...config
+    });
   }
 
-  async getManyAndCount(options?: FindManyOptions<Clip>): Promise<[Clip[], number]> {
-    return this.repositoryRead.findAndCount(options);
+  async getManyByChannelAndCountPublic(
+    channel_id_text: string,
+    config: FindManyOptions<Clip>
+  ): Promise<[Clip[], number]> {
+    return this.repositoryRead.findAndCount({
+      where: {
+        sharable_status_id: SharableStatusEnum.Public,
+        item: {
+          channel: {
+            feed: {
+              feed_flag_status: In([FeedFlagStatusStatusEnum.Active, FeedFlagStatusStatusEnum.AlwaysParse])
+            },
+            id_text: channel_id_text
+          }
+        },
+      },
+      ...config
+    });
+  }
+
+  async getManyByItemAndCountPublic(
+    item_id_text: string,
+    config: FindManyOptions<Clip>
+  ): Promise<[Clip[], number]> {
+    return this.repositoryRead.findAndCount({
+      where: {
+        sharable_status_id: SharableStatusEnum.Public,
+        item: {
+          id_text: item_id_text,
+          channel: {
+            feed: {
+              feed_flag_status: In([FeedFlagStatusStatusEnum.Active, FeedFlagStatusStatusEnum.AlwaysParse])
+            },
+          }
+        },
+      },
+      ...config
+    });
   }
 
   async getManyByAccount(account_id: number): Promise<Clip[]> {

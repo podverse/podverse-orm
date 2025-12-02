@@ -37,48 +37,16 @@ export class StatsAggregatedChannelService extends BaseStatsAggregatedService<St
     });
   }
 
-  async getManyCount(
-    config: FindManyOptions<StatsAggregatedChannel>,
-    medium_id: MediumEnum | null
-  ): Promise<number> {
-    const feedWhere = getActiveFeedWhere({
-      channel_ids: null,
-      medium_id,
-      category_id: null
-    });
-    return this.repositoryRead.count({
-      ...config,
-      where: this.mergeWhere(feedWhere, config.where)
-    });
-  }
-
-  async getManyByChannels(
+  async getManyByChannelsAndCount(
     channel_ids: number[],
-    medium_id: MediumEnum | null,
     config: FindManyOptions<StatsAggregatedChannel>,
-  ): Promise<StatsAggregatedChannel[]> {
+  ): Promise<[StatsAggregatedChannel[], number]> {
     const feedWhere = getActiveFeedWhere({
       channel_ids,
-      medium_id,
+      medium_id: null,
       category_id: null
     });
-    return this.repositoryRead.find({
-      ...config,
-      where: this.mergeWhere(feedWhere, config.where)
-    });
-  }
-
-  async getManyByChannelsCount(
-    channel_ids: number[],
-    medium_id: MediumEnum | null,
-    config: FindManyOptions<StatsAggregatedChannel>
-  ): Promise<number> {
-    const feedWhere = getActiveFeedWhere({
-      channel_ids,
-      medium_id,
-      category_id: null
-    });
-    return this.repositoryRead.count({
+    return this.repositoryRead.findAndCount({
       ...config,
       where: this.mergeWhere(feedWhere, config.where)
     });

@@ -19,7 +19,8 @@ export class StatsAggregatedClipService extends BaseStatsAggregatedService<Stats
 
   async getMany(
     config: FindManyOptions<StatsAggregatedClip>,
-    medium_id: MediumEnum | null
+    medium_id: MediumEnum | null,
+    category_id: number | null
   ): Promise<StatsAggregatedClip[]> {
     return this.repositoryRead.find({
       where: {
@@ -28,7 +29,7 @@ export class StatsAggregatedClipService extends BaseStatsAggregatedService<Stats
             ...getActiveFeedWhere({
               channel_ids: null,
               medium_id,
-              category_id: null
+              category_id
             })
           }
         }
@@ -39,7 +40,8 @@ export class StatsAggregatedClipService extends BaseStatsAggregatedService<Stats
 
   async getManyAndCountPublic(
     config: FindManyOptions<StatsAggregatedClip>,
-    medium_id: MediumEnum | null
+    medium_id: MediumEnum | null,
+    category_id: number | null,
   ): Promise<[StatsAggregatedClip[], number]> {
     return this.repositoryRead.findAndCount({
       where: {
@@ -49,6 +51,49 @@ export class StatsAggregatedClipService extends BaseStatsAggregatedService<Stats
             ...getActiveFeedWhere({
               channel_ids: null,
               medium_id,
+              category_id
+            })
+          }
+        }
+      },
+      ...config
+    });
+  }
+
+  async getManyByChannelsAndCountPublic(
+    channel_ids: number[],
+    config: FindManyOptions<StatsAggregatedClip>,
+  ): Promise<[StatsAggregatedClip[], number]> {
+    return this.repositoryRead.findAndCount({
+      where: {
+        clip: {
+          sharable_status_id: SharableStatusEnum.Public,
+          item: {
+            ...getActiveFeedWhere({
+              channel_ids,
+              medium_id: null,
+              category_id: null
+            })
+          }
+        }
+      },
+      ...config
+    });
+  }
+
+  async getManyByItemAndCountPublic(
+    item_id: number,
+    config: FindManyOptions<StatsAggregatedClip>,
+  ): Promise<[StatsAggregatedClip[], number]> {
+    return this.repositoryRead.findAndCount({
+      where: {
+        clip: {
+          sharable_status_id: SharableStatusEnum.Public,
+          item: {
+            id: item_id,
+            ...getActiveFeedWhere({
+              channel_ids: null,
+              medium_id: null,
               category_id: null
             })
           }
