@@ -1,4 +1,4 @@
-import { MediumEnum } from 'podverse-helpers';
+import { LiveItemStatusEnum, MediumEnum } from 'podverse-helpers';
 import { FindManyOptions, FindOptionsRelations, FindOptionsWhere,
   In, IsNull, Not, Repository, MoreThan, LessThan, 
   Equal} from 'typeorm';
@@ -219,7 +219,8 @@ export class ItemService {
     config: FindManyOptions<Item>,
     medium_id: MediumEnum | null,
     category_id: number | null,
-    itemType: 'normal' | 'live-item'
+    itemType: 'normal' | 'live-item',
+    liveItemType: LiveItemStatusEnum | null
   ): Promise<Item[]> {
     return this.repositoryRead.find({
       ...config,
@@ -235,7 +236,8 @@ export class ItemService {
           id: ItemFlagStatusStatusEnum.Active
         },
         live_item: {
-          id: itemType === 'live-item' ? Not(IsNull()) : IsNull()
+          id: itemType === 'live-item' ? Not(IsNull()) : IsNull(),
+          ...(liveItemType ? { live_item_status_id: Equal(liveItemType) } : {})
         }
       }
     });
