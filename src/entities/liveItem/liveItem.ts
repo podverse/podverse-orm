@@ -15,6 +15,9 @@ export class LiveItem {
   @JoinColumn({ name: 'live_item_status_id' })
   live_item_status!: LiveItemStatusEnum;
 
+  @Column({ name: 'live_item_status_id', type: 'int', nullable: false })
+  live_item_status_id!: number;
+
   @Column({ type: 'timestamptz' })
   start_time!: Date;
 
