@@ -17,7 +17,7 @@ export class StatsAggregatedClipService extends BaseStatsAggregatedService<Stats
     return 'clip_id';
   }
 
-  async getMany(
+  async getManyPublic(
     config: FindManyOptions<StatsAggregatedClip>,
     medium_id: MediumEnum | null,
     category_id: number | null
@@ -25,6 +25,7 @@ export class StatsAggregatedClipService extends BaseStatsAggregatedService<Stats
     return this.repositoryRead.find({
       where: {
         clip: {
+          sharable_status_id: SharableStatusEnum.Public,
           item: {
             ...getActiveFeedWhere({
               channel_ids: null,
