@@ -127,6 +127,26 @@ export class ClipService extends BaseManyService<Clip, 'account'> {
     });
   }
 
+  async getManyByChannels(
+    channel_ids: number[],
+    config: FindManyOptions<Clip>
+  ): Promise<[Clip[], number]> {
+    return this.repositoryRead.findAndCount({
+      where: {
+        sharable_status_id: SharableStatusEnum.Public,
+        item: {
+          channel: {
+            id: In(channel_ids),
+            feed: {
+              feed_flag_status: In([FeedFlagStatusStatusEnum.Active, FeedFlagStatusStatusEnum.AlwaysParse])
+            },
+          }
+        },
+      },
+      ...config
+    });
+  }
+
   async getManyByChannelAndCountPublic(
     channel_id_text: string,
     config: FindManyOptions<Clip>
