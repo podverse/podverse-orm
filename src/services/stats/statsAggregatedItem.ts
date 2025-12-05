@@ -2,8 +2,9 @@ import { MediumEnum } from 'podverse-helpers';
 import { StatsAggregatedItem } from '@orm/entities/stats/statsAggregatedItem';
 import { StatsTrackEventItemService } from './statsTrackEventItem';
 import { BaseStatsAggregatedService, UpdateHistoricalOptions } from './baseStatsAggregated';
-import { FindManyOptions, IsNull, Not } from 'typeorm';
+import { Equal, FindManyOptions, IsNull, Not } from 'typeorm';
 import { getActiveFeedWhere } from '@orm/lib/feedFlagHelpers';
+import { getLiveItemStatusEnumValue } from '@orm/index';
 
 export class StatsAggregatedItemService extends BaseStatsAggregatedService<StatsAggregatedItem, number> {
   private statsTrackEventItemService: StatsTrackEventItemService;
@@ -21,8 +22,11 @@ export class StatsAggregatedItemService extends BaseStatsAggregatedService<Stats
     config: FindManyOptions<StatsAggregatedItem>,
     medium_id: MediumEnum | null,
     category_id: number | null,
-    itemType: 'normal' | 'live-item'
+    itemType: 'normal' | 'live-item',
+    liveItemType: 'pending' | 'live' | 'ended' | null
   ): Promise<StatsAggregatedItem[]> {
+    const live_item_status_id = getLiveItemStatusEnumValue(liveItemType);
+
     return this.repositoryRead.find({
       where: {
         item: {
@@ -32,7 +36,9 @@ export class StatsAggregatedItemService extends BaseStatsAggregatedService<Stats
             category_id
           }),
           live_item: {
-            id: itemType === 'live-item' ? Not(IsNull()) : IsNull()
+            id: itemType === 'live-item' ? Not(IsNull()) : IsNull(),
+            ...(live_item_status_id ? { live_item_status_id: Equal(live_item_status_id) } : {})
+
           }
         }
       },
@@ -43,8 +49,11 @@ export class StatsAggregatedItemService extends BaseStatsAggregatedService<Stats
   async getManyByChannelsAndCount(
     config: FindManyOptions<StatsAggregatedItem>,
     channel_ids: number[],
-    itemType: 'normal' | 'live-item'
+    itemType: 'normal' | 'live-item',
+    liveItemType: 'pending' | 'live' | 'ended' | null
   ): Promise<[StatsAggregatedItem[], number]> {
+    const live_item_status_id = getLiveItemStatusEnumValue(liveItemType);
+
     return this.repositoryRead.findAndCount({
       where: {
         item: {
@@ -54,7 +63,8 @@ export class StatsAggregatedItemService extends BaseStatsAggregatedService<Stats
             category_id: null
           }),
           live_item: {
-            id: itemType === 'live-item' ? Not(IsNull()) : IsNull()
+            id: itemType === 'live-item' ? Not(IsNull()) : IsNull(),
+            ...(live_item_status_id ? { live_item_status_id: Equal(live_item_status_id) } : {})
           }
         }
       },

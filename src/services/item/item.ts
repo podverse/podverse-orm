@@ -24,6 +24,7 @@ import { ItemValueTimeSplitRemoteItemService } from './itemValueTimeSplitRemoteI
 import { ItemValueTimeSplit } from '@orm/entities/item/itemValueTimeSplit';
 import { ItemFlagStatusService } from './itemFlagStatus';
 import { ItemFlagStatusStatusEnum } from '@orm/entities/item/itemFlagStatus';
+import { getLiveItemStatusEnumValue } from '@orm/entities/liveItem/liveItemStatus';
 
 type ItemDto = {
   title: string | null
@@ -220,8 +221,10 @@ export class ItemService {
     medium_id: MediumEnum | null,
     category_id: number | null,
     itemType: 'normal' | 'live-item',
-    liveItemType: LiveItemStatusEnum | null
+    liveItemType: 'pending' | 'live' | 'ended' | null
   ): Promise<Item[]> {
+    const live_item_status_id = getLiveItemStatusEnumValue(liveItemType);
+    
     return this.repositoryRead.find({
       ...config,
       where: {
@@ -237,7 +240,7 @@ export class ItemService {
         },
         live_item: {
           id: itemType === 'live-item' ? Not(IsNull()) : IsNull(),
-          ...(liveItemType ? { live_item_status_id: Equal(liveItemType) } : {})
+          ...(live_item_status_id ? { live_item_status_id: Equal(live_item_status_id) } : {})
         }
       }
     });
@@ -392,12 +395,20 @@ export class ItemService {
     });
   }
 
-  async getManyByChannels(channels: Channel[], options?: FindManyOptions<Item>): Promise<Item[]> {
+  async getManyByChannels(
+    channels: Channel[],
+    itemType: 'normal' | 'live-item',
+    liveItemType: 'pending' | 'live' | 'ended' | null,
+    options?: FindManyOptions<Item>
+  ): Promise<Item[]> {
+    const live_item_status_id = getLiveItemStatusEnumValue(liveItemType);
+
     return this.repositoryRead.find({
       where: {
         channel: In(channels),
         live_item: {
-          id: IsNull()
+          id: itemType === 'live-item' ? Not(IsNull()) : IsNull(),
+          ...(live_item_status_id ? { live_item_status_id: Equal(live_item_status_id) } : {})
         },
         item_flag_status: {
           id: ItemFlagStatusStatusEnum.Active
