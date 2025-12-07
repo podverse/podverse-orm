@@ -1,4 +1,4 @@
-import { MediumEnum, SharableStatusEnum } from 'podverse-helpers';
+import { getQueueMediumIdFromType, QueryParamsQueueMedium, SharableStatusEnum } from 'podverse-helpers';
 import { Equal, FindManyOptions, In } from 'typeorm';
 import { StatsAggregatedPlaylist } from '@orm/entities/stats/statsAggregatedPlaylist';
 import { StatsTrackEventPlaylistService } from './statsTrackEventPlaylist';
@@ -26,8 +26,10 @@ export class StatsAggregatedPlaylistService extends BaseStatsAggregatedService<S
 
   async getManyPublic(
     config: FindManyOptions<StatsAggregatedPlaylist>,
-    medium_id: MediumEnum | null
+    queueMediumType: QueryParamsQueueMedium | null,
   ): Promise<StatsAggregatedPlaylist[]> {
+    const medium_id = getQueueMediumIdFromType(queueMediumType);
+
     return this.repositoryRead.find({
       ...config,
       select: {
@@ -65,8 +67,10 @@ export class StatsAggregatedPlaylistService extends BaseStatsAggregatedService<S
   async getManyPrivate(
     config: FindManyOptions<StatsAggregatedPlaylist>,
     account_id: number,
-    medium_id: MediumEnum | null,
+    queueMediumType: QueryParamsQueueMedium | null,
   ): Promise<[StatsAggregatedPlaylist[], number]> {
+    const medium_id = getQueueMediumIdFromType(queueMediumType);
+
     return this.repositoryRead.findAndCount({
       ...config,
       select: {

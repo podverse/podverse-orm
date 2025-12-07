@@ -1,4 +1,4 @@
-import { MediumEnum } from 'podverse-helpers';
+import { QueryParamsMedium } from 'podverse-helpers';
 import { StatsAggregatedItem } from '@orm/entities/stats/statsAggregatedItem';
 import { StatsTrackEventItemService } from './statsTrackEventItem';
 import { BaseStatsAggregatedService, UpdateHistoricalOptions } from './baseStatsAggregated';
@@ -20,7 +20,7 @@ export class StatsAggregatedItemService extends BaseStatsAggregatedService<Stats
 
   async getMany(
     config: FindManyOptions<StatsAggregatedItem>,
-    medium_id: MediumEnum | null,
+    mediumType: QueryParamsMedium | null,
     category_id: number | null,
     itemType: 'normal' | 'live-item',
     liveItemType: 'pending' | 'live' | 'ended' | null
@@ -32,7 +32,7 @@ export class StatsAggregatedItemService extends BaseStatsAggregatedService<Stats
         item: {
           ...getActiveFeedWhere({
             channel_ids: null,
-            medium_id,
+            mediumType,
             category_id
           }),
           live_item: {
@@ -59,7 +59,7 @@ export class StatsAggregatedItemService extends BaseStatsAggregatedService<Stats
         item: {
           ...getActiveFeedWhere({
             channel_ids,
-            medium_id: null,
+            mediumType: null,
             category_id: null
           }),
           live_item: {

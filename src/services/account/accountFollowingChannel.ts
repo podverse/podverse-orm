@@ -1,5 +1,5 @@
-import { MediumEnum } from 'podverse-helpers';
-import { EntityManager, Equal, FindManyOptions } from 'typeorm';
+import { getMediumIdArrayFromType, MediumEnum, QueryParamsMedium } from 'podverse-helpers';
+import { EntityManager, Equal, FindManyOptions, In } from 'typeorm';
 import { AccountFollowingChannel } from '@orm/entities/account/accountFollowingChannel';
 import { BaseManyService } from '@orm/services/base/baseManyService';
 import { AccountService } from '@orm/services/account/account';
@@ -15,8 +15,10 @@ export class AccountFollowingChannelService extends BaseManyService<AccountFollo
     this.channelService = new ChannelService();
   }
 
-  async getFollowedChannels(account_id: number, medium_id: MediumEnum | null,
+  async getFollowedChannels(account_id: number, mediumType: QueryParamsMedium | null,
     config?: FindManyOptions<AccountFollowingChannel>): Promise<AccountFollowingChannel[]> {
+    const medium_ids = mediumType ? getMediumIdArrayFromType(mediumType) : null;
+
     const account = await this.accountService.get(account_id);
     if (!account) {
       throw new Error("Account not found.");
@@ -24,11 +26,11 @@ export class AccountFollowingChannelService extends BaseManyService<AccountFollo
 
     const finalConfig = {
       ...config,
-      ...(medium_id ? {
+      ...(medium_ids ? {
         where: {
           ...config?.where,
           channel: {
-            medium_id: Equal(medium_id)
+            medium_id: In(medium_ids)
           }
         }
       } : {})
@@ -37,9 +39,11 @@ export class AccountFollowingChannelService extends BaseManyService<AccountFollo
     return this._getAll(account, finalConfig);
   }
 
-  async getFollowedChannelsWithCount(account_id: number, medium_id: MediumEnum | null,
+  async getFollowedChannelsWithCount(account_id: number, mediumType: QueryParamsMedium | null,
     config?: FindManyOptions<AccountFollowingChannel>): Promise<{
       count: number; results: AccountFollowingChannel[] }> {
+    const medium_ids = mediumType ? getMediumIdArrayFromType(mediumType) : null;
+
     const account = await this.accountService.get(account_id);
     if (!account) {
       throw new Error("Account not found.");
@@ -49,8 +53,8 @@ export class AccountFollowingChannelService extends BaseManyService<AccountFollo
       account_id: Equal(account.id),
     };
 
-    if (medium_id) {
-      where['channel'] = { medium_id: Equal(medium_id) };
+    if (medium_ids) {
+      where['channel'] = { medium_id: In(medium_ids) };
     }
 
     const finalConfig = {

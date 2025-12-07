@@ -1,4 +1,4 @@
-import { MediumEnum } from 'podverse-helpers';
+import { getMediumIdArrayFromType, MediumEnum, QueryParamsMedium } from 'podverse-helpers';
 import { FindManyOptions, FindOptionsRelations, FindOptionsWhere, In, Repository, Equal } from 'typeorm';
 import { Channel } from '@orm/entities/channel/channel';
 import { Feed } from '@orm/entities/feed/feed';
@@ -251,15 +251,17 @@ export class ChannelService {
 
   async getMany(
     config: FindManyOptions<Channel>,
-    medium_id: MediumEnum | null,
+    mediumType: QueryParamsMedium,
     category_id: number | null
   ): Promise<Channel[]> {
+    const medium_ids = mediumType ? getMediumIdArrayFromType(mediumType) : null;
+
     return this.repositoryRead.find({
       where: {
         feed: {
           feed_flag_status: In([FeedFlagStatusStatusEnum.Active, FeedFlagStatusStatusEnum.AlwaysParse])
         },
-        ...(medium_id ? { medium_id: Equal(medium_id) } : {}),
+        ...(medium_ids ? { medium_id: In(medium_ids) } : {}),
         ...(category_id ? { channel_categories: { category_id: Equal(category_id) } } : {})
       },
       ...config

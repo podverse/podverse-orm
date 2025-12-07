@@ -1,4 +1,4 @@
-import { MediumEnum, SharableStatusEnum } from 'podverse-helpers';
+import { QueryParamsMedium, SharableStatusEnum } from 'podverse-helpers';
 import { StatsAggregatedClip } from '@orm/entities/stats/statsAggregatedClip';
 import { StatsTrackEventClipService } from './statsTrackEventClip';
 import { BaseStatsAggregatedService, UpdateHistoricalOptions } from './baseStatsAggregated';
@@ -19,7 +19,7 @@ export class StatsAggregatedClipService extends BaseStatsAggregatedService<Stats
 
   async getManyPublic(
     config: FindManyOptions<StatsAggregatedClip>,
-    medium_id: MediumEnum | null,
+    mediumType: QueryParamsMedium | null,
     category_id: number | null
   ): Promise<StatsAggregatedClip[]> {
     return this.repositoryRead.find({
@@ -29,7 +29,7 @@ export class StatsAggregatedClipService extends BaseStatsAggregatedService<Stats
           item: {
             ...getActiveFeedWhere({
               channel_ids: null,
-              medium_id,
+              mediumType,
               category_id
             })
           }
@@ -41,7 +41,7 @@ export class StatsAggregatedClipService extends BaseStatsAggregatedService<Stats
 
   async getManyAndCountPublic(
     config: FindManyOptions<StatsAggregatedClip>,
-    medium_id: MediumEnum | null,
+    mediumType: QueryParamsMedium | null,
     category_id: number | null,
   ): Promise<[StatsAggregatedClip[], number]> {
     return this.repositoryRead.findAndCount({
@@ -51,7 +51,7 @@ export class StatsAggregatedClipService extends BaseStatsAggregatedService<Stats
           item: {
             ...getActiveFeedWhere({
               channel_ids: null,
-              medium_id,
+              mediumType,
               category_id
             })
           }
@@ -72,7 +72,7 @@ export class StatsAggregatedClipService extends BaseStatsAggregatedService<Stats
           item: {
             ...getActiveFeedWhere({
               channel_ids,
-              medium_id: null,
+              mediumType: null,
               category_id: null
             })
           }
@@ -94,7 +94,7 @@ export class StatsAggregatedClipService extends BaseStatsAggregatedService<Stats
             id: item_id,
             ...getActiveFeedWhere({
               channel_ids: null,
-              medium_id: null,
+              mediumType: null,
               category_id: null
             })
           }

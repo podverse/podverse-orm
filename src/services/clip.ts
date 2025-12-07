@@ -3,7 +3,7 @@ import { Clip } from '@orm/entities/clip';
 import { BaseManyService } from '@orm/services/base/baseManyService';
 import { AccountService } from '@orm/services/account/account';
 import { ItemService } from './item/item';
-import { MediumEnum, SharableStatusEnum } from 'podverse-helpers';
+import { getMediumIdArrayFromType, QueryParamsMedium, SharableStatusEnum } from 'podverse-helpers';
 import { FeedFlagStatusStatusEnum } from '../';
 
 export type ClipDto = {
@@ -106,10 +106,11 @@ export class ClipService extends BaseManyService<Clip, 'account'> {
   }
 
   async getManyPublic(
-    medium_id: MediumEnum | null,
+    mediumType: QueryParamsMedium | null,
     category_id: number | null,
     config: FindManyOptions<Clip>
   ): Promise<Clip[]> {
+    const medium_ids = mediumType ? getMediumIdArrayFromType(mediumType) : null;
     return this.repositoryRead.find({
       where: {
         sharable_status_id: SharableStatusEnum.Public,
@@ -118,7 +119,7 @@ export class ClipService extends BaseManyService<Clip, 'account'> {
             feed: {
               feed_flag_status: In([FeedFlagStatusStatusEnum.Active, FeedFlagStatusStatusEnum.AlwaysParse])
             },
-            ...(medium_id ? { medium_id: Equal(medium_id) } : {}),
+            ...(medium_ids ? { medium_id: In(medium_ids) } : {}),
             ...(category_id ? { channel_categories: { category_id: Equal(category_id) } } : {})
           }
         },

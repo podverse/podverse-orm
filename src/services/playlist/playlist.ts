@@ -1,4 +1,5 @@
-import { MediumEnum, SharableStatusEnum } from 'podverse-helpers';
+import { getQueueMediumIdFromType, MediumEnum, QueryParamsQueueMedium,
+  SharableStatusEnum } from 'podverse-helpers';
 import { EntityManager, Equal, FindManyOptions, FindOneOptions, Not } from 'typeorm';
 import { Playlist } from '@orm/entities/playlist/playlist';
 import { BaseManyService } from '@orm/services/base/baseManyService';
@@ -88,9 +89,11 @@ export class PlaylistService extends BaseManyService<Playlist, 'account'> {
 
   async getManyPrivate(
     account_id: number,
-    medium_id: MediumEnum | null,
+    queueMediumType: QueryParamsQueueMedium | null,
     options?: FindManyOptions<Playlist>
   ): Promise<[Playlist[], number] > {
+    const medium_id = getQueueMediumIdFromType(queueMediumType);
+    
     return this.repositoryRead.findAndCount({
       ...options,
       where: {

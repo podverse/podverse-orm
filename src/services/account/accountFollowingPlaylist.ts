@@ -1,9 +1,9 @@
-import { EntityManager, FindManyOptions, Not } from 'typeorm';
+import { EntityManager, Equal, FindManyOptions, Not } from 'typeorm';
 import { AccountFollowingPlaylist } from '@orm/entities/account/accountFollowingPlaylist';
 import { BaseManyService } from '@orm/services/base/baseManyService';
 import { AccountService } from '@orm/services/account/account';
 import { PlaylistService } from '../playlist/playlist';
-import { SharableStatusEnum } from 'podverse-helpers';
+import { getQueueMediumIdFromType, QueryParamsQueueMedium, SharableStatusEnum } from 'podverse-helpers';
 
 export class AccountFollowingPlaylistService extends BaseManyService<AccountFollowingPlaylist, 'account'> {
   private accountService: AccountService;
@@ -26,15 +26,17 @@ export class AccountFollowingPlaylistService extends BaseManyService<AccountFoll
 
   async getFollowedPlaylistsPrivateWithCount(
     account_id: number,
-    medium_id: number | null,
+    queueMediumType: QueryParamsQueueMedium | null,
     config?: FindManyOptions<AccountFollowingPlaylist>):
       Promise<[AccountFollowingPlaylist[], number]> {
+    const medium_id = getQueueMediumIdFromType(queueMediumType);
+    
     return this.repositoryRead.findAndCount({
       ...config,
       where: {
         ...config?.where,
         account_id,
-        ...(medium_id ? { playlist: { medium_id } } : {})
+        ...(medium_id ? { playlist: { medium_id: Equal(medium_id) } } : {})
       },
       relations: [
         'playlist',

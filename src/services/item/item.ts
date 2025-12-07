@@ -1,4 +1,4 @@
-import { LiveItemStatusEnum, MediumEnum } from 'podverse-helpers';
+import { getMediumIdArrayFromType, QueryParamsMedium } from 'podverse-helpers';
 import { FindManyOptions, FindOptionsRelations, FindOptionsWhere,
   In, IsNull, Not, Repository, MoreThan, LessThan, 
   Equal} from 'typeorm';
@@ -218,11 +218,12 @@ export class ItemService {
 
   async getMany(
     config: FindManyOptions<Item>,
-    medium_id: MediumEnum | null,
+    mediumType: QueryParamsMedium | null,
     category_id: number | null,
     itemType: 'normal' | 'live-item',
     liveItemType: 'pending' | 'live' | 'ended' | null
   ): Promise<Item[]> {
+    const medium_ids = mediumType ? getMediumIdArrayFromType(mediumType) : null;
     const live_item_status_id = getLiveItemStatusEnumValue(liveItemType);
     
     return this.repositoryRead.find({
@@ -232,7 +233,7 @@ export class ItemService {
           feed: {
             feed_flag_status: In([1, 2])
           },
-          ...(medium_id ? { medium_id: Equal(medium_id) } : {}),
+          ...(medium_ids ? { medium_id: In(medium_ids) } : {}),
           ...(category_id ? { channel_categories: { category_id: Equal(category_id) } } : {})
         },
         item_flag_status: {
