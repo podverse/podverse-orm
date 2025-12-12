@@ -17,14 +17,12 @@ export class LiveItemService extends BaseOneService<LiveItem, 'item'> {
   }
 
   async update(item: Item, dto: LiveItemDto): Promise<LiveItem> {
-    console.log('LiveItemService.update called with item.id:', item.id);
-    console.log('LiveItemService.update called with dto:', dto);
     const finalDto = {
       start_time: dto.start_time,
       end_time: dto.end_time,
       live_item_status_id: dto.live_item_status
     };
-    console.log('LiveItemService.update finalDto:', finalDto);
+    
     return super._update(item, finalDto, { relations: ['live_item_status'] });
   }
 
