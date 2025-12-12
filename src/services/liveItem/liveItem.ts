@@ -23,7 +23,7 @@ export class LiveItemService extends BaseOneService<LiveItem, 'item'> {
       live_item_status_id: dto.live_item_status
     };
     
-    return super._update(item, finalDto, { relations: ['live_item_status'] });
+    return super._update(item, finalDto);
   }
 
   async getManyByChannel(channel: Channel, config?: FindManyOptions<LiveItem>): Promise<LiveItem[]> {
