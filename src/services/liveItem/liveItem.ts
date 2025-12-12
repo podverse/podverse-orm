@@ -20,7 +20,8 @@ export class LiveItemService extends BaseOneService<LiveItem, 'item'> {
     console.log('LiveItemService.update called with item.id:', item.id);
     console.log('LiveItemService.update called with dto:', dto);
     const finalDto = {
-      ...dto,
+      start_time: dto.start_time,
+      end_time: dto.end_time,
       live_item_status_id: dto.live_item_status
     };
     console.log('LiveItemService.update finalDto:', finalDto);
