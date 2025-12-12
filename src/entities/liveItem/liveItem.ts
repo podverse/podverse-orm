@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
 import { Item } from '@orm/entities/item/item';
-import { LiveItemStatus, LiveItemStatusEnum } from '@orm/entities/liveItem/liveItemStatus';
+import { LiveItemStatus } from '@orm/entities/liveItem/liveItemStatus';
 
 @Entity()
 export class LiveItem {
@@ -13,7 +13,7 @@ export class LiveItem {
 
   @ManyToOne(() => LiveItemStatus, liveItemStatus => liveItemStatus.id)
   @JoinColumn({ name: 'live_item_status_id' })
-  live_item_status!: LiveItemStatusEnum;
+  live_item_status!: LiveItemStatus;
 
   @Column({ name: 'live_item_status_id', type: 'int', nullable: false })
   live_item_status_id!: number;
