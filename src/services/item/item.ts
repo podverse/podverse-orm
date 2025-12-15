@@ -1,7 +1,7 @@
 import { getMediumIdArrayFromType, QueryParamsMedium } from 'podverse-helpers';
 import { FindManyOptions, FindOptionsRelations, FindOptionsWhere,
   In, IsNull, Not, Repository, MoreThan, LessThan, 
-  Equal} from 'typeorm';
+  Equal, Brackets} from 'typeorm';
 import { Channel } from '@orm/entities/channel/channel';
 import { Item } from '@orm/entities/item/item';
 import { applyProperties } from '@orm/lib/applyProperties';
@@ -379,6 +379,153 @@ export class ItemService {
       take: 20,
       relations: itemQueueListRelations
     });
+  }
+
+  async getManyForQueueBySeason(
+    item_id_text: string,
+    order: 'forward' | 'backward'
+  ): Promise<Item[]> {
+    const item = await this.repositoryRead.findOne({
+      where: { id_text: item_id_text },
+      relations: {
+        channel: true,
+        item_season: { channel_season: true },
+        item_season_episode: true
+      }
+    });
+
+    if (!item || !item.channel) {
+      return [];
+    }
+
+    const currentSeasonNumber = item.item_season?.channel_season?.number ?? -1;
+    const currentEpisodeNumber = item.item_season_episode?.number ?? null;
+    const currentPubDate = item.pub_date ?? null;
+    const LIMIT = 20;
+
+    // Helper function to create base query builder with all relations
+    const createBaseQueryBuilder = () => {
+      return this.repositoryRead.createQueryBuilder('item')
+        .leftJoinAndSelect('item.item_about', 'item_about')
+        .leftJoinAndSelect('item_about.item_itunes_episode_type', 'item_itunes_episode_type')
+        .leftJoinAndSelect('item.item_enclosures', 'item_enclosures')
+        .leftJoinAndSelect('item_enclosures.item_enclosure_sources', 'item_enclosure_sources')
+        .leftJoinAndSelect('item.item_images', 'item_images')
+        .leftJoinAndSelect('item.item_season', 'item_season')
+        .leftJoinAndSelect('item_season.channel_season', 'cs')
+        .leftJoinAndSelect('item.item_season_episode', 'item_season_episode')
+        .leftJoinAndSelect('item.channel', 'channel')
+        .leftJoinAndSelect('channel.channel_images', 'channel_images')
+        .leftJoinAndSelect('item.live_item', 'live_item')
+        .leftJoinAndSelect('item.item_flag_status', 'item_flag_status')
+        .where('item.channel_id = :channel_id', { channel_id: item.channel.id })
+        .andWhere('live_item.id IS NULL')
+        .andWhere('item_flag_status.id = :status', { status: ItemFlagStatusStatusEnum.Active });
+    };
+
+    let finalResults: Item[] = [];
+
+    if (currentSeasonNumber !== -1) {
+      // Current item has an actual season number
+      // Query for items with actual season numbers
+      const seasonedQuery = createBaseQueryBuilder()
+        .andWhere('cs.number IS NOT NULL');
+
+      if (order === 'forward') {
+        seasonedQuery
+          .andWhere(new Brackets(qb => {
+            qb.where('cs.number > :seasonNum', { seasonNum: currentSeasonNumber })
+              .orWhere(
+                new Brackets(qb2 => {
+                  qb2.where('cs.number = :seasonNum', { seasonNum: currentSeasonNumber })
+                    .andWhere('item_season_episode.number > :episodeNum', { episodeNum: currentEpisodeNumber });
+                })
+              );
+          }))
+          .orderBy('cs.number', 'ASC')
+          .addOrderBy('item_season_episode.number', 'ASC');
+      } else { // backward
+        seasonedQuery
+          .andWhere(new Brackets(qb => {
+            qb.where('cs.number < :seasonNum', { seasonNum: currentSeasonNumber })
+              .orWhere(
+                new Brackets(qb2 => {
+                  qb2.where('cs.number = :seasonNum', { seasonNum: currentSeasonNumber })
+                    .andWhere('item_season_episode.number < :episodeNum', { episodeNum: currentEpisodeNumber });
+                })
+              );
+          }))
+          .orderBy('cs.number', 'DESC')
+          .addOrderBy('item_season_episode.number', 'DESC');
+      }
+
+      seasonedQuery.limit(LIMIT);
+      const seasonedResults = (await seasonedQuery.getRawAndEntities()).entities;
+      finalResults = seasonedResults;
+
+      // If we have fewer than 20 items and direction is backward, fill with -1 season items
+      if (order === 'backward' && finalResults.length < LIMIT) {
+        const remaining = LIMIT - finalResults.length;
+        const unseasonedQuery = createBaseQueryBuilder()
+          .andWhere('cs.number IS NULL')
+          .andWhere('item.pub_date IS NOT NULL')
+          .orderBy('item.pub_date', 'ASC')
+          .limit(remaining);
+
+        const unseasonedResults = (await unseasonedQuery.getRawAndEntities()).entities;
+        finalResults = [...finalResults, ...unseasonedResults];
+      }
+    } else {
+      // Current item does NOT have an actual season number (it's -1)
+      if (order === 'forward') {
+        // Query -1 items first
+        const unseasonedQuery = createBaseQueryBuilder()
+          .andWhere('cs.number IS NULL')
+          .andWhere('item.pub_date IS NOT NULL');
+
+        if (currentPubDate) {
+          unseasonedQuery.andWhere('item.pub_date < :currentPubDate', { currentPubDate });
+        }
+
+        unseasonedQuery
+          .orderBy('item.pub_date', 'DESC')
+          .limit(LIMIT);
+
+        const unseasonedResults = (await unseasonedQuery.getRawAndEntities()).entities;
+        finalResults = unseasonedResults;
+
+        // If we have fewer than 20 items, fill with actual season items
+        if (finalResults.length < LIMIT) {
+          const remaining = LIMIT - finalResults.length;
+          const seasonedQuery = createBaseQueryBuilder()
+            .andWhere('cs.number IS NOT NULL')
+            .orderBy('cs.number', 'ASC')
+            .addOrderBy('item_season_episode.number', 'ASC')
+            .limit(remaining);
+
+          const seasonedResults = (await seasonedQuery.getRawAndEntities()).entities;
+          finalResults = [...finalResults, ...seasonedResults];
+        }
+      } else { // backward
+        // Only query -1 items
+        const unseasonedQuery = createBaseQueryBuilder()
+          .andWhere('cs.number IS NULL')
+          .andWhere('item.pub_date IS NOT NULL');
+
+        if (currentPubDate) {
+          unseasonedQuery.andWhere('item.pub_date > :currentPubDate', { currentPubDate });
+        }
+
+        unseasonedQuery
+          .orderBy('item.pub_date', 'ASC')
+          .limit(LIMIT);
+
+        const unseasonedResults = (await unseasonedQuery.getRawAndEntities()).entities;
+        finalResults = unseasonedResults;
+      }
+    }
+
+    return finalResults.slice(0, LIMIT);
   }
 
   async getManyByChannelWithLiveItem(channel: Channel, options?: FindManyOptions<Item>): Promise<Item[]> {
