@@ -200,6 +200,8 @@ export * from './services/medium';
 
 export * from './services/membershipClaimToken';
 
+export * from './services/onDemandParserEvent';
+
 export * from './services/playlist/playlist';
 export * from './services/playlist/playlistResource';
 

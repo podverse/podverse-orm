@@ -81,6 +81,7 @@ import { LiveItem } from "@orm/entities/liveItem/liveItem";
 import { LiveItemStatus } from "@orm/entities/liveItem/liveItemStatus";
 import { Medium } from "@orm/entities/medium";
 import { MembershipClaimToken } from "@orm/entities/membershipClaimToken";
+import { OnDemandParserEvent } from "@orm/entities/onDemandParserEvent";
 import { Playlist } from "@orm/entities/playlist/playlist";
 import { PlaylistResource } from "@orm/entities/playlist/playlistResource";
 import { Queue } from "@orm/entities/queue/queue";
@@ -187,6 +188,7 @@ const commonConfig: DataSourceOptions = {
     LiveItemStatus,
     MembershipClaimToken,
     Medium,
+    OnDemandParserEvent,
     Playlist,
     PlaylistResource,
     Queue,
