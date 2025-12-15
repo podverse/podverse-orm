@@ -1,3 +1,4 @@
+import { Equal } from 'typeorm';
 import { Channel } from '@orm/entities/channel/channel';
 import { ChannelSeason } from '@orm/entities/channel/channelSeason';
 import { BaseManyService } from '@orm/services/base/baseManyService';
@@ -17,8 +18,7 @@ export class ChannelSeasonService extends BaseManyService<ChannelSeason, 'channe
   async getChannelSeasonIndex(channel: Channel): Promise<ChannelSeasonIndex> {
     const channelSeasonIndex: ChannelSeasonIndex = {};
     
-    const channel_seasons = await this.repositoryRead.find({ where: { channel } });
-  
+    const channel_seasons = await this.repositoryRead.find({ where: { channel_id: Equal(channel.id) } });
     for (const channel_season of channel_seasons) {
       channelSeasonIndex[channel_season.number] = channel_season;
     }
