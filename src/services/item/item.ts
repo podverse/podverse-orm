@@ -1,4 +1,4 @@
-import { getMediumIdArrayFromType, QueryParamsMedium } from 'podverse-helpers';
+import { getMediumIdArrayFromType, PAGINATION, QueryParamsMedium } from 'podverse-helpers';
 import { FindManyOptions, FindOptionsRelations, FindOptionsWhere,
   In, IsNull, Not, Repository, MoreThan, LessThan, 
   Equal, Brackets} from 'typeorm';
@@ -526,6 +526,119 @@ export class ItemService {
     }
 
     return finalResults.slice(0, LIMIT);
+  }
+
+  async getManyByChannelBySeason(
+    channel: Channel,
+    order: 'forward' | 'backward',
+    options?: FindManyOptions<Item>
+  ): Promise<Item[]> {
+    if (!channel) {
+      return [];
+    }
+
+    const skip = options?.skip ?? 0;
+    const take = options?.take ?? PAGINATION.DEFAULT_LIMIT;
+
+    const createBaseQueryBuilder = () => {
+      return this.repositoryRead.createQueryBuilder('item')
+        .leftJoinAndSelect('item.item_about', 'item_about')
+        .leftJoinAndSelect('item_about.item_itunes_episode_type', 'item_itunes_episode_type')
+        .leftJoinAndSelect('item.item_enclosures', 'item_enclosures')
+        .leftJoinAndSelect('item_enclosures.item_enclosure_sources', 'item_enclosure_sources')
+        .leftJoinAndSelect('item.item_images', 'item_images')
+        .leftJoinAndSelect('item.item_season', 'item_season')
+        .leftJoinAndSelect('item_season.channel_season', 'cs')
+        .leftJoinAndSelect('item.item_season_episode', 'item_season_episode')
+        .leftJoinAndSelect('item.channel', 'channel')
+        .leftJoinAndSelect('channel.channel_images', 'channel_images')
+        .leftJoinAndSelect('item.live_item', 'live_item')
+        .leftJoinAndSelect('item.item_flag_status', 'item_flag_status')
+        .where('item.channel_id = :channel_id', { channel_id: channel.id })
+        .andWhere('live_item.id IS NULL')
+        .andWhere('item_flag_status.id = :status', { status: ItemFlagStatusStatusEnum.Active });
+    };
+
+    let finalResults: Item[] = [];
+
+    if (order === 'forward') {
+      // Forward = unseasoned items first (DESC pub_date), then seasoned items (ASC season/episode)
+      const unseasonedQuery = createBaseQueryBuilder()
+        .andWhere('cs.number IS NULL')
+        .andWhere('item.pub_date IS NOT NULL')
+        .orderBy('item.pub_date', 'DESC')
+        .skip(skip)
+        .take(take);
+
+      const unseasonedResults = (await unseasonedQuery.getRawAndEntities()).entities;
+      finalResults = unseasonedResults;
+
+      if (finalResults.length < take) {
+        const remaining = take - finalResults.length;
+        const unseasonedCount = await this.repositoryRead.createQueryBuilder('item')
+          .leftJoin('item.item_season', 'item_season')
+          .leftJoin('item_season.channel_season', 'cs')
+          .leftJoin('item.live_item', 'live_item')
+          .leftJoin('item.item_flag_status', 'item_flag_status')
+          .where('item.channel_id = :channel_id', { channel_id: channel.id })
+          .andWhere('live_item.id IS NULL')
+          .andWhere('item_flag_status.id = :status', { status: ItemFlagStatusStatusEnum.Active })
+          .andWhere('cs.number IS NULL')
+          .andWhere('item.pub_date IS NOT NULL')
+          .getCount();
+
+        const seasonedSkip = Math.max(0, skip - unseasonedCount);
+
+        const seasonedQuery = createBaseQueryBuilder()
+          .andWhere('cs.number IS NOT NULL')
+          .orderBy('cs.number', 'ASC')
+          .addOrderBy('item_season_episode.number', 'ASC')
+          .skip(seasonedSkip)
+          .take(remaining);
+
+        const seasonedResults = (await seasonedQuery.getRawAndEntities()).entities;
+        finalResults = [...finalResults, ...seasonedResults];
+      }
+    } else {
+      // Backward = seasoned items first (DESC season/episode), then unseasoned items (ASC pub_date)
+      const seasonedQuery = createBaseQueryBuilder()
+        .andWhere('cs.number IS NOT NULL')
+        .orderBy('cs.number', 'DESC')
+        .addOrderBy('item_season_episode.number', 'DESC')
+        .skip(skip)
+        .take(take);
+
+      const seasonedResults = (await seasonedQuery.getRawAndEntities()).entities;
+      finalResults = seasonedResults;
+
+      if (finalResults.length < take) {
+        const remaining = take - finalResults.length;
+        const seasonedCount = await this.repositoryRead.createQueryBuilder('item')
+          .leftJoin('item.item_season', 'item_season')
+          .leftJoin('item_season.channel_season', 'cs')
+          .leftJoin('item.live_item', 'live_item')
+          .leftJoin('item.item_flag_status', 'item_flag_status')
+          .where('item.channel_id = :channel_id', { channel_id: channel.id })
+          .andWhere('live_item.id IS NULL')
+          .andWhere('item_flag_status.id = :status', { status: ItemFlagStatusStatusEnum.Active })
+          .andWhere('cs.number IS NOT NULL')
+          .getCount();
+
+        const unseasonedSkip = Math.max(0, skip - seasonedCount);
+
+        const unseasonedQuery = createBaseQueryBuilder()
+          .andWhere('cs.number IS NULL')
+          .andWhere('item.pub_date IS NOT NULL')
+          .orderBy('item.pub_date', 'ASC')
+          .skip(unseasonedSkip)
+          .take(remaining);
+
+        const unseasonedResults = (await unseasonedQuery.getRawAndEntities()).entities;
+        finalResults = [...finalResults, ...unseasonedResults];
+      }
+    }
+
+    return finalResults;
   }
 
   async getManyByChannelWithLiveItem(channel: Channel, options?: FindManyOptions<Item>): Promise<Item[]> {
