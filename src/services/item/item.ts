@@ -824,12 +824,14 @@ export const subItemGetManyRelations: SubItemGetManyRelations[] = [
 export type ItemGetManyRelationsWithChannel =
   | ItemGetManyRelations
   | 'channel'
-  | 'channel.channel_images';
+  | 'channel.channel_images'
+  | 'channel.channel_about'
 
 export const itemGetManyRelationsWithChannel: ItemGetManyRelationsWithChannel[] = [
   ...itemGetManyRelations,
   'channel',
-  'channel.channel_images'
+  'channel.channel_images',
+  'channel.channel_about'
 ];
 
 export type SubItemGetManyRelationsWithChannel =
