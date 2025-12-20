@@ -1,8 +1,7 @@
-// TODO: get rid of "any" in the file 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Mutex } from 'async-mutex';
 import { getMd5Hash, QueueExtraParams } from 'podverse-helpers';
-import { Between, EntityManager, FindManyOptions, FindOptionsOrderValue, LessThan, MoreThan, MoreThanOrEqual } from 'typeorm';
+import { Between, EntityManager, FindManyOptions, FindOptionsOrderValue, LessThan, LessThanOrEqual, MoreThan, MoreThanOrEqual } from 'typeorm';
 import { QueueResource } from '@orm/entities/queue/queueResource';
 import { BaseManyService } from '@orm/services/base/baseManyService';
 import { QueueService } from '@orm/services/queue/queue';
@@ -118,7 +117,7 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     }
 
     return this.repositoryRead.findAndCount({
-      where: { queue: { id: queue.id }, list_position: LessThan(0) as any },
+      where: { queue: { id: queue.id }, list_position: LessThanOrEqual(0) as any },
       order: { list_position: 'DESC' as FindOptionsOrderValue },
       relations: listResourceRelations,
       ...options
