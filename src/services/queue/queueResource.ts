@@ -11,6 +11,8 @@ import { ItemSoundbiteService } from '../item/itemSoundbite';
 
 const QUEUE_LIST_POSITION_INCREMENT = 0.00000001;
 
+const epsilon = 1e-21;
+
 export const listResourceRelations = [
   'clip', 'clip.item', 'clip.item.item_about', 'clip.item.item_enclosures', 'clip.item.item_enclosures.item_enclosure_sources', 'clip.item.item_images', 'clip.item.channel', 'clip.item.channel.channel_images',
   'item', 'item.item_about', 'item.item_enclosures', 'item.item_enclosures.item_enclosure_sources', 'item.item_images', 'item.channel', 'item.channel.channel_images',
@@ -71,7 +73,7 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     }
 
     const options = {
-      where: { queue: { id: queue.id }, list_position: MoreThanOrEqual(0) as any },
+      where: { queue: { id: queue.id }, list_position: Between(-epsilon, epsilon) as any },
       order: { list_position: 'ASC' as FindOptionsOrderValue },
       relations: listResourceRelations
     };
@@ -273,7 +275,6 @@ export class QueueResourceService extends BaseManyService<QueueResource, 'queue'
     const resource = await resourceService.getByIdText(resource_id_text);
     if (!resource) throw new Error(`${resourceKey} not found.`);
 
-    const epsilon = 1e-21;
     const existingNowPlaying = await manager.findOne(QueueResource, {
       where: { queue: { id: queue.id }, list_position: Between(-epsilon, epsilon) as any }
     }) as any;
