@@ -530,11 +530,16 @@ export class ItemService {
 
   async getManyByChannelBySeason(
     channel: Channel,
-    order: 'forward' | 'backward',
-    options?: FindManyOptions<Item>
+    order: 'forward' | 'backward' | 'shuffle',
+    options?: FindManyOptions<Item>,
+    shuffleHash?: string
   ): Promise<Item[]> {
     if (!channel) {
       return [];
+    }
+
+    if (order === 'shuffle' && !shuffleHash) {
+      throw new Error('shuffleHash is required when order is "shuffle"');
     }
 
     const skip = options?.skip ?? 0;
@@ -561,7 +566,17 @@ export class ItemService {
 
     let finalResults: Item[] = [];
 
-    if (order === 'forward') {
+    if (order === 'shuffle') {
+      // Use a deterministic random order based on shuffleHash
+      const query = createBaseQueryBuilder()
+        .addSelect('MD5(item.id::text || (:shuffleHash)::text)', 'shuffle_order')
+        .setParameter('shuffleHash', String(shuffleHash))
+        .orderBy('shuffle_order', 'ASC')
+        .skip(skip)
+        .take(take);
+
+      finalResults = (await query.getRawAndEntities()).entities;
+    } else if (order === 'forward') {
       // Forward = unseasoned items first (DESC pub_date), then seasoned items (ASC season/episode)
       const unseasonedQuery = createBaseQueryBuilder()
         .andWhere('cs.number IS NULL')
