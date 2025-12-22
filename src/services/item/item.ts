@@ -376,7 +376,7 @@ export class ItemService {
       order: {
         pub_date: pubDateSort
       },
-      take: 20,
+      take: PAGINATION.DEFAULT_LIMIT,
       relations: itemQueueListRelations
     });
   }
@@ -401,7 +401,7 @@ export class ItemService {
     const currentSeasonNumber = item.item_season?.channel_season?.number ?? -1;
     const currentEpisodeNumber = item.item_season_episode?.number ?? null;
     const currentPubDate = item.pub_date ?? null;
-    const LIMIT = 20;
+    const LIMIT = PAGINATION.DEFAULT_LIMIT;
 
     // Helper function to create base query builder with all relations
     const createBaseQueryBuilder = () => {
@@ -528,18 +528,59 @@ export class ItemService {
     return finalResults.slice(0, LIMIT);
   }
 
-  async getManyByChannelBySeason(
+  async getManyByChannelShuffle(
     channel: Channel,
-    order: 'forward' | 'backward' | 'shuffle',
-    options?: FindManyOptions<Item>,
-    shuffleHash?: string
+    shuffleHash: string,
+    options?: FindManyOptions<Item>
   ): Promise<Item[]> {
     if (!channel) {
       return [];
     }
 
-    if (order === 'shuffle' && !shuffleHash) {
+    if (!shuffleHash) {
       throw new Error('shuffleHash is required when order is "shuffle"');
+    }
+
+    const skip = options?.skip ?? 0;
+    const take = options?.take ?? PAGINATION.DEFAULT_LIMIT;
+
+    const createBaseQueryBuilder = () => {
+      return this.repositoryRead.createQueryBuilder('item')
+        .leftJoinAndSelect('item.item_about', 'item_about')
+        .leftJoinAndSelect('item_about.item_itunes_episode_type', 'item_itunes_episode_type')
+        .leftJoinAndSelect('item.item_enclosures', 'item_enclosures')
+        .leftJoinAndSelect('item_enclosures.item_enclosure_sources', 'item_enclosure_sources')
+        .leftJoinAndSelect('item.item_images', 'item_images')
+        .leftJoinAndSelect('item.item_season', 'item_season')
+        .leftJoinAndSelect('item_season.channel_season', 'cs')
+        .leftJoinAndSelect('item.item_season_episode', 'item_season_episode')
+        .leftJoinAndSelect('item.channel', 'channel')
+        .leftJoinAndSelect('channel.channel_images', 'channel_images')
+        .leftJoinAndSelect('item.live_item', 'live_item')
+        .leftJoinAndSelect('item.item_flag_status', 'item_flag_status')
+        .where('item.channel_id = :channel_id', { channel_id: channel.id })
+        .andWhere('live_item.id IS NULL')
+        .andWhere('item_flag_status.id = :status', { status: ItemFlagStatusStatusEnum.Active });
+    };
+
+    // Use a deterministic random order based on shuffleHash
+    const query = createBaseQueryBuilder()
+      .addSelect('MD5(item.id::text || (:shuffleHash)::text)', 'shuffle_order')
+      .setParameter('shuffleHash', String(shuffleHash))
+      .orderBy('shuffle_order', 'ASC')
+      .skip(skip)
+      .take(take);
+
+    return (await query.getRawAndEntities()).entities;
+  }
+
+  async getManyByChannelBySeason(
+    channel: Channel,
+    order: 'forward' | 'backward',
+    options?: FindManyOptions<Item>
+  ): Promise<Item[]> {
+    if (!channel) {
+      return [];
     }
 
     const skip = options?.skip ?? 0;
@@ -566,17 +607,7 @@ export class ItemService {
 
     let finalResults: Item[] = [];
 
-    if (order === 'shuffle') {
-      // Use a deterministic random order based on shuffleHash
-      const query = createBaseQueryBuilder()
-        .addSelect('MD5(item.id::text || (:shuffleHash)::text)', 'shuffle_order')
-        .setParameter('shuffleHash', String(shuffleHash))
-        .orderBy('shuffle_order', 'ASC')
-        .skip(skip)
-        .take(take);
-
-      finalResults = (await query.getRawAndEntities()).entities;
-    } else if (order === 'forward') {
+    if (order === 'forward') {
       // Forward = unseasoned items first (DESC pub_date), then seasoned items (ASC season/episode)
       const unseasonedQuery = createBaseQueryBuilder()
         .andWhere('cs.number IS NULL')
