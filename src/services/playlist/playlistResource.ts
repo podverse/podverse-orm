@@ -1,7 +1,7 @@
 // TODO: get rid of "any" in the file 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { getMd5Hash } from 'podverse-helpers';
-import { EntityManager, FindManyOptions, FindOptionsOrderValue } from 'typeorm';
+import { getMd5Hash, PAGINATION, PlaylistResourceIdTextOptions } from 'podverse-helpers';
+import { EntityManager, FindManyOptions, FindOptionsOrderValue, FindOptionsWhere, MoreThan, LessThan } from 'typeorm';
 import { PlaylistResource } from '@orm/entities/playlist/playlistResource';
 import { PlaylistService } from './playlist';
 import { BaseManyService } from '@orm/services/base/baseManyService';
@@ -25,9 +25,23 @@ export class PlaylistResourceService extends BaseManyService<PlaylistResource, '
     this.itemService = new ItemService();
     this.itemSoundbiteService = new ItemSoundbiteService(transactionalEntityManager);
   }
+  
+  private filterPrivateClips<T extends { clip?: { sharable_status_id?: number | null, account?: { id?: number } } }>(
+    resources: T[],
+    account_id: number | null
+  ): T[] {
+    return resources.filter(resource => {
+      if (resource.clip?.sharable_status_id === 3) {
+        // Only include private clips if owned by the account
+        return resource.clip.account?.id === account_id;
+      }
+      return true;
+    });
+  }
 
   async getManyByPlaylistIdText(
     playlist_id_text: string,
+    account_id: number | null,
     options: Partial<FindManyOptions<PlaylistResource>> = {}
   ): Promise<PlaylistResource[]> {
     const playlist = await this.playlistService.getByIdText(playlist_id_text);
@@ -41,14 +55,139 @@ export class PlaylistResourceService extends BaseManyService<PlaylistResource, '
       relations: listResourceRelations
     };
 
-    return this.repositoryRead.find({
+    const results = await this.repositoryRead.find({
       ...defaultOptions,
       ...options,
       where: { ...defaultOptions.where, ...(options.where || {}) }
     });
+
+    return this.filterPrivateClips(results, account_id);
   }
 
-  async getAllByPlaylistIdText(playlist_id_text: string): Promise<PlaylistResource[]> {
+  async getManyForQueueByListPosition(
+    playlist_id_text: string,
+    idTextOptions: PlaylistResourceIdTextOptions,
+    direction: 'forward' | 'backward',
+    account_id: number | null
+  ): Promise<PlaylistResource[]> {
+    if (!idTextOptions.item_id_text && !idTextOptions.clip_id_text && !idTextOptions.item_soundbite_id_text) {
+      throw new Error('One of item_id_text, clip_id_text, or item_soundbite_id_text must be provided');
+    }
+
+    const playlist = await this.playlistService.getByIdText(playlist_id_text);
+    if (!playlist) {
+      throw new Error('Playlist not found.');
+    }
+
+    let list_position = '0';
+    
+    if (idTextOptions.clip_id_text) {
+      const clip = await this.clipService.getByIdText(idTextOptions.clip_id_text);
+      if (clip) {
+        const pr = await this.repositoryRead.findOne({
+          where: { playlist: { id: playlist.id }, clip: { id: clip.id } }
+        });
+        if (pr) list_position = pr.list_position;
+      }
+    } else if (idTextOptions.item_soundbite_id_text) {
+      const soundbite = await this.itemSoundbiteService.getByIdText(idTextOptions.item_soundbite_id_text);
+      if (soundbite) {
+        const pr = await this.repositoryRead.findOne({
+          where: { playlist: { id: playlist.id }, item_soundbite: { id: soundbite.id } }
+        });
+        if (pr) list_position = pr.list_position;
+      }
+    } else if (idTextOptions.item_id_text) {
+      const item = await this.itemService.getByIdText(idTextOptions.item_id_text);
+      if (item) {
+        const pr = await this.repositoryRead.findOne({
+          where: { playlist: { id: playlist.id }, item: { id: item.id } }
+        });
+        if (pr) list_position = pr.list_position;
+      }
+    }
+    
+    const where: FindOptionsWhere<PlaylistResource> = {
+      playlist: { id: playlist.id },
+      list_position: direction === 'forward' ? MoreThan(list_position) : LessThan(list_position)
+    };
+
+    const order: FindOptionsOrderValue = direction === 'forward' ? 'ASC' : 'DESC';
+
+    const results = await this.repositoryRead.find({
+      where,
+      order: { list_position: order },
+      take: PAGINATION.DEFAULT_LIMIT,
+      relations: listResourceRelations
+    });
+
+    return this.filterPrivateClips(results, account_id);
+  }
+
+  async getManyByPlaylistShuffle(
+    playlist_id_text: string,
+    shuffleHash: string,
+    account_id: number | null,
+    options?: FindManyOptions<PlaylistResource>
+  ): Promise<PlaylistResource[]> {
+    const playlist = await this.playlistService.getByIdText(playlist_id_text);
+    if (!playlist) {
+      throw new Error('Playlist not found.');
+    }
+
+    if (!shuffleHash) {
+      throw new Error('Shuffle hash is required.');
+    }
+
+    const skip = options?.skip ?? 0;
+    const take = options?.take ?? PAGINATION.DEFAULT_LIMIT;
+
+    const createBaseQueryBuilder = () => {
+      return this.repositoryRead.createQueryBuilder('pr')
+        .where('pr.playlist_id = :playlistId', { playlistId: playlist.id })
+        .leftJoinAndSelect('pr.clip', 'clip')
+        .leftJoinAndSelect('clip.item', 'clip_item')
+        .leftJoinAndSelect('clip_item.item_about', 'clip_item_about')
+        .leftJoinAndSelect('clip_item.item_enclosures', 'clip_item_enclosures')
+        .leftJoinAndSelect('clip_item_enclosures.item_enclosure_sources', 'clip_item_enclosure_sources')
+        .leftJoinAndSelect('clip_item.item_images', 'clip_item_images')
+        .leftJoinAndSelect('clip_item.channel', 'clip_channel')
+        .leftJoinAndSelect('clip_channel.channel_images', 'clip_channel_images')
+        .leftJoinAndSelect('clip.sharable_status', 'sharable_status')
+        .leftJoinAndSelect('clip.account', 'clip_account')
+        .leftJoinAndSelect('pr.item', 'item')
+        .leftJoinAndSelect('item.item_about', 'item_about')
+        .leftJoinAndSelect('item.item_enclosures', 'item_enclosures')
+        .leftJoinAndSelect('item_enclosures.item_enclosure_sources', 'item_enclosure_sources')
+        .leftJoinAndSelect('item.item_images', 'item_images')
+        .leftJoinAndSelect('item.channel', 'item_channel')
+        .leftJoinAndSelect('item_channel.channel_images', 'item_channel_images')
+        .leftJoinAndSelect('pr.item_soundbite', 'item_soundbite')
+        .leftJoinAndSelect('item_soundbite.item', 'soundbite_item')
+        .leftJoinAndSelect('soundbite_item.item_about', 'soundbite_item_about')
+        .leftJoinAndSelect('soundbite_item.item_enclosures', 'soundbite_item_enclosures')
+        .leftJoinAndSelect('soundbite_item_enclosures.item_enclosure_sources', 'soundbite_item_enclosure_sources')
+        .leftJoinAndSelect('soundbite_item.item_images', 'soundbite_item_images')
+        .leftJoinAndSelect('soundbite_item.channel', 'soundbite_channel')
+        .leftJoinAndSelect('soundbite_channel.channel_images', 'soundbite_channel_images');
+    };
+
+    // Use a deterministic random order based on shuffleHash
+    const query = createBaseQueryBuilder()
+      .addSelect('MD5(pr.id::text || (:shuffleHash)::text)', 'shuffle_order')
+      .setParameter('shuffleHash', String(shuffleHash))
+      .orderBy('shuffle_order', 'ASC')
+      .skip(skip)
+      .take(take);
+
+    const result = await query.getRawAndEntities();
+    return this.filterPrivateClips(result.entities, account_id);
+  }
+
+  async getAllByPlaylistIdText(
+    playlist_id_text: string,
+    account_id: number | null
+  ): Promise<PlaylistResource[]> {
     const playlist = await this.playlistService.getByIdText(playlist_id_text);
     if (!playlist) {
       throw new Error("Playlist not found.");
@@ -60,7 +199,8 @@ export class PlaylistResourceService extends BaseManyService<PlaylistResource, '
       relations: listResourceRelations
     };
 
-    return this.repositoryRead.find(options);
+    const results = await this.repositoryRead.find(options);
+    return this.filterPrivateClips(results, account_id);
   }
 
   async getAllByPlaylistIdTextCount(playlist_id_text: string): Promise<number> {
