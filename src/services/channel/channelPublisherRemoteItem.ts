@@ -1,4 +1,4 @@
-import { RemoteItemDto } from 'podverse-helpers';
+import { filterInvalidFeedUuids, RemoteItemDto } from 'podverse-helpers';
 import { EntityManager } from 'typeorm';
 import { ChannelPublisher } from '@orm/entities/channel/channelPublisher';
 import { ChannelPublisherRemoteItem } from '@orm/entities/channel/channelPublisherRemoteItem';
@@ -18,6 +18,7 @@ export class ChannelPublisherRemoteItemService extends BaseRemoteItemsService<Ch
   }
 
   async updateMany(channel_publisher: ChannelPublisher, dtos: RemoteItemDto[]): Promise<ChannelPublisherRemoteItem[]> { 
-    return super.updateMany(channel_publisher, dtos);
+    const filteredDtos = filterInvalidFeedUuids(dtos);
+    return super.updateMany(channel_publisher, filteredDtos);
   }
 }

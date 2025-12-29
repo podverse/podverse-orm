@@ -1,4 +1,4 @@
-import { RemoteItemDto } from 'podverse-helpers';
+import { filterInvalidFeedUuids, RemoteItemDto } from 'podverse-helpers';
 import { EntityManager } from 'typeorm';
 import { Channel } from '@orm/entities/channel/channel';
 import { ChannelRemoteItem } from '@orm/entities/channel/channelRemoteItem';
@@ -18,7 +18,8 @@ export class ChannelRemoteItemService extends BaseRemoteItemsService<ChannelRemo
   }
 
   async updateMany(channel: Channel, dtos: RemoteItemDto[]): Promise<ChannelRemoteItem[]> { 
-    return super.updateMany(channel, dtos);
+    const filteredDtos = filterInvalidFeedUuids(dtos);
+    return super.updateMany(channel, filteredDtos);
   }
 
   async deleteAll(channel: Channel): Promise<void> {
