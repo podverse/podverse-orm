@@ -5,6 +5,7 @@ import { BaseOneService } from '@orm/services/base/baseOneService';
 import { ChannelService } from './channel';
 import { ItemService } from '../item/item';
 import { ChannelPodrollRemoteItem } from '@orm/entities/channel/channelPodrollRemoteItem';
+import { Item } from '@orm/entities/item/item';
 
 type ChannelPodrollDto = object
 
@@ -95,8 +96,10 @@ export class ChannelPodrollService extends BaseOneService<ChannelPodroll, 'chann
 
     if (!channel) {
       return {
-        podrollChannels: [],
-        podrollItems: []
+        podrollChannelsAdded: [],
+        podrollChannelsUnadded: [],
+        podrollItemsAdded: [],
+        podrollItemsUnadded: []
       };
     }
 
@@ -104,17 +107,75 @@ export class ChannelPodrollService extends BaseOneService<ChannelPodroll, 'chann
 
     if (!channel_podroll_remote_items || channel_podroll_remote_items.length === 0) {
       return {
-        podrollChannels: [],
-        podrollItems: []
+        podrollChannelsAdded: [],
+        podrollChannelsUnadded: [],
+        podrollItemsAdded: [],
+        podrollItemsUnadded: []
       };
     }
 
-    const podrollChannels = await this.getPodrollChannels(channel_podroll_remote_items);
-    const podrollItems = await this.getPodrollItems(channel_podroll_remote_items);
+    const channelFeedGuids: string[] = [];
+    const itemParams: { podcast_guid: string, item_guid: string }[] = [];
+
+    for (const rItem of channel_podroll_remote_items) {
+      if (rItem.feed_guid && !rItem.item_guid) {
+        channelFeedGuids.push(rItem.feed_guid);
+      }
+
+      if (rItem.feed_guid && rItem.item_guid) {
+        itemParams.push({ podcast_guid: rItem.feed_guid, item_guid: rItem.item_guid });
+      }
+    }
+
+    const podrollChannels = channelFeedGuids.length ? await this.getPodrollChannels(channel_podroll_remote_items) : [];
+    const podrollItems = itemParams.length ? await this.getPodrollItems(channel_podroll_remote_items) : [];
+
+    const foundChannelGuids = new Set<string>(
+      podrollChannels
+        .map(c => c.podcast_guid)
+        .filter((g): g is string => !!g)
+    );
+
+    const foundItemKey = new Set<string>(
+      podrollItems
+        .filter(i => !!i.channel?.podcast_guid && !!i.guid)
+        .map(i => `${i.channel!.podcast_guid}||${i.guid}`)
+    );
+
+    const podrollChannelsAdded: Channel[] = [];
+    const podrollChannelsUnadded: ChannelPodrollRemoteItem[] = [];
+
+    for (const rItem of channel_podroll_remote_items) {
+      if (rItem.feed_guid && !rItem.item_guid) {
+        if (foundChannelGuids.has(rItem.feed_guid)) {
+          const ch = podrollChannels.find(c => c.podcast_guid === rItem.feed_guid);
+          if (ch && !podrollChannelsAdded.find(pc => pc.id === ch.id)) podrollChannelsAdded.push(ch);
+        } else {
+          podrollChannelsUnadded.push(rItem);
+        }
+      }
+    }
+
+    const podrollItemsAdded: Item[] = [];
+    const podrollItemsUnadded: ChannelPodrollRemoteItem[] = [];
+
+    for (const rItem of channel_podroll_remote_items) {
+      if (rItem.feed_guid && rItem.item_guid) {
+        const key = `${rItem.feed_guid}||${rItem.item_guid}`;
+        if (foundItemKey.has(key)) {
+          const it = podrollItems.find(i => i.guid === rItem.item_guid && i.channel?.podcast_guid === rItem.feed_guid);
+          if (it && !podrollItemsAdded.find(pi => pi.id === it.id)) podrollItemsAdded.push(it);
+        } else {
+          podrollItemsUnadded.push(rItem);
+        }
+      }
+    }
 
     return {
-      podrollChannels,
-      podrollItems
+      podrollChannelsAdded,
+      podrollChannelsUnadded,
+      podrollItemsAdded,
+      podrollItemsUnadded
     };
   }
 }
