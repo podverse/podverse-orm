@@ -205,6 +205,8 @@ export * from './services/onDemandParserEvent';
 export * from './services/playlist/playlist';
 export * from './services/playlist/playlistResource';
 
+export * from './services/publisherFeed';
+
 export * from './services/queue/queue';
 export * from './services/queue/queueResource';
 
