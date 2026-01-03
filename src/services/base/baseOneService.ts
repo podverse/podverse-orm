@@ -25,6 +25,12 @@ export class BaseOneService<T extends ObjectLiteral, K extends keyof T> {
   async _update(parentEntity: T[K], dto: Partial<T>, config?: FindOneOptions<T>): Promise<T> {
     let entity = await this._get(parentEntity, config);
 
+    loggerService.debug(`parentEntityKey: ${this.parentEntityKey as string}`);
+    loggerService.debug(`dto: ${dto ? JSON.stringify(dto) : 'null'}`);
+    loggerService.debug(`config: ${config ? JSON.stringify(config) : 'null'}`);
+    loggerService.debug(`Entity exists: ${!!entity}`);
+    loggerService.debug(`Entity has different values: ${entity ? hasDifferentValues(entity, dto) : 'N/A'}`);
+
     if (!entity) {
       entity = new (this.repositoryReadWrite.target as { new (): T })();
       entity[this.parentEntityKey] = parentEntity;
