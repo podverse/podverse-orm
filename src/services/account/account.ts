@@ -1,8 +1,8 @@
-import { ERROR_MESSAGES } from 'podverse-helpers';
+import { AccountMembershipEnum, SharableStatusEnum, validateEmail, validatePassword,
+  AccountNotificationTypeEnum, ERROR_MESSAGES } from 'podverse-helpers';
 import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
 import { Account } from '@orm/entities/account/account';
 import { AppDataSourceRead, AppDataSourceReadWrite } from '@orm/db';
-import { AccountMembershipEnum, SharableStatusEnum, validateEmail, validatePassword } from 'podverse-helpers';
 import { SharableStatus } from '@orm/entities/sharableStatus';
 import { hashPassword } from '@orm/lib/password';
 import { AccountCredentialsService } from './accountCredentials';
@@ -10,6 +10,9 @@ import { AccountMembershipStatusService } from './accountMembershipStatus';
 import { AccountVerificationService } from './accountVerification';
 import { AccountResetPasswordService } from './accountResetPassword';
 import { AccountProfileService } from './accountProfile';
+import { AccountSettings } from '@orm/entities/account/accountSettings/accountSettings';
+import { AccountSettingsNotification } from '@orm/entities/account/accountSettings/accountSettingsNotification';
+import { AccountSettingsNotificationType } from '@orm/entities/account/accountSettings/accountSettingsNotificationType';
 
 type CreateAccountDto = {
   email: string
@@ -81,9 +84,22 @@ export class AccountService {
       throw new Error(ERROR_MESSAGES.ACCOUNT.ALREADY_EXISTS);
     }
 
+    const accountSettings = new AccountSettings();
+    const accountSettingsNotification = new AccountSettingsNotification();
+
+    // create the two default notification types
+    const t1 = new AccountSettingsNotificationType();
+    t1.type = AccountNotificationTypeEnum.NewItem;
+    const t2 = new AccountSettingsNotificationType();
+    t2.type = AccountNotificationTypeEnum.LivestreamStarting;
+
+    accountSettingsNotification.account_settings_notification_types = [t1, t2];
+    accountSettings.account_settings_notification = accountSettingsNotification;
+
     const accountObj = this.repositoryReadWrite.create({
       sharable_status: sharableStatus,
-      verified: qaVerified ?? false
+      verified: qaVerified ?? false,
+      account_settings: accountSettings
     });
     
     const account = await this.repositoryReadWrite.save(accountObj);

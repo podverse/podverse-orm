@@ -98,6 +98,10 @@ import { StatsTrackEventAccount } from "@orm/entities/stats/statsTrackEventAccou
 import { StatsTrackEventClip } from "@orm/entities/stats/statsTrackEventClip";
 import { StatsTrackEventItem } from "@orm/entities/stats/statsTrackEventItem";
 import { StatsTrackEventPlaylist } from "@orm/entities/stats/statsTrackEventPlaylist";
+import { AccountNotificationChannelType } from "@orm/entities/account/accountNotificationChannelType";
+import { AccountSettings } from "@orm/entities/account/accountSettings/accountSettings";
+import { AccountSettingsNotification } from "@orm/entities/account/accountSettings/accountSettingsNotification";
+import { AccountSettingsNotificationType } from "@orm/entities/account/accountSettings/accountSettingsNotificationType";
 
 const commonConfig: DataSourceOptions = {
   type: "postgres",
@@ -121,9 +125,13 @@ const commonConfig: DataSourceOptions = {
     AccountMembership,
     AccountMembershipStatus,
     AccountNotificationChannel,
+    AccountNotificationChannelType,
     AccountPayPalOrder,
     AccountProfile,
     AccountResetPassword,
+    AccountSettings,
+    AccountSettingsNotification,
+    AccountSettingsNotificationType,
     AccountUpDevice,
     AccountVerification,
     Category,

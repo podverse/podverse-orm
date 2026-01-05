@@ -1,4 +1,4 @@
-import { DATABASE_CONSTANTS } from 'podverse-helpers';
+import { DATABASE_CONSTANTS, AccountFCMDevicePlatformEnum } from 'podverse-helpers';
 import { Entity, Column, ManyToOne, JoinColumn, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { Account } from '@orm/entities/account/account';
 
@@ -15,6 +15,12 @@ export class AccountFCMDevice {
 
   @Column()
   account_id!: number;
+
+  @Column({ type: 'enum', enum: AccountFCMDevicePlatformEnum })
+  platform!: AccountFCMDevicePlatformEnum;
+
+  @Column({ type: 'varchar', length: DATABASE_CONSTANTS.varchar_locale })
+  locale!: string;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   created_at!: Date;

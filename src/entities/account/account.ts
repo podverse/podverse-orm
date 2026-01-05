@@ -16,6 +16,7 @@ import { AccountResetPassword } from './accountResetPassword';
 import { AccountUpDevice } from './accountUPDevice';
 import { AccountVerification } from './accountVerification';
 import { generateRandomIdText } from '@orm/lib/nanoid';
+import { AccountSettings } from './accountSettings/accountSettings';
 
 @Entity()
 export class Account {
@@ -70,6 +71,9 @@ export class Account {
 
   @OneToOne(() => AccountResetPassword, accountResetPassword => accountResetPassword.account)
   account_reset_password!: AccountResetPassword;
+
+  @OneToOne(() => AccountSettings, accountSettings => accountSettings.account, { cascade: ['insert'] })
+  account_settings!: AccountSettings;
 
   @OneToMany(() => AccountUpDevice, accountUpDevice => accountUpDevice.account)
   account_up_devices!: AccountUpDevice[];
