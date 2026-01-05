@@ -11,19 +11,29 @@ import { AccountVerificationService } from './accountVerification';
 import { AccountResetPasswordService } from './accountResetPassword';
 import { AccountProfileService } from './accountProfile';
 import { AccountSettings } from '@orm/entities/account/accountSettings/accountSettings';
+import { AccountSettingsLocale } from '@orm/entities/account/accountSettings/accountSettingsLocale';
 import { AccountSettingsNotification } from '@orm/entities/account/accountSettings/accountSettingsNotification';
 import { AccountSettingsNotificationType } from '@orm/entities/account/accountSettings/accountSettingsNotificationType';
 
 type CreateAccountDto = {
   email: string
   password: string
+  locale: string
 }
 
 type UpdateAccountDto = {
   display_name?: string;
   bio?: string;
   sharable_status?: SharableStatusEnum;
+  locale: string;
 };
+
+const requiredRelations = [
+  'account_settings',
+  'account_settings.account_settings_locale',
+  'account_settings.account_settings_notification',
+  'account_settings.account_settings_notification.account_settings_notification_types'
+];
 
 export class AccountService {
   protected repositoryRead: Repository<Account>;
@@ -38,7 +48,20 @@ export class AccountService {
     if (!id) {
       return null;
     }
-    return this.repositoryRead.findOne({ where: { id }, ...config });
+    
+    let mergedRelations: string[];
+    if (config?.relations && Array.isArray(config.relations)) {
+      mergedRelations = Array.from(new Set([...config.relations, ...requiredRelations]));
+    } else {
+      mergedRelations = requiredRelations;
+    }
+
+    const account = await this.repositoryRead.findOne({ where: { id }, ...(config || {}), relations: mergedRelations });
+    if (!account) return null;
+
+    await this.ensureAccountSettings(account, { alwaysCreate: false, locale: 'en-US' });
+
+    return this.repositoryRead.findOne({ where: { id }, relations: mergedRelations });
   }
 
   async getByEmail(email: string, config?: FindOneOptions<Account>): Promise<Account | null> {
@@ -84,25 +107,13 @@ export class AccountService {
       throw new Error(ERROR_MESSAGES.ACCOUNT.ALREADY_EXISTS);
     }
 
-    const accountSettings = new AccountSettings();
-    const accountSettingsNotification = new AccountSettingsNotification();
-
-    // create the two default notification types
-    const t1 = new AccountSettingsNotificationType();
-    t1.type = AccountNotificationTypeEnum.NewItem;
-    const t2 = new AccountSettingsNotificationType();
-    t2.type = AccountNotificationTypeEnum.LivestreamStarting;
-
-    accountSettingsNotification.account_settings_notification_types = [t1, t2];
-    accountSettings.account_settings_notification = accountSettingsNotification;
-
     const accountObj = this.repositoryReadWrite.create({
       sharable_status: sharableStatus,
-      verified: qaVerified ?? false,
-      account_settings: accountSettings
+      verified: qaVerified ?? false
     });
-    
     const account = await this.repositoryReadWrite.save(accountObj);
+
+    await this.ensureAccountSettings(account, { alwaysCreate: true, locale: dto.locale });
     const saltedPassword = await hashPassword(dto.password);
     
     await accountCredentialsService.update(account, {
@@ -143,6 +154,17 @@ export class AccountService {
       }
       account.sharable_status = sharableStatus;
       await this.repositoryReadWrite.save(account);
+    }
+
+    const accountSettings = await AppDataSourceReadWrite.getRepository(AccountSettings).findOne({
+      where: { account_id },
+      relations: ['account_settings_locale']
+    });
+    
+    if (accountSettings?.account_settings_locale) {
+      const localeRepo = AppDataSourceReadWrite.getRepository(AccountSettingsLocale);
+      accountSettings.account_settings_locale.locale = dto.locale;
+      await localeRepo.save(accountSettings.account_settings_locale);
     }
   
     return this.repositoryReadWrite.findOne({ where: { id: account_id }, relations: ['account_profile', 'sharable_status'] });
@@ -188,5 +210,73 @@ export class AccountService {
     }
 
     await this.repositoryReadWrite.remove(account);
+  }
+
+  private async ensureAccountSettings(account: Account, params: { alwaysCreate: boolean; locale: string }): Promise<void> {
+    const accountSettingsRepo = AppDataSourceReadWrite.getRepository(AccountSettings);
+    const localeRepo = AppDataSourceReadWrite.getRepository(AccountSettingsLocale);
+    const notificationRepo = AppDataSourceReadWrite.getRepository(AccountSettingsNotification);
+
+    // If alwaysCreate (used by create), always create new AccountSettings row linked to the account
+    if (params.alwaysCreate || !account.account_settings) {
+      // First, create and save AccountSettings
+      const accountSettings = new AccountSettings();
+      accountSettings.account_id = account.id;
+      const savedAccountSettings = await accountSettingsRepo.save(accountSettings);
+
+      // Then create and save the locale with the proper foreign key
+      const locale = new AccountSettingsLocale();
+      locale.account_settings_id = savedAccountSettings.id;
+      locale.locale = params.locale;
+      await localeRepo.save(locale);
+
+      // Then create and save the notification with the proper foreign key
+      const notification = new AccountSettingsNotification();
+      notification.account_settings_id = savedAccountSettings.id;
+      await notificationRepo.save(notification);
+
+      // Finally, create and save the notification types
+      const t1 = new AccountSettingsNotificationType();
+      t1.account_settings_notification_id = notification.id;
+      t1.type = AccountNotificationTypeEnum.NewItem;
+      const t2 = new AccountSettingsNotificationType();
+      t2.account_settings_notification_id = notification.id;
+      t2.type = AccountNotificationTypeEnum.LivestreamStarting;
+      
+      const notificationTypeRepo = AppDataSourceReadWrite.getRepository(AccountSettingsNotificationType);
+      await notificationTypeRepo.save([t1, t2]);
+      
+      return;
+    }
+
+    // Otherwise (used by get) ensure sub-rows exist, create only if missing
+    const existingSettings = account.account_settings;
+
+    if (!existingSettings.account_settings_locale) {
+      const locale = new AccountSettingsLocale();
+      locale.account_settings_id = existingSettings.id;
+      locale.locale = params.locale;
+      await localeRepo.save(locale);
+    }
+
+    if (!existingSettings.account_settings_notification) {
+      const notification = new AccountSettingsNotification();
+      notification.account_settings_id = existingSettings.id;
+      const t1 = new AccountSettingsNotificationType();
+      t1.type = AccountNotificationTypeEnum.NewItem;
+      const t2 = new AccountSettingsNotificationType();
+      t2.type = AccountNotificationTypeEnum.LivestreamStarting;
+      notification.account_settings_notification_types = [t1, t2];
+      await notificationRepo.save(notification);
+    } else if (!existingSettings.account_settings_notification.account_settings_notification_types || existingSettings.account_settings_notification.account_settings_notification_types.length === 0) {
+      // add default types if missing
+      const notification = existingSettings.account_settings_notification;
+      const t1 = new AccountSettingsNotificationType();
+      t1.type = AccountNotificationTypeEnum.NewItem;
+      const t2 = new AccountSettingsNotificationType();
+      t2.type = AccountNotificationTypeEnum.LivestreamStarting;
+      notification.account_settings_notification_types = [t1, t2];
+      await notificationRepo.save(notification);
+    }
   }
 }

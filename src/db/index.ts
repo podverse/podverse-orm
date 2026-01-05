@@ -102,6 +102,7 @@ import { AccountNotificationChannelType } from "@orm/entities/account/accountNot
 import { AccountSettings } from "@orm/entities/account/accountSettings/accountSettings";
 import { AccountSettingsNotification } from "@orm/entities/account/accountSettings/accountSettingsNotification";
 import { AccountSettingsNotificationType } from "@orm/entities/account/accountSettings/accountSettingsNotificationType";
+import { AccountSettingsLocale } from "@orm/entities/account/accountSettings/accountSettingsLocale";
 
 const commonConfig: DataSourceOptions = {
   type: "postgres",
@@ -130,6 +131,7 @@ const commonConfig: DataSourceOptions = {
     AccountProfile,
     AccountResetPassword,
     AccountSettings,
+    AccountSettingsLocale,
     AccountSettingsNotification,
     AccountSettingsNotificationType,
     AccountUpDevice,

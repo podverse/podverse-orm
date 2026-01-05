@@ -17,4 +17,7 @@ export class AccountSettingsNotificationType {
   )
   @JoinColumn({ name: 'account_settings_notification_id' })
   account_settings_notification!: AccountSettingsNotification;
+
+  @Column({ name: 'account_settings_notification_id' })
+  account_settings_notification_id!: number;
 }

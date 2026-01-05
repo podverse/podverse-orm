@@ -1,6 +1,5 @@
-import { AccountFCMDevicePlatformValues, CreateAccountFCMDeviceParams,
-  UpdateAccountFCMDeviceParams, DeleteAccountFCMDeviceParams,
-  UpdateLocaleForAccountParams } from 'podverse-helpers';
+import { CreateAccountFCMDeviceParams,
+  UpdateAccountFCMDeviceParams, DeleteAccountFCMDeviceParams } from 'podverse-helpers';
 import { AccountFCMDevice } from '@orm/entities/account/accountFCMDevice';
 import { BaseManyService } from '@orm/services/base/baseManyService';
 import { AccountService } from '@orm/services/account/account';
@@ -21,7 +20,9 @@ export class AccountFCMDeviceService extends BaseManyService<AccountFCMDevice, '
     if (!account) {
       throw new Error('Account not found.');
     }
-    const { fcm_token, installation_id, platform, locale } = params;
+    const { fcm_token, installation_id, platform } = params;
+
+    const locale = account.account_settings?.account_settings_locale?.locale || 'en-US';
 
     const dto: Partial<AccountFCMDevice> = { fcm_token, installation_id, platform, locale };
     return this._update(account, ['fcm_token', 'installation_id', 'platform', 'locale'], dto);
@@ -35,7 +36,9 @@ export class AccountFCMDeviceService extends BaseManyService<AccountFCMDevice, '
     if (!account) {
       throw new Error('Account not found.');
     }
-    const { new_fcm_token, installation_id, previous_fcm_token, platform, locale } = params;
+    const { new_fcm_token, installation_id, previous_fcm_token, platform } = params;
+
+    const locale = account.account_settings?.account_settings_locale?.locale || 'en-US';
 
     // Prefer a match by installation_id + account_id
     if (installation_id) {
@@ -101,7 +104,7 @@ export class AccountFCMDeviceService extends BaseManyService<AccountFCMDevice, '
     return this.repositoryRead.find({ where: { account_id } });
   }
 
-  async updateLocaleForAccount(account_id: number, params: UpdateLocaleForAccountParams): Promise<void> {
+  async updateLocaleForAccount(account_id: number, params: { locale: string }): Promise<void> {
     const account = await this.accountService.get(account_id);
     if (!account) {
       throw new Error('Account not found.');
