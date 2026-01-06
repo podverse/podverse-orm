@@ -1,13 +1,18 @@
-import { Entity, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany, Unique } from 'typeorm';
 import { Account } from '@orm/entities/account/account';
 import { Channel } from '@orm/entities/channel/channel';
+import { AccountNotificationChannelType } from './accountNotificationChannelType';
 
 @Entity()
+@Unique(['channel_id', 'account_id'])
 export class AccountNotificationChannel {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
+  id!: number;
+
+  @Column()
   channel_id!: number;
 
-  @PrimaryColumn()
+  @Column()
   account_id!: number;
 
   @ManyToOne(() => Channel, channel => channel.id, { onDelete: 'CASCADE' })
@@ -17,4 +22,7 @@ export class AccountNotificationChannel {
   @ManyToOne(() => Account, account => account.id, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'account_id' })
   account!: Account;
+
+  @OneToMany(() => AccountNotificationChannelType, accountNotificationChannelType => accountNotificationChannelType.account_notification_channel)
+  account_notification_channel_types!: AccountNotificationChannelType[];
 }

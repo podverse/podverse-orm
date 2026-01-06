@@ -23,9 +23,14 @@ export * from './entities/account/accountGooglePlayPurchase';
 export * from './entities/account/accountMembership';
 export * from './entities/account/accountMembershipStatus';
 export * from './entities/account/accountNotificationChannel';
+export * from './entities/account/accountNotificationChannelType';
 export * from './entities/account/accountPayPalOrder';
 export * from './entities/account/accountProfile';
 export * from './entities/account/accountResetPassword';
+export * from './entities/account/accountSettings/accountSettings';
+export * from './entities/account/accountSettings/accountSettingsLocale';
+export * from './entities/account/accountSettings/accountSettingsNotification';
+export * from './entities/account/accountSettings/accountSettingsNotificationType';
 export * from './entities/account/accountUPDevice';
 export * from './entities/account/accountVerification';
 
@@ -129,9 +134,12 @@ export * from './services/account/accountFollowingPlaylist';
 export * from './services/account/accountMembership';
 export * from './services/account/accountMembershipStatus';
 export * from './services/account/accountNotificationChannel';
+export * from './services/account/accountNotificationChannelType';
 export * from './services/account/accountPayPalOrder';
 export * from './services/account/accountProfile';
 export * from './services/account/accountResetPassword';
+export * from './services/account/accountSettings/accountSettingsLocale';
+export * from './services/account/accountSettings/accountSettingsNotificationType';
 export * from './services/account/accountVerification';
 
 export * from './services/archiver';
