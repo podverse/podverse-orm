@@ -1,5 +1,6 @@
 import { CreateAccountFCMDeviceParams,
   UpdateAccountFCMDeviceParams, DeleteAccountFCMDeviceParams } from 'podverse-helpers';
+import { In } from 'typeorm';
 import { AccountFCMDevice } from '@orm/entities/account/accountFCMDevice';
 import { BaseManyService } from '@orm/services/base/baseManyService';
 import { AccountService } from '@orm/services/account/account';
@@ -102,6 +103,11 @@ export class AccountFCMDeviceService extends BaseManyService<AccountFCMDevice, '
 
   async getAllForAccount(account_id: number): Promise<AccountFCMDevice[]> {
     return this.repositoryRead.find({ where: { account_id } });
+  }
+
+  async getAllForAccountIds(account_ids: number[]): Promise<AccountFCMDevice[]> {
+    if (account_ids.length === 0) return [];
+    return this.repositoryRead.find({ where: { account_id: In(account_ids) } });
   }
 
   async updateLocaleForAccount(account_id: number, params: { locale: string }): Promise<void> {

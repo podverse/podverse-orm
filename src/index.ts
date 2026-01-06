@@ -23,6 +23,7 @@ export * from './entities/account/accountGooglePlayPurchase';
 export * from './entities/account/accountMembership';
 export * from './entities/account/accountMembershipStatus';
 export * from './entities/account/accountNotificationChannel';
+export * from './entities/account/accountNotificationChannelType';
 export * from './entities/account/accountPayPalOrder';
 export * from './entities/account/accountProfile';
 export * from './entities/account/accountResetPassword';

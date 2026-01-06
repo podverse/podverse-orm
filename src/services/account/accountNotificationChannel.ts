@@ -1,8 +1,10 @@
 import { EntityManager, FindManyOptions, FindOneOptions } from 'typeorm';
 import { AccountNotificationChannel } from '@orm/entities/account/accountNotificationChannel';
+import { AccountNotificationChannelType } from '@orm/entities/account/accountNotificationChannelType';
 import { BaseManyService } from '@orm/services/base/baseManyService';
 import { AccountService } from '@orm/services/account/account';
 import { ChannelService } from '@orm/services/channel/channel';
+import { AppDataSourceReadWrite } from '@orm/db';
 
 export class AccountNotificationChannelService extends BaseManyService<AccountNotificationChannel, 'account'> {
   private accountService: AccountService;
@@ -58,7 +60,25 @@ export class AccountNotificationChannelService extends BaseManyService<AccountNo
     }
 
     const dto = { account_id, channel_id: channel.id };
-    return this._update(account, ['account_id', 'channel_id'], dto);
+    const accountNotificationChannel = await this._update(account, ['account_id', 'channel_id'], dto);
+
+    const notificationTypes = account.account_settings?.account_settings_notification?.account_settings_notification_types;
+
+    if (notificationTypes && notificationTypes.length > 0) {
+      const channelTypeRepo = AppDataSourceReadWrite.getRepository(AccountNotificationChannelType);
+      const channelTypes = notificationTypes.map(settingsType => {
+        const channelType = new AccountNotificationChannelType();
+        channelType.account_notification_channel = accountNotificationChannel;
+        channelType.type = settingsType.type;
+        return channelType;
+      });
+      await channelTypeRepo.save(channelTypes);
+    } else {
+      console.warn(`AccountNotificationChannelService.create: No notification types found for account ${account_id}. ` +
+        `AccountNotificationChannelTypes will not be created automatically.`);
+    }
+
+    return accountNotificationChannel;
   }
 
   async delete(account_id: number, channel_id_text: string): Promise<void> {
