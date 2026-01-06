@@ -134,6 +134,7 @@ export * from './services/account/accountFollowingPlaylist';
 export * from './services/account/accountMembership';
 export * from './services/account/accountMembershipStatus';
 export * from './services/account/accountNotificationChannel';
+export * from './services/account/accountNotificationChannelType';
 export * from './services/account/accountPayPalOrder';
 export * from './services/account/accountProfile';
 export * from './services/account/accountResetPassword';
