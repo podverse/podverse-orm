@@ -14,6 +14,7 @@ import { AccountSettings } from '@orm/entities/account/accountSettings/accountSe
 import { AccountSettingsLocale } from '@orm/entities/account/accountSettings/accountSettingsLocale';
 import { AccountSettingsNotification } from '@orm/entities/account/accountSettings/accountSettingsNotification';
 import { AccountSettingsNotificationType } from '@orm/entities/account/accountSettings/accountSettingsNotificationType';
+import { config as projectConfig } from '@orm/config';
 
 type CreateAccountDto = {
   email: string
@@ -59,7 +60,7 @@ export class AccountService {
     const account = await this.repositoryRead.findOne({ where: { id }, ...(config || {}), relations: mergedRelations });
     if (!account) return null;
 
-    await this.ensureAccountSettings(account, { alwaysCreate: false, locale: 'en-US' });
+    await this.ensureAccountSettings(account, { alwaysCreate: false, locale: projectConfig.defaults.account.settings.locale });
 
     return this.repositoryRead.findOne({ where: { id }, relations: mergedRelations });
   }

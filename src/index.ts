@@ -33,6 +33,7 @@ export * from './entities/account/accountSettings/accountSettingsNotification';
 export * from './entities/account/accountSettings/accountSettingsNotificationType';
 export * from './entities/account/accountUPDevice';
 export * from './entities/account/accountVerification';
+export * from './entities/account/accountWebPushDevice';
 
 export * from './entities/channel/channel';
 export * from './entities/channel/channelAbout';
@@ -141,6 +142,7 @@ export * from './services/account/accountResetPassword';
 export * from './services/account/accountSettings/accountSettingsLocale';
 export * from './services/account/accountSettings/accountSettingsNotificationType';
 export * from './services/account/accountVerification';
+export * from './services/account/accountWebPushDevice';
 
 export * from './services/archiver';
 

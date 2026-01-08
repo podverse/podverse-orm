@@ -18,6 +18,7 @@ import { AccountPayPalOrder } from "@orm/entities/account/accountPayPalOrder";
 import { AccountProfile } from "@orm/entities/account/accountProfile";
 import { AccountResetPassword } from "@orm/entities/account/accountResetPassword";
 import { AccountUpDevice } from "@orm/entities/account/accountUPDevice";
+import { AccountWebPushDevice } from "@orm/entities/account/accountWebPushDevice";
 import { AccountVerification } from "@orm/entities/account/accountVerification";
 import { Category } from "@orm/entities/category";
 import { Channel } from "@orm/entities/channel/channel";
@@ -135,6 +136,7 @@ const commonConfig: DataSourceOptions = {
     AccountSettingsNotification,
     AccountSettingsNotificationType,
     AccountUpDevice,
+    AccountWebPushDevice,
     AccountVerification,
     Category,
     Channel,

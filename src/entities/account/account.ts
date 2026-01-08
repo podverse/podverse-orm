@@ -17,6 +17,7 @@ import { AccountUpDevice } from './accountUPDevice';
 import { AccountVerification } from './accountVerification';
 import { generateRandomIdText } from '@orm/lib/nanoid';
 import { AccountSettings } from './accountSettings/accountSettings';
+import { AccountWebPushDevice } from './accountWebPushDevice';
 
 @Entity()
 export class Account {
@@ -77,6 +78,9 @@ export class Account {
 
   @OneToMany(() => AccountUpDevice, accountUpDevice => accountUpDevice.account)
   account_up_devices!: AccountUpDevice[];
+
+  @OneToMany(() => AccountWebPushDevice, accountWebPushDevice => accountWebPushDevice.account)
+  account_web_push_devices!: AccountWebPushDevice[];
 
   @OneToOne(() => AccountVerification, accountVerification => accountVerification.account)
   account_verification!: AccountVerification;
