@@ -13,7 +13,7 @@ import { AccountNotificationChannel } from './accountNotificationChannel';
 import { AccountPayPalOrder } from './accountPayPalOrder';
 import { AccountProfile } from './accountProfile';
 import { AccountResetPassword } from './accountResetPassword';
-import { AccountUpDevice } from './accountUPDevice';
+import { AccountUPDevice } from './accountUPDevice';
 import { AccountVerification } from './accountVerification';
 import { generateRandomIdText } from '@orm/lib/nanoid';
 import { AccountSettings } from './accountSettings/accountSettings';
@@ -76,8 +76,8 @@ export class Account {
   @OneToOne(() => AccountSettings, accountSettings => accountSettings.account, { cascade: ['insert'] })
   account_settings!: AccountSettings;
 
-  @OneToMany(() => AccountUpDevice, accountUpDevice => accountUpDevice.account)
-  account_up_devices!: AccountUpDevice[];
+  @OneToMany(() => AccountUPDevice, accountUPDevice => accountUPDevice.account)
+  account_up_devices!: AccountUPDevice[];
 
   @OneToMany(() => AccountWebPushDevice, accountWebPushDevice => accountWebPushDevice.account)
   account_web_push_devices!: AccountWebPushDevice[];

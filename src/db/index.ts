@@ -17,7 +17,7 @@ import { AccountNotificationChannel } from "@orm/entities/account/accountNotific
 import { AccountPayPalOrder } from "@orm/entities/account/accountPayPalOrder";
 import { AccountProfile } from "@orm/entities/account/accountProfile";
 import { AccountResetPassword } from "@orm/entities/account/accountResetPassword";
-import { AccountUpDevice } from "@orm/entities/account/accountUPDevice";
+import { AccountUPDevice } from "@orm/entities/account/accountUPDevice";
 import { AccountWebPushDevice } from "@orm/entities/account/accountWebPushDevice";
 import { AccountVerification } from "@orm/entities/account/accountVerification";
 import { Category } from "@orm/entities/category";
@@ -135,7 +135,7 @@ const commonConfig: DataSourceOptions = {
     AccountSettingsLocale,
     AccountSettingsNotification,
     AccountSettingsNotificationType,
-    AccountUpDevice,
+    AccountUPDevice,
     AccountWebPushDevice,
     AccountVerification,
     Category,

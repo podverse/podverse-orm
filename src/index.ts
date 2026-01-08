@@ -141,6 +141,7 @@ export * from './services/account/accountProfile';
 export * from './services/account/accountResetPassword';
 export * from './services/account/accountSettings/accountSettingsLocale';
 export * from './services/account/accountSettings/accountSettingsNotificationType';
+export * from './services/account/accountUPDevice';
 export * from './services/account/accountVerification';
 export * from './services/account/accountWebPushDevice';
 
