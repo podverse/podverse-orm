@@ -13,7 +13,7 @@ export class AccountUPDevice {
   @Column({ type: 'varchar', length: DATABASE_CONSTANTS.varchar_long, nullable: true })
   up_auth_key!: string | null;
 
-  @Column()
+  @Column({ unique: true })
   account_id!: number;
 
   @Column({ type: 'varchar', length: DATABASE_CONSTANTS.varchar_locale })

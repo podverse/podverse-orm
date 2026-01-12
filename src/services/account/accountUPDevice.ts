@@ -25,8 +25,18 @@ export class AccountUPDeviceService extends BaseManyService<AccountUPDevice, 'ac
 
     const locale = account.account_settings?.account_settings_locale?.locale || config.defaults.account.settings.locale;
 
-    const dto: Partial<AccountUPDevice> = { up_endpoint, up_auth_key: up_auth_key, locale };
-    return this._update(account, ['up_endpoint', 'up_auth_key', 'locale'], dto);
+    const existing = await this.repositoryRead.findOne({ where: { account_id } });
+    if (existing) {
+      await this.repositoryReadWrite.remove(existing);
+    }
+
+    const newDevice = this.repositoryReadWrite.create({
+      account_id,
+      up_endpoint,
+      up_auth_key,
+      locale
+    });
+    return this.repositoryReadWrite.save(newDevice);
   }
 
   async update(
@@ -41,29 +51,25 @@ export class AccountUPDeviceService extends BaseManyService<AccountUPDevice, 'ac
 
     const locale = account.account_settings?.account_settings_locale?.locale || config.defaults.account.settings.locale;
 
-    // Match by up_endpoint + account_id
-    const existing = await this.repositoryRead.findOne({ where: { account_id, up_endpoint } });
+    // Since there's only one device per account, find by account_id
+    const existing = await this.repositoryRead.findOne({ where: { account_id } });
     if (existing) {
-      const dto: Partial<AccountUPDevice> = { account, up_endpoint, up_auth_key, locale };
-      return this._update(account, ['up_endpoint', 'up_auth_key', 'locale'], dto, undefined, existing);
+      existing.up_endpoint = up_endpoint;
+      existing.up_auth_key = up_auth_key;
+      existing.locale = locale;
+      return this.repositoryReadWrite.save(existing);
     }
 
     throw new Error('UP Device not found for update.');
   }
 
-  async delete(account_id: number, params: DeleteAccountUPDeviceParams): Promise<void> {
+  async delete(account_id: number): Promise<void> {
     const account = await this.accountService.get(account_id);
     if (!account) {
       throw new Error('Account not found.');
     }
-    const { up_endpoint } = params;
 
-    const existing = await this.repositoryRead.findOne({ where: { account_id, up_endpoint } });
-    if (existing) {
-      return this._delete(account, { up_endpoint });
-    }
-
-    throw new Error('UP Device not found for deletion.');
+    await this.repositoryReadWrite.delete({ account_id });
   }
 
   async getUPSubscriptionsByChannelIdText(channel_id_text: string): Promise<Array<{
@@ -75,8 +81,9 @@ export class AccountUPDeviceService extends BaseManyService<AccountUPDevice, 'ac
     const subscriptions: Array<{ up_endpoint: string; up_auth_key: string | null; locale: string }> = [];
 
     for (const notificationChannel of notificationChannels) {
-      const upDevices = await this.repositoryRead.find({ where: { account_id: notificationChannel.account_id } });
-      for (const device of upDevices) {
+      // Since there's only one device per account, use findOne
+      const device = await this.repositoryRead.findOne({ where: { account_id: notificationChannel.account_id } });
+      if (device) {
         subscriptions.push({
           up_endpoint: device.up_endpoint,
           up_auth_key: device.up_auth_key,
@@ -88,8 +95,8 @@ export class AccountUPDeviceService extends BaseManyService<AccountUPDevice, 'ac
     return subscriptions;
   }
 
-  async getAllForAccount(account_id: number): Promise<AccountUPDevice[]> {
-    return this.repositoryRead.find({ where: { account_id } });
+  async getForAccount(account_id: number): Promise<AccountUPDevice | null> {
+    return this.repositoryRead.findOne({ where: { account_id } });
   }
 
   async getAllForAccountIds(account_ids: number[]): Promise<AccountUPDevice[]> {
