@@ -17,4 +17,7 @@ export class AccountMembershipStatus {
 
   @Column({ type: 'timestamp', nullable: true })
   membership_expires_at?: Date | null;
+
+  @Column({ type: 'boolean', default: false })
+  auto_renew?: boolean;
 }
