@@ -121,6 +121,7 @@ export * from './entities/stats/statsTrackEventItem';
 export * from './entities/stats/statsTrackEventPlaylist';
 
 export * from './lib/typeORMTypes';
+export * from './lib/nanoid';
 
 export * from './services/category';
 
