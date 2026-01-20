@@ -1,6 +1,6 @@
 import { AccountMembershipEnum, SharableStatusEnum, validateEmail, validatePassword,
-  AccountNotificationTypeEnum, ERROR_MESSAGES } from 'podverse-helpers';
-import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
+  AccountNotificationTypeEnum, ERROR_MESSAGES, getSharableStatusIdsForProfileType } from 'podverse-helpers';
+import { FindManyOptions, FindOneOptions, Repository, In, Not, IsNull } from 'typeorm';
 import { Account } from '@orm/entities/account/account';
 import { AppDataSourceRead, AppDataSourceReadWrite } from '@orm/db';
 import { SharableStatus } from '@orm/entities/sharableStatus';
@@ -10,6 +10,7 @@ import { AccountMembershipStatusService } from './accountMembershipStatus';
 import { AccountVerificationService } from './accountVerification';
 import { AccountResetPasswordService } from './accountResetPassword';
 import { AccountProfileService } from './accountProfile';
+import { AccountProfile } from '@orm/entities/account/accountProfile';
 import { AccountSettings } from '@orm/entities/account/accountSettings/accountSettings';
 import { AccountSettingsLocale } from '@orm/entities/account/accountSettings/accountSettingsLocale';
 import { AccountSettingsNotification } from '@orm/entities/account/accountSettings/accountSettingsNotification';
@@ -23,9 +24,9 @@ type CreateAccountDto = {
 }
 
 type UpdateAccountDto = {
-  display_name?: string;
-  bio?: string;
-  sharable_status?: SharableStatusEnum;
+  display_name: string | null;
+  bio: string | null;
+  sharable_status: SharableStatusEnum;
   locale: string;
 };
 
@@ -86,6 +87,39 @@ export class AccountService {
     return this.repositoryRead.find(config);
   }
 
+  async getManyPublic(config: FindManyOptions<Account>): Promise<Account[]> {
+    const sharableStatusIds = getSharableStatusIdsForProfileType('global');
+    return this.repositoryRead.find({
+      ...config,
+      where: {
+        ...config.where,
+        sharable_status: { id: In(sharableStatusIds) },
+        account_profile: {
+          display_name: Not(IsNull())
+        }
+      }
+    });
+  }
+
+  async getManySubscribed(accountIds: number[], config: FindManyOptions<Account>): Promise<Account[]> {
+    if (accountIds.length === 0) {
+      return [];
+    }
+    
+    const sharableStatusIds = getSharableStatusIdsForProfileType('subscribed');
+    return this.repositoryRead.find({
+      ...config,
+      where: {
+        ...config.where,
+        id: In(accountIds),
+        sharable_status: { id: In(sharableStatusIds) },
+        account_profile: {
+          display_name: Not(IsNull())
+        }
+      }
+    });
+  }
+
   async create(dto: CreateAccountDto, qaVerified?: boolean) {
     if (!validateEmail(dto.email)) {
       throw new Error('Invalid email');
@@ -115,6 +149,15 @@ export class AccountService {
     const account = await this.repositoryReadWrite.save(accountObj);
 
     await this.ensureAccountSettings(account, { alwaysCreate: true, locale: dto.locale });
+    
+    // Create account_profile row with null display_name and bio
+    const accountProfileRepo = AppDataSourceReadWrite.getRepository(AccountProfile);
+    const accountProfile = new AccountProfile();
+    accountProfile.account = account;
+    accountProfile.display_name = null;
+    accountProfile.bio = null;
+    await accountProfileRepo.save(accountProfile);
+    
     const saltedPassword = await hashPassword(dto.password);
     
     await accountCredentialsService.update(account, {
@@ -138,25 +181,24 @@ export class AccountService {
       throw new Error('Account not found');
     }
   
-    if (dto.display_name !== undefined || dto.bio !== undefined) {
-      const accountProfileService = new AccountProfileService();
-      const accountProfileDto = {
-        display_name: dto.display_name,
-        bio: dto.bio
-      };
-      await accountProfileService.update(account, accountProfileDto);
-    }
+    // Always update account profile
+    const accountProfileService = new AccountProfileService();
+    const accountProfileDto = {
+      display_name: dto.display_name,
+      bio: dto.bio
+    };
+    await accountProfileService.update(account, accountProfileDto);
   
-    if (dto.sharable_status !== undefined) {
-      const sharableStatusRepository = AppDataSourceRead.getRepository(SharableStatus);
-      const sharableStatus = await sharableStatusRepository.findOne({ where: { id: dto.sharable_status } });
-      if (!sharableStatus) {
-        throw new Error('SharableStatus not found');
-      }
-      account.sharable_status = sharableStatus;
-      await this.repositoryReadWrite.save(account);
+    // Always update sharable status
+    const sharableStatusRepository = AppDataSourceRead.getRepository(SharableStatus);
+    const sharableStatus = await sharableStatusRepository.findOne({ where: { id: dto.sharable_status } });
+    if (!sharableStatus) {
+      throw new Error('SharableStatus not found');
     }
+    account.sharable_status = sharableStatus;
+    await this.repositoryReadWrite.save(account);
 
+    // Always update locale
     const accountSettings = await AppDataSourceReadWrite.getRepository(AccountSettings).findOne({
       where: { account_id },
       relations: ['account_settings_locale']
