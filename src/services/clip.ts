@@ -197,6 +197,49 @@ export class ClipService extends BaseManyService<Clip, 'account'> {
     return this._getAll(account);
   }
 
+  async getManyByAccountIdTextAndCount(
+    account_id_text: string,
+    config: FindManyOptions<Clip>
+  ): Promise<[Clip[], number]> {
+    return this.repositoryRead.findAndCount({
+      where: {
+        account: {
+          id_text: account_id_text
+        },
+        item: {
+          channel: {
+            feed: {
+              feed_flag_status: In([FeedFlagStatusStatusEnum.Active, FeedFlagStatusStatusEnum.AlwaysParse])
+            }
+          }
+        }
+      },
+      ...config
+    });
+  }
+
+  async getManyByAccountIdTextPublicAndCount(
+    account_id_text: string,
+    config: FindManyOptions<Clip>
+  ): Promise<[Clip[], number]> {
+    return this.repositoryRead.findAndCount({
+      where: {
+        account: {
+          id_text: account_id_text
+        },
+        sharable_status_id: SharableStatusEnum.Public,
+        item: {
+          channel: {
+            feed: {
+              feed_flag_status: In([FeedFlagStatusStatusEnum.Active, FeedFlagStatusStatusEnum.AlwaysParse])
+            }
+          }
+        }
+      },
+      ...config
+    });
+  }
+
   async getRandomClip(medium_id: number): Promise<Clip | null> {
     let query = this.repositoryRead.createQueryBuilder('clip')
       .innerJoin('clip.item', 'item')

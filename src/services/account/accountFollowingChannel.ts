@@ -1,9 +1,10 @@
-import { getMediumIdArrayFromType, MediumEnum, QueryParamsMedium } from 'podverse-helpers';
+import { getMediumIdArrayFromType, QueryParamsMedium } from 'podverse-helpers';
 import { EntityManager, Equal, FindManyOptions, In } from 'typeorm';
 import { AccountFollowingChannel } from '@orm/entities/account/accountFollowingChannel';
 import { BaseManyService } from '@orm/services/base/baseManyService';
 import { AccountService } from '@orm/services/account/account';
 import { ChannelService } from '../channel/channel';
+import { FeedFlagStatusStatusEnum } from '@orm/entities/feed/feedFlagStatus';
 
 export class AccountFollowingChannelService extends BaseManyService<AccountFollowingChannel, 'account'> {
   private accountService: AccountService;
@@ -51,11 +52,13 @@ export class AccountFollowingChannelService extends BaseManyService<AccountFollo
 
     const where: FindManyOptions<AccountFollowingChannel>['where'] = {
       account_id: Equal(account.id),
+      channel: {
+        feed: {
+          feed_flag_status: In([FeedFlagStatusStatusEnum.Active, FeedFlagStatusStatusEnum.AlwaysParse])
+        },
+        ...(medium_ids ? { medium_id: In(medium_ids) } : {})
+      }
     };
-
-    if (medium_ids) {
-      where['channel'] = { medium_id: In(medium_ids) };
-    }
 
     const finalConfig = {
       ...config,
@@ -97,5 +100,35 @@ export class AccountFollowingChannelService extends BaseManyService<AccountFollo
     }
 
     return this._delete(account, { channel_id: channel.id });
+  }
+
+  async getFollowedChannelsByAccountIdTextWithCount(
+    account_id_text: string,
+    mediumType: QueryParamsMedium | null = null,
+    config?: FindManyOptions<AccountFollowingChannel>
+  ): Promise<{ count: number; results: AccountFollowingChannel[] }> {
+    const medium_ids = mediumType ? getMediumIdArrayFromType(mediumType) : null;
+
+    const account = await this.accountService.getByIdText(account_id_text);
+    if (!account) {
+      throw new Error("Account not found.");
+    }
+
+    const where: FindManyOptions<AccountFollowingChannel>['where'] = {
+      account_id: Equal(account.id),
+      channel: {
+        feed: {
+          feed_flag_status: In([FeedFlagStatusStatusEnum.Active, FeedFlagStatusStatusEnum.AlwaysParse])
+        },
+        ...(medium_ids ? { medium_id: In(medium_ids) } : {})
+      }
+    };
+
+    const finalConfig = {
+      ...config,
+      where
+    };
+
+    return this._getAllWithCount(account, finalConfig);
   }
 }

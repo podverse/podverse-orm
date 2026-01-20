@@ -152,4 +152,35 @@ export class PlaylistService extends BaseManyService<Playlist, 'account'> {
 
     return this.repositoryRead.find(options);
   }
+
+  async getManyByAccountIdTextAndCount(
+    account_id_text: string,
+    options?: FindManyOptions<Playlist>
+  ): Promise<[Playlist[], number]> {
+    return this.repositoryRead.findAndCount({
+      ...options,
+      where: {
+        ...options?.where,
+        account: {
+          id_text: account_id_text
+        }
+      }
+    });
+  }
+
+  async getManyByAccountIdTextPublicAndCount(
+    account_id_text: string,
+    options?: FindManyOptions<Playlist>
+  ): Promise<[Playlist[], number]> {
+    return this.repositoryRead.findAndCount({
+      ...options,
+      where: {
+        ...options?.where,
+        account: {
+          id_text: account_id_text
+        },
+        sharable_status_id: SharableStatusEnum.Public
+      }
+    });
+  }
 }
