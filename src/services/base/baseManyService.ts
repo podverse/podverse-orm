@@ -19,20 +19,30 @@ export class BaseManyService<T extends ObjectLiteral, K extends keyof T> {
     this.transactionalEntityManager = transactionalEntityManager;
   }
 
+  private getParentWhereValue(parentEntity: T[K]) {
+    if (parentEntity && typeof parentEntity === 'object' && 'id' in parentEntity) {
+      return { id: (parentEntity as { id: number | string }).id };
+    }
+    return parentEntity;
+  }
+
   public async _getAll(parentEntity: T[K], config?: FindManyOptions<T>): Promise<T[]> {
-    const where: FindOptionsWhere<T> = { [this.parentEntityKey]: parentEntity } as FindOptionsWhere<T>;
+    const parentWhereValue = this.getParentWhereValue(parentEntity);
+    const where: FindOptionsWhere<T> = { [this.parentEntityKey]: parentWhereValue } as FindOptionsWhere<T>;
     return this.repositoryRead.find({ where, ...config });
   }
 
   public async _getAllWithCount(parentEntity: T[K], config?: FindManyOptions<T>): Promise<{ count: number; results: T[] }> {
-    const where: FindOptionsWhere<T> = { [this.parentEntityKey]: parentEntity } as FindOptionsWhere<T>;
+    const parentWhereValue = this.getParentWhereValue(parentEntity);
+    const where: FindOptionsWhere<T> = { [this.parentEntityKey]: parentWhereValue } as FindOptionsWhere<T>;
     const [results, count] = await this.repositoryRead.findAndCount({ where, ...config });
     return { count, results };
   }
 
   public async _get(parentEntity: T[K], whereKeyValues: Record<string,unknown>, config?: FindOneOptions<T>): Promise<T | null> {
+    const parentWhereValue = this.getParentWhereValue(parentEntity);
     const where: FindOptionsWhere<T> = {
-      [this.parentEntityKey]: parentEntity,
+      [this.parentEntityKey]: parentWhereValue,
       ...whereKeyValues
     } as FindOptionsWhere<T>;
     return this.repositoryRead.findOne({ where, ...config });
