@@ -1,7 +1,6 @@
 export const config = {
   nodeEnv: process.env.NODE_ENV || 'development',
   database: {
-    type: process.env.DB_TYPE || 'postgres',
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '5432', 10),
     read_username: process.env.DB_READ_USERNAME || 'read',
