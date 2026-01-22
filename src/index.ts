@@ -127,6 +127,7 @@ export * from './services/category';
 
 export * from './services/account/account';
 export * from './services/account/accountCredentials';
+export * from './services/account/accountDataExport';
 export * from './services/account/accountEmailChangeVerification';
 export * from './services/account/accountFCMDevice';
 export * from './services/account/accountFollowingAccount';
