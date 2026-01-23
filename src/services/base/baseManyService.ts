@@ -1,8 +1,7 @@
 import { EntityManager, FindManyOptions, FindOneOptions, FindOptionsWhere, ObjectLiteral, Repository } from "typeorm";
-import { AppDataSourceRead, AppDataSourceReadWrite } from "@orm/db";
+import { getDataSourceRead, getDataSourceReadWrite, getLoggerService } from "@orm/context";
 import { applyProperties } from "@orm/lib/applyProperties";
 import { hasDifferentValues } from "@orm/lib/hasDifferentValues";
-import { loggerService } from "@orm/factories/loggerService";
 
 export class BaseManyService<T extends ObjectLiteral, K extends keyof T> {
   protected repositoryRead: Repository<T>;
@@ -14,8 +13,8 @@ export class BaseManyService<T extends ObjectLiteral, K extends keyof T> {
   constructor(targetEntity: { new (): T }, parentEntityKey: K, transactionalEntityManager?: EntityManager) {
     this.targetEntity = targetEntity;
     this.parentEntityKey = parentEntityKey;
-    this.repositoryRead = AppDataSourceRead.getRepository(targetEntity) as Repository<T>;
-    this.repositoryReadWrite = AppDataSourceReadWrite.getRepository(targetEntity) as Repository<T>;
+    this.repositoryRead = getDataSourceRead().getRepository(targetEntity) as Repository<T>;
+    this.repositoryReadWrite = getDataSourceReadWrite().getRepository(targetEntity) as Repository<T>;
     this.transactionalEntityManager = transactionalEntityManager;
   }
 
@@ -76,6 +75,7 @@ export class BaseManyService<T extends ObjectLiteral, K extends keyof T> {
     }
 
     entity = applyProperties(entity, dto);
+    const loggerService = getLoggerService();
     loggerService.debug(`Updating entity ${JSON.stringify(entity)}`);
     loggerService.debug(`With DTO ${JSON.stringify(dto)}`);
 
@@ -92,7 +92,7 @@ export class BaseManyService<T extends ObjectLiteral, K extends keyof T> {
     const existingEntities = await this._getAll(parentEntity);
 
     const existingIdentifiers = dtos.map((dto: Partial<T>) => {
-      let identifier: Partial<T> = {};
+      const identifier: Partial<T> = {};
       for (const whereKey of whereKeys) {
         identifier[whereKey] = dto[whereKey];
       }
@@ -127,7 +127,7 @@ export class BaseManyService<T extends ObjectLiteral, K extends keyof T> {
       ?? this.repositoryReadWrite).save(updatedEntities);
   
     const entitiesToDelete = existingEntities.filter(existingEntity => {
-      let identifier: Partial<T> = {};
+      const identifier: Partial<T> = {};
       for (const whereKey of whereKeys) {
         identifier[whereKey] = existingEntity[whereKey];
       }

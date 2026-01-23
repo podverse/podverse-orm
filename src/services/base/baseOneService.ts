@@ -1,8 +1,7 @@
 import { EntityManager, FindOneOptions, FindOptionsWhere, ObjectLiteral, Repository } from "typeorm";
-import { AppDataSourceRead, AppDataSourceReadWrite } from "@orm/db";
+import { getDataSourceRead, getDataSourceReadWrite, getLoggerService } from "@orm/context";
 import { applyProperties } from "@orm/lib/applyProperties";
 import { hasDifferentValues } from "@orm/lib/hasDifferentValues";
-import { loggerService } from "@orm/factories/loggerService";
 
 export class BaseOneService<T extends ObjectLiteral, K extends keyof T> {
   private parentEntityKey: K;
@@ -12,8 +11,8 @@ export class BaseOneService<T extends ObjectLiteral, K extends keyof T> {
 
   constructor(entity: { new (): T }, parentEntityKey: K, transactionalEntityManager?: EntityManager) {
     this.parentEntityKey = parentEntityKey;
-    this.repositoryRead = AppDataSourceRead.getRepository(entity) as Repository<T>;
-    this.repositoryReadWrite = AppDataSourceReadWrite.getRepository(entity) as Repository<T>;
+    this.repositoryRead = getDataSourceRead().getRepository(entity) as Repository<T>;
+    this.repositoryReadWrite = getDataSourceReadWrite().getRepository(entity) as Repository<T>;
     this.transactionalEntityManager = transactionalEntityManager;
   }
 
@@ -24,6 +23,7 @@ export class BaseOneService<T extends ObjectLiteral, K extends keyof T> {
 
   async _update(parentEntity: T[K], dto: Partial<T>, config?: FindOneOptions<T>): Promise<T> {
     let entity = await this._get(parentEntity, config);
+    const loggerService = getLoggerService();
 
     loggerService.debug(`parentEntityKey: ${this.parentEntityKey as string}`);
     loggerService.debug(`dto: ${dto ? JSON.stringify(dto) : 'null'}`);

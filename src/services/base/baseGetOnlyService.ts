@@ -1,5 +1,5 @@
 import { FindManyOptions, FindOneOptions, FindOptionsWhere, ObjectLiteral, Repository } from "typeorm";
-import { AppDataSourceRead } from "@orm/db";
+import { getDataSourceRead } from "@orm/context";
 
 interface EntityWithId extends ObjectLiteral {
   id: number;
@@ -9,7 +9,7 @@ export class BaseGetOnlyService<T extends EntityWithId> {
   protected repositoryRead: Repository<T>;
 
   constructor(entity: { new (): T }) {
-    this.repositoryRead = AppDataSourceRead.getRepository(entity) as Repository<T>;
+    this.repositoryRead = getDataSourceRead().getRepository(entity) as Repository<T>;
   }
 
   async get(id: number, config?: FindOneOptions<T>): Promise<T | null> {

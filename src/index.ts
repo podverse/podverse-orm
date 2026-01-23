@@ -6,8 +6,16 @@ export type {
   FindOptionsOrder
 } from 'typeorm';
 
+// Config types for app-level configuration
 export * from './config';
 
+// Factory function to create the ORM context
+export { createORMContext, ORMContext } from './factory';
+
+// Context accessors for advanced use cases
+export { getDataSourceRead, getDataSourceReadWrite, getLoggerService, getORMConfig } from './context';
+
+// DB exports (proxies to context for backwards compatibility)
 export * from './db';
 
 export * from './entities/account/account';

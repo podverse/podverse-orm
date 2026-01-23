@@ -1,25 +1,15 @@
-export const config = {
-  nodeEnv: process.env.NODE_ENV || 'development',
-  database: {
-    host: process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.DB_PORT || '5432', 10),
-    read_username: process.env.DB_READ_USERNAME || 'read',
-    read_password: process.env.DB_READ_PASSWORD || '',
-    read_write_username: process.env.DB_READ_WRITE_USERNAME || 'read_write',
-    read_write_password: process.env.DB_READ_WRITE_PASSWORD || '',
-    database: process.env.DB_DATABASE || 'db',
-    ssl_connection: process.env.DB_SSL_CONNECTION === 'true',
-  },
-  log: {
-    level: process.env.LOG_LEVEL || 'info',
-    dir: process.env.LOG_DIR || 'logs',
-    timer: process.env.LOG_TIMER === 'true',
-  },
-  defaults: {
-    account: {
-      settings: {
-        locale: process.env.DEFAULT_ACCOUNT_SETTINGS_LOCALE || 'en-US',
-      }
-    }
+// Re-export config types for app-level use
+export * from './types';
+
+// Re-export config from context for backwards compatibility
+// This creates a proxy that delegates to the context's config
+// Apps should use createORMContext() and access config from the returned context
+import { getORMConfig } from "@orm/context";
+
+// Create a proxy object that delegates property access to the context's config
+// This allows code using `config.defaults.account.settings.locale` to work
+export const config = new Proxy({} as ReturnType<typeof getORMConfig>, {
+  get(_target, prop) {
+    return getORMConfig()[prop as keyof ReturnType<typeof getORMConfig>];
   }
-};
+});
